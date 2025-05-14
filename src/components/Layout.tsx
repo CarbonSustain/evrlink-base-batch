@@ -46,8 +46,17 @@ const Layout = () => {
           <span className="text-xl font-display font-medium bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Evrlink</span>
         </Link>
 
-        {/* Wallet Connection */}
-        <div className="flex items-center">
+        {/* Wallet Connection and Sign In */}
+        <div className="flex items-center gap-4">
+          <Link to="/sign-in">
+            <Button 
+              variant="outline"
+              className="flex items-center gap-2 border-white/30 bg-white/10 text-white hover:bg-white/20"
+            >
+              Sign In
+            </Button>
+          </Link>
+
           {address ? (
             <AccountMenu address={address} />
           ) : (

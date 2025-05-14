@@ -838,6 +838,115 @@ export const getCurrentUser = async (): Promise<User | null> => {
     return null;
   }
 };
+// Associate email with wallet address
+export const associateEmailWithWallet = async (email: string, walletAddress: string): Promise<any> => {
+  try {
+    console.log('Associating email with wallet:', { email, walletAddress });
+    
+    // Make the API call without auth headers initially, since this might be called before login
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    const token = localStorage.getItem('token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    // Debug the API URL being used
+    const apiUrl = `${API_BASE_URL}/api/auth/email-wallet`;
+    console.log('API URL for email-wallet association:', apiUrl);
+    
+    const response = await axios.post(
+      apiUrl,
+      { email, walletAddress },
+      { headers }
+    );
+    
+    console.log('Email-wallet association response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error associating email with wallet:', error);
+    console.error('Error details:', error.response?.data || error.message);
+    
+    // Log the specific error for debugging
+    if (error.response) {
+      console.error('Status:', error.response.status);
+      console.error('Status Text:', error.response.statusText);
+      console.error('Response Data:', error.response.data);
+      console.error('Request URL:', error.config?.url);
+      console.error('Request Method:', error.config?.method);
+    }
+    
+    // Throw a more detailed error
+    if (error.response?.data?.error) {
+      throw new Error(error.response.data.error);
+    }
+    throw new Error('Failed to associate email with wallet: ' + error.message);
+  }
+};
+
+// Get wallet by email
+export const getWalletByEmail = async (email: string): Promise<string | null> => {
+  try {
+    console.log('Getting wallet for email:', email);
+    
+    // Make the API call without auth headers initially
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    const token = localStorage.getItem('token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await axios.get(`${API_BASE_URL}/api/auth/email-wallet`, {
+      params: { email },
+      headers
+    });
+    
+    console.log('Get wallet by email response:', response.data);
+    
+    if (response.data && response.data.walletAddress) {
+      return response.data.walletAddress;
+    }
+    return null;
+  } catch (error: any) {
+    // If the error is 404 (not found), that's an expected case - just return null
+    if (error.response && error.response.status === 404) {
+      console.log('No wallet found for email:', email);
+      return null;
+    }
+    
+    console.error('Error getting wallet for email:', error);
+    console.error('Error details:', error.response?.data || error.message);
+    
+    // For other errors, log but don't throw - just return null
+    return null;
+  }
+};
+
+// Login with email
+export const loginWithEmail = async (email: string): Promise<any> => {
+  try {
+    // First check if the email has an associated wallet
+    const walletAddress = await getWalletByEmail(email);
+    
+    // If no wallet exists, return null indicating we need to create one
+    if (!walletAddress) {
+      return null;
+    }
+    
+    // Otherwise, authenticate with the existing wallet
+    // Create a mock signature for development
+    const signature = `mock_signature_for_${walletAddress}`;
+    return await loginWithWallet(walletAddress, signature);
+  } catch (error) {
+    console.error('Error logging in with email:', error);
+    throw new Error('Failed to login with email');
+  }
+};
 
 // Logout
 export const logout = (): void => {
