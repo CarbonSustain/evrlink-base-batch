@@ -56,7 +56,6 @@ const Layout = () => {
               Sign In
             </Button>
           </Link>
-
           {address ? (
             <AccountMenu address={address} />
           ) : (

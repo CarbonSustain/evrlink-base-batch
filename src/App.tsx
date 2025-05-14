@@ -23,6 +23,7 @@ import CreateBackground from "./pages/CreateBackground";
 import Debug from "./pages/Debug";
 import ProfilePage from "./pages/ProfilePage";
 import SignIn from "./pages/SignIn";
+import Dashboard from "./pages/Dashboard";
 import { User } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -63,7 +64,8 @@ const App = () => (
                 <Route path="debug" element={<Debug />} />
               </Route>
               {/* Auth routes outside of Layout */}
-              <Route path="sign-in" element={<SignIn />} />
+              <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

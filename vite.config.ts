@@ -12,9 +12,9 @@ export default defineConfig(({ mode }) => ({
     proxy: {
       // Proxy API requests to bypass CORS during development
       '/api': {
-        target: 'https://api.evrlink.com',
+        target: mode === 'development' ? 'http://localhost:3001' : 'https://api.evrlink.com',
         changeOrigin: true,
-        secure: true,
+        secure: false, // Set to false for local development
         rewrite: (path) => path
       }
     }
@@ -44,5 +44,9 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
+  },
+  define: {
+    // Make environment variables available in the code
+    'import.meta.env.VITE_USE_PROXY': JSON.stringify(process.env.VITE_USE_PROXY || 'true'),
   },
 }));

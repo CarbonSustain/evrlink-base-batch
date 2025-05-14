@@ -24,7 +24,7 @@ const SignIn = () => {
   // If already connected, redirect to dashboard
   useEffect(() => {
     if (isConnected) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isConnected, navigate]);
 
@@ -68,7 +68,7 @@ const SignIn = () => {
           
           // Connect through WalletContext
           await connect(authResponse.user.walletAddress);
-          navigate('/');
+          navigate('/dashboard');
           return;
         }
       } catch (loginError: any) {
@@ -126,7 +126,7 @@ const SignIn = () => {
         await connect(address);
         
         toast.success('Successfully created and authenticated your account!');
-        navigate('/');
+        navigate('/dashboard');
       } catch (authError: any) {
         console.error('Authentication error:', authError);
         toast.error('Authentication failed: ' + (authError.message || 'Unknown error'));
@@ -160,7 +160,7 @@ const SignIn = () => {
       console.log('Wallet connected through WalletContext');
       
       // Navigate to dashboard after successful connection
-      navigate('/');
+      navigate('/dashboard');
       return true;
     } catch (error: any) {
       console.error('Wallet context connection error:', error);
