@@ -174,12 +174,20 @@ export function useAgent(userId: string = `user_${Math.random().toString(36).sub
     setIsOfflineMode(prev => !prev);
   };
 
+  /**
+   * Sets offline mode directly
+   */
+  const setOfflineMode = (value: boolean) => {
+    setIsOfflineMode(value);
+  };
+
   return { 
     messages, 
     sendMessage, 
     isThinking, 
     clearHistory,
     isOfflineMode,
-    toggleOfflineMode
+    toggleOfflineMode,
+    setOfflineMode
   };
 }

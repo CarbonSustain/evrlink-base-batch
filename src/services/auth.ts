@@ -20,6 +20,12 @@ class AuthService {
   getWalletAddress(): string | null {
     return localStorage.getItem('walletAddress');
   }
+  
+  // Get the user's role ID from local storage
+  getUserRoleId(): number {
+    const roleId = localStorage.getItem('userRoleId');
+    return roleId ? parseInt(roleId, 10) : 1; // Default to role 1 if not present
+  }
 
   // Check if user is authenticated
   isAuthenticated(): boolean {
@@ -78,6 +84,15 @@ class AuthService {
         localStorage.setItem('token', response.token);
         localStorage.setItem('walletAddress', walletAddress);
         
+        // Store user role ID if available
+        if (response.user && response.user.roleId !== undefined) {
+          console.log('Storing user role ID:', response.user.roleId);
+          localStorage.setItem('userRoleId', response.user.roleId.toString());
+        } else {
+          console.log('No roleId in response, using default');
+          localStorage.setItem('userRoleId', '1'); // Default to role 1 (offline chatbot)
+        }
+        
         // Verify the token was stored
         const storedToken = localStorage.getItem('token');
         if (storedToken !== response.token) {
@@ -86,6 +101,13 @@ class AuthService {
         }
         
         console.log('Authentication completed successfully');
+        
+        // Dispatch a custom event to notify other components
+        const authEvent = new CustomEvent('authStateChanged', { 
+          detail: { authenticated: true, roleId: response.user?.roleId || 1 } 
+        });
+        document.dispatchEvent(authEvent);
+        console.log('Dispatched authStateChanged event');
       } else {
         console.error('No token received in authentication response');
         throw new Error('Authentication failed - no token received');
@@ -96,6 +118,7 @@ class AuthService {
       // Clear any partial authentication state
       localStorage.removeItem('token');
       localStorage.removeItem('walletAddress');
+      localStorage.removeItem('userRoleId');
       
       if (error instanceof Error) {
         throw new Error(`Failed to authenticate wallet: ${error.message}`);

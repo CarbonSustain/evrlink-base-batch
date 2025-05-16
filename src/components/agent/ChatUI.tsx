@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import { useAgent } from "../../hooks/useAgent";
+import authService from "../../services/auth";
+import { getChatbotMode } from "../../services/chatbot";
 
 // Suggested questions and their answers in offline mode
 const SUGGESTED_QA: Record<string, string> = {
@@ -47,8 +49,59 @@ interface Message {
 
 export const ChatUI: React.FC<ChatUIProps> = ({ isMinimized, onMinimize, onClose }) => {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, isThinking, isOfflineMode, toggleOfflineMode, clearHistory } = useAgent();
+  const { messages, sendMessage, isThinking, isOfflineMode, toggleOfflineMode, clearHistory, setOfflineMode } = useAgent();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [userRoleId, setUserRoleId] = useState<number>(1); // Default to role 1
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Initialize the chat mode based on user role from the database
+  useEffect(() => {
+    const fetchChatbotMode = async () => {
+      try {
+        // Only fetch mode if user is authenticated
+        if (authService.isAuthenticated()) {
+          setIsLoading(true);
+
+          // Get chatbot mode from API
+          const modeResponse = await getChatbotMode();
+
+          if (modeResponse) {
+            console.log('Chatbot mode determined from API:', modeResponse);
+
+            // Update the role ID state
+            setUserRoleId(modeResponse.roleId || 1);
+
+            // Set the offline mode based on API response
+            const shouldBeOffline = modeResponse.mode === 'offline';
+            setOfflineMode(shouldBeOffline);
+
+            console.log(`Setting chatbot to ${shouldBeOffline ? 'offline' : 'online'} mode based on role_id ${modeResponse.roleId}`);
+          } else {
+            // Fallback to local storage if API fails
+            const localRoleId = authService.getUserRoleId();
+            setUserRoleId(localRoleId);
+
+            // Apply role-based access: role_id 1 gets offline, all others get online
+            const shouldBeOffline = localRoleId === 1;
+            setOfflineMode(shouldBeOffline);
+
+            console.log(`Fallback: Setting chatbot to ${shouldBeOffline ? 'offline' : 'online'} mode based on local role_id ${localRoleId}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching chatbot mode:', error);
+
+        // Fallback to default if there's an error
+        const localRoleId = authService.getUserRoleId();
+        setUserRoleId(localRoleId);
+        setOfflineMode(localRoleId === 1);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchChatbotMode();
+  }, [setOfflineMode]);
 
   // Function to scroll to the bottom
   const scrollToBottom = () => {
@@ -98,12 +151,15 @@ export const ChatUI: React.FC<ChatUIProps> = ({ isMinimized, onMinimize, onClose
       <div className="bg-blue-600 text-white p-3 flex justify-between items-center">
         <h3 className="font-semibold">Evrlink Assistant {isOfflineMode && "(Offline Mode)"}</h3>
         <div className="flex items-center space-x-1">
-          <button 
-            onClick={toggleOfflineMode}
-            className="text-white hover:text-gray-200 px-2 py-1 text-xs rounded-full border border-white/30"
-          >
-            {isOfflineMode ? "Go Online" : "Go Offline"}
-          </button>
+          {userRoleId === 1 ? (
+            <span className="text-white px-2 py-1 text-xs rounded-full border border-white/30">
+              Offline Mode Only
+            </span>
+          ) : (
+            <span className="text-white px-2 py-1 text-xs rounded-full border border-white/30">
+              Online Mode
+            </span>
+          )}
           {messages.length > 0 && (
             <button 
               onClick={clearHistory}
