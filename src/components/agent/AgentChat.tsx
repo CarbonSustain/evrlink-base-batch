@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAgent } from "../../hooks/useAgent";
+import ReactMarkdown from "react-markdown";
 
 // Generate a persistent user ID or retrieve from local storage
 const getUserId = () => {
@@ -25,7 +26,50 @@ const AgentMessage = ({ text, sender }: { text: string; sender: "user" | "agent"
           : "bg-gray-200 text-gray-800"
       }`}
     >
-      <div className="whitespace-pre-wrap break-words text-sm md:text-base">{text}</div>
+      {sender === "user" ? (
+        <div className="whitespace-pre-wrap break-words text-sm md:text-base">{text}</div>
+      ) : (
+        <div className="text-sm md:text-base whitespace-pre-wrap break-words">
+          <ReactMarkdown
+            components={{
+              a: props => (
+                <a
+                  {...props}
+                  className="text-blue-600 underline hover:text-blue-800"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              ),
+              p: props => (
+                <p {...props} className="whitespace-pre-wrap mb-2" />
+              ),
+              code: props => (
+                <code {...props} className="bg-gray-100 px-1 rounded" />
+              ),
+              li: props => (
+                <li {...props} className="ml-4" />
+              ),
+              ul: props => (
+                <ul {...props} className="list-disc ml-4 mb-2" />
+              ),
+              ol: props => (
+                <ol {...props} className="list-decimal ml-4 mb-2" />
+              ),
+              h1: props => (
+                <h1 {...props} className="text-xl font-bold mb-2" />
+              ),
+              h2: props => (
+                <h2 {...props} className="text-lg font-bold mb-1" />
+              ),
+              h3: props => (
+                <h3 {...props} className="text-base font-bold mb-1" />
+              )
+            }}
+          >
+            {text}
+          </ReactMarkdown>
+        </div>
+      )}
     </div>
   );
 };
@@ -103,7 +147,7 @@ export const AgentChat = ({ userId: propUserId }: AgentChatProps = {}) => {
           <div 
             className="flex items-center cursor-pointer mr-2" 
             onClick={toggleOfflineMode}
-            title={isOfflineMode ? "Switch to online mode" : "Switch to offline mode"}
+            title={isOfflineMode ? "Switch to online mode" : "Switch to online mode with onchain agent"}
           >
             <span className="text-xs mr-1">Offline</span>
             <div className={`w-8 h-4 rounded-full transition-colors ${isOfflineMode ? 'bg-green-400' : 'bg-gray-400'} relative`}>

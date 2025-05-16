@@ -50,20 +50,28 @@ async function messageAgent(userMessage: string, offlineMode: boolean = false, u
   }
 
   try {
-    // Try the enhanced AgentKit chatbot endpoint first (running on port 3000)
-    const chatbotUrl = "http://localhost:3000/api/agent";
-    
-    console.log("Connecting to enhanced AgentKit chatbot at:", chatbotUrl);
+    // Connect to our new onchain agent backend on port 3001
+    const agentUrl = "http://localhost:3001/api/agent";
+
+    console.log("Connecting to onchain agent backend at:", agentUrl);
     console.log("Sending message:", userMessage);
     console.log("User ID:", userId);
-    
-    const response = await fetch(chatbotUrl, {
+
+    const response = await fetch(agentUrl, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
+        "Accept": "application/json"
       },
-      // Send the message and userId in the format expected by the enhanced chatbot
-      body: JSON.stringify({ userMessage, userId } as AgentRequest),
+      body: JSON.stringify({
+        message: userMessage,
+        userId,
+        context: {
+          platform: "Evrlink",
+          features: ["gift_cards", "nft_backgrounds", "wallet_management"],
+          userId
+        }
+      }),
     });
 
     if (!response.ok) {
@@ -73,7 +81,7 @@ async function messageAgent(userMessage: string, offlineMode: boolean = false, u
     const data = (await response.json()) as AgentResponse;
     return data.response ?? data.error ?? null;
   } catch (error) {
-    console.error("Error communicating with enhanced AgentKit chatbot:", error);
+    console.error("Error communicating with onchain agent:", error);
     
     // Try the original backend endpoint as fallback
     try {
