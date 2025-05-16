@@ -9,7 +9,7 @@ export const getApiBaseUrl = () => {
   if (import.meta.env.MODE === "development") {
     console.log("Using development API URL");
     // Check if we should use the proxy (empty string) or direct URL
-    const useProxy = import.meta.env.VITE_USE_PROXY === 'true';
+    const useProxy = import.meta.env.VITE_USE_PROXY === "true";
     if (useProxy) {
       console.log("Using proxy configuration");
       return ""; // Empty string will use relative URLs that go through the proxy
@@ -18,7 +18,7 @@ export const getApiBaseUrl = () => {
       return "http://localhost:3001"; // Direct connection to backend
     }
   }
-  
+
   // For production, use the environment variable
   let baseUrl = import.meta.env.VITE_API_URL;
 
@@ -36,7 +36,7 @@ export const getApiBaseUrl = () => {
 };
 
 // Use the function to get the base URL
-export const API_BASE_URL = getApiBaseUrl();
+export const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 // Ensure the base URL is reasonable
 if (!API_BASE_URL.startsWith("http")) {
@@ -251,7 +251,10 @@ export const createGiftCard = async (data: {
 }): Promise<any> => {
   try {
     // Get the total required price from backend (including fees)
-    const totalResult = await getGiftCardTotalRequired(data.backgroundId, data.price);
+    const totalResult = await getGiftCardTotalRequired(
+      data.backgroundId,
+      data.price
+    );
     if (!totalResult.success) {
       return {
         success: false,
@@ -862,75 +865,80 @@ export const getCurrentUser = async (): Promise<User | null> => {
   }
 };
 // Associate email with wallet address
-export const associateEmailWithWallet = async (email: string, walletAddress: string): Promise<any> => {
+export const associateEmailWithWallet = async (
+  email: string,
+  walletAddress: string
+): Promise<any> => {
   try {
-    console.log('Associating email with wallet:', { email, walletAddress });
-    
+    console.log("Associating email with wallet:", { email, walletAddress });
+
     // Make the API call without auth headers initially, since this might be called before login
     const headers = {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     };
-    
-    const token = localStorage.getItem('token');
+
+    const token = localStorage.getItem("token");
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
-    
+
     // Debug the API URL being used
     const apiUrl = `${API_BASE_URL}/api/auth/email-wallet`;
-    console.log('API URL for email-wallet association:', apiUrl);
-    
+    console.log("API URL for email-wallet association:", apiUrl);
+
     const response = await axios.post(
       apiUrl,
       { email, walletAddress },
       { headers }
     );
-    
-    console.log('Email-wallet association response:', response.data);
+
+    console.log("Email-wallet association response:", response.data);
     return response.data;
   } catch (error: any) {
-    console.error('Error associating email with wallet:', error);
-    console.error('Error details:', error.response?.data || error.message);
-    
+    console.error("Error associating email with wallet:", error);
+    console.error("Error details:", error.response?.data || error.message);
+
     // Log the specific error for debugging
     if (error.response) {
-      console.error('Status:', error.response.status);
-      console.error('Status Text:', error.response.statusText);
-      console.error('Response Data:', error.response.data);
-      console.error('Request URL:', error.config?.url);
-      console.error('Request Method:', error.config?.method);
+      console.error("Status:", error.response.status);
+      console.error("Status Text:", error.response.statusText);
+      console.error("Response Data:", error.response.data);
+      console.error("Request URL:", error.config?.url);
+      console.error("Request Method:", error.config?.method);
     }
-    
+
     // Throw a more detailed error
     if (error.response?.data?.error) {
       throw new Error(error.response.data.error);
     }
-    throw new Error('Failed to associate email with wallet: ' + error.message);
+    throw new Error("Failed to associate email with wallet: " + error.message);
   }
 };
 
 // Get wallet by email
-export const getWalletByEmail = async (email: string): Promise<string | null> => {
+export const getWalletByEmail = async (
+  email: string
+): Promise<string | null> => {
   try {
-    console.log('Getting wallet for email:', email);
-    
+    console.log("Getting wallet for email:", email);
+
     // Make the API call without auth headers initially
     const headers = {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     };
-    
-    const token = localStorage.getItem('token');
+
+    const token = localStorage.getItem("token");
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
-    
+
     const response = await axios.get(`${API_BASE_URL}/api/auth/email-wallet`, {
       params: { email },
-      headers
+      headers,
     });
-    
-    console.log('Get wallet by email response:', response.data);
-    
+
+    console.log("Get wallet by email response:", response.data);
+
     if (response.data && response.data.walletAddress) {
       return response.data.walletAddress;
     }
@@ -938,13 +946,13 @@ export const getWalletByEmail = async (email: string): Promise<string | null> =>
   } catch (error: any) {
     // If the error is 404 (not found), that's an expected case - just return null
     if (error.response && error.response.status === 404) {
-      console.log('No wallet found for email:', email);
+      console.log("No wallet found for email:", email);
       return null;
     }
-    
-    console.error('Error getting wallet for email:', error);
-    console.error('Error details:', error.response?.data || error.message);
-    
+
+    console.error("Error getting wallet for email:", error);
+    console.error("Error details:", error.response?.data || error.message);
+
     // For other errors, log but don't throw - just return null
     return null;
   }
@@ -955,19 +963,19 @@ export const loginWithEmail = async (email: string): Promise<any> => {
   try {
     // First check if the email has an associated wallet
     const walletAddress = await getWalletByEmail(email);
-    
+
     // If no wallet exists, return null indicating we need to create one
     if (!walletAddress) {
       return null;
     }
-    
+
     // Otherwise, authenticate with the existing wallet
     // Create a mock signature for development
     const signature = `mock_signature_for_${walletAddress}`;
     return await loginWithWallet(walletAddress, signature);
   } catch (error) {
-    console.error('Error logging in with email:', error);
-    throw new Error('Failed to login with email');
+    console.error("Error logging in with email:", error);
+    throw new Error("Failed to login with email");
   }
 };
 
@@ -1133,7 +1141,13 @@ export const checkAuthState = async (): Promise<{
 export const getGiftCardTotalRequired = async (
   backgroundId: string | number,
   price: string
-): Promise<{ success: boolean; totalRequired: string; totalRequiredEth: string; breakdown: any; error?: string }> => {
+): Promise<{
+  success: boolean;
+  totalRequired: string;
+  totalRequiredEth: string;
+  breakdown: any;
+  error?: string;
+}> => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/api/giftcard/price`,
@@ -1147,13 +1161,17 @@ export const getGiftCardTotalRequired = async (
       breakdown: response.data.breakdown,
     };
   } catch (error: any) {
-    console.error("Get gift card total required error:", error.response?.data || error);
+    console.error(
+      "Get gift card total required error:",
+      error.response?.data || error
+    );
     return {
       success: false,
       totalRequired: "0",
       totalRequiredEth: "0",
       breakdown: {},
-      error: error.response?.data?.error || "Failed to get total required price",
+      error:
+        error.response?.data?.error || "Failed to get total required price",
     };
   }
 };
