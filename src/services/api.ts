@@ -38,14 +38,6 @@ export const getApiBaseUrl = () => {
 // Use the function to get the base URL
 export const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-// Ensure the base URL is reasonable
-if (!API_BASE_URL.startsWith("http")) {
-  console.error("Invalid API base URL detected:", API_BASE_URL);
-  console.error(
-    "This will cause API requests to fail. Please check your VITE_API_URL environment variable."
-  );
-}
-
 // Event system for database changes
 export class DatabaseEvents {
   private static listeners = {
