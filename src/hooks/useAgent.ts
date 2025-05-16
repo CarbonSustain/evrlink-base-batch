@@ -2,12 +2,17 @@ import { useState, useEffect } from "react";
 import { AgentMessage, AgentRequest, AgentResponse } from "../types/agent";
 import { API_BASE_URL } from "../services/api";
 
-// Offline mode responses for common questions
+// Offline mode responses for common questions with comprehensive answers
 const OFFLINE_RESPONSES: Record<string, string> = {
-  "how do i create a gift card": "To create a gift card in Evrlink, go to the 'Create' page, select a background, enter the recipient details, and specify the amount. You can then mint the gift card as an NFT.",
-  "what blockchain networks are supported": "Evrlink currently supports Ethereum, Polygon, and Base networks. You can select your preferred network when connecting your wallet.",
-  "how do i connect my wallet": "To connect your wallet, click on the 'Connect Wallet' button in the top right corner. Evrlink supports MetaMask, WalletConnect, and Coinbase Wallet.",
-  "tell me about nft backgrounds": "NFT backgrounds in Evrlink are customizable images that appear behind your gift cards. You can select from pre-made backgrounds or create your own in the 'Create Background' section.",
+  "how do i create a gift card": "To create a gift card in Evrlink, go to the 'Create' page, select a background, enter the recipient details, and specify the amount. You can then mint the gift card as an NFT. Gift cards can be personalized with custom messages and backgrounds to make them more special.",
+  "what blockchain networks are supported": "Evrlink currently supports Ethereum, Polygon, and Base networks. You can select your preferred network when connecting your wallet. Base Sepolia is our recommended testnet for trying out features without spending real crypto.",
+  "how do i connect my wallet": "To connect your wallet, click on the 'Connect Wallet' button in the top right corner. Evrlink supports MetaMask, WalletConnect, and Coinbase Wallet. Make sure you have one of these wallets installed before attempting to connect.",
+  "tell me about nft backgrounds": "NFT backgrounds in Evrlink are customizable images that appear behind your gift cards. You can select from pre-made backgrounds or create your own in the 'Create Background' section. Artists can also mint and sell their own background designs on the platform.",
+  "what is evrlink": "Evrlink is a platform that allows you to create and send digital gift cards as NFTs on the blockchain. It combines the personalization of traditional gift cards with the security and ownership benefits of blockchain technology.",
+  "how do i claim a gift card": "To claim a gift card, you'll need the gift card ID and the secret code provided by the sender. Go to the 'Claim a Gift' page, enter these details, and connect your wallet to receive the gift card as an NFT.",
+  "what are the fees": "Evrlink charges minimal fees for creating and transferring gift cards. The exact fee depends on the blockchain network you're using and current gas prices. We strive to keep our platform affordable for all users.",
+  "tell me about wallet details": "In offline mode, I can only provide general information about wallets. To get your specific wallet details, please switch to online mode where I can access your connected wallet information.",
+  "help": "I can help you with information about creating gift cards, supported blockchain networks, connecting wallets, NFT backgrounds, claiming gifts, and platform fees. What would you like to know?",
   "default": "I'm currently in offline mode. When connected to the backend, I can provide more detailed assistance with Evrlink features and functionality."
 };
 
@@ -19,10 +24,28 @@ function findOfflineResponse(query: string): string {
   if (OFFLINE_RESPONSES[normalizedQuery]) {
     return OFFLINE_RESPONSES[normalizedQuery];
   }
-  
-  // Check for partial matches
+
+  // Check for questions from the suggested questions UI
+  // These come with proper capitalization and question marks
+  const strippedQuery = normalizedQuery
+    .replace(/\?/g, '')
+    .replace(/^how do i |^what |^tell me about |^how |^what are /g, '');
+
+  // Look for key words in the offline responses
   for (const [key, response] of Object.entries(OFFLINE_RESPONSES)) {
-    if (normalizedQuery.includes(key) || key.includes(normalizedQuery)) {
+    // Convert both strings to simple keyword sets for better matching
+    const keyWords = key.replace(/[^a-z0-9\s]/g, '').split(' ');
+    const queryWords = strippedQuery.replace(/[^a-z0-9\s]/g, '').split(' ');
+    
+    // Count matching words
+    const matchCount = keyWords.filter(word => 
+      word.length > 3 && queryWords.some(qw => qw.includes(word) || word.includes(qw))
+    ).length;
+    
+    // If we have good matches or the key is fully contained
+    if (matchCount >= 2 || 
+        normalizedQuery.includes(key) || 
+        key.includes(strippedQuery)) {
       return response;
     }
   }
