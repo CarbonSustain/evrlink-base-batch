@@ -250,20 +250,35 @@ export const createGiftCard = async (data: {
   message: string;
 }): Promise<any> => {
   try {
+    // Get the total required price from backend (including fees)
+    const totalResult = await getGiftCardTotalRequired(data.backgroundId, data.price);
+    if (!totalResult.success) {
+      return {
+        success: false,
+        error: totalResult.error || "Failed to calculate total required price",
+      };
+    }
+    // Set price to totalRequired (in wei)
+    const payload = {
+      ...data,
+      price: totalResult.totalRequired,
+    };
     const response = await axios.post(
       `${API_BASE_URL}/api/gift-cards/create`,
-      data,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
-
     // Add success field to the response
     return {
       success: true,
       data: response.data,
+      totalRequired: totalResult.totalRequired,
+      totalRequiredEth: totalResult.totalRequiredEth,
+      breakdown: totalResult.breakdown,
     };
   } catch (error: any) {
     console.error("Create gift card error:", error.response?.data || error);
@@ -1110,6 +1125,35 @@ export const checkAuthState = async (): Promise<{
       isAuthenticated: false,
       message:
         "Authentication check failed: " + (error.message || "Unknown error"),
+    };
+  }
+};
+
+// Get total required price for a gift card (including fees)
+export const getGiftCardTotalRequired = async (
+  backgroundId: string | number,
+  price: string
+): Promise<{ success: boolean; totalRequired: string; totalRequiredEth: string; breakdown: any; error?: string }> => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/api/giftcard/price`,
+      { backgroundId, price },
+      { headers: getAuthHeaders() }
+    );
+    return {
+      success: true,
+      totalRequired: response.data.totalRequired,
+      totalRequiredEth: response.data.totalRequiredEth,
+      breakdown: response.data.breakdown,
+    };
+  } catch (error: any) {
+    console.error("Get gift card total required error:", error.response?.data || error);
+    return {
+      success: false,
+      totalRequired: "0",
+      totalRequiredEth: "0",
+      breakdown: {},
+      error: error.response?.data?.error || "Failed to get total required price",
     };
   }
 };
