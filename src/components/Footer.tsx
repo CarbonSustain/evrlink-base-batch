@@ -16,7 +16,7 @@ const Footer = () => {
             </div>
             
             <p className="text-gray-300 max-w-md">
-              A beautiful way to share and receive gifts. Send love, surprise, and joy to your friends and loved ones.
+              A beautiful way to share and receive meeps. Send love, surprise, and joy to your friends and loved ones.
             </p>
             
             <div className="flex items-center space-x-6">
@@ -48,12 +48,12 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/create" className="text-gray-300 hover:text-white transition-colors">
-                  Create a Gift
+                  Create a Meep
                 </Link>
               </li>
               <li>
                 <Link to="/claim" className="text-gray-300 hover:text-white transition-colors">
-                  Claim a Gift
+                  Claim a Meep
                 </Link>
               </li>
             </ul>

@@ -73,8 +73,8 @@ const Index = () => {
                 variants={fadeInUpVariants}
                 custom={1}
               >
-                Make Gift Giving 
-                <span className="block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Magical & Memorable</span>
+                Meeps, Greeting Cards with more value
+                <span className="block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Save Money. Send Instantly. Seal Greetings Forever</span>
               </motion.h1>
               
               <motion.p 
@@ -82,8 +82,7 @@ const Index = () => {
                 variants={fadeInUpVariants}
                 custom={2}
               >
-                Send personal gifts with secret messages that can be claimed with a special code. Create memorable experiences for your loved ones.
-              </motion.p>
+Keepsakes you and your friends, family - anyone can revisit anytime            </motion.p>
               
               <motion.div 
                 className="pt-8 flex flex-col sm:flex-row gap-4 justify-center"
@@ -96,7 +95,7 @@ const Index = () => {
                   className="bg-gradient-to-r from-primary/90 to-secondary/90 hover:from-primary hover:to-secondary text-white font-medium shadow-xl shadow-primary/20"
                   onClick={() => window.location.href = '/create'}
                 >
-                  Create a Gift
+                  Create a Meep
                 </Button>
                 <Button 
                   size="lg" 
@@ -105,7 +104,7 @@ const Index = () => {
                   className="border-white/30 bg-white/10 text-white hover:bg-white/20 font-medium shadow-xl"
                   onClick={() => window.location.href = '/claim'}
                 >
-                  Claim a Gift
+                  Claim a Meep
                 </Button>
               </motion.div>
             </motion.div>
@@ -136,8 +135,8 @@ const Index = () => {
               transition={{ duration: 0.6 }}
             >
               <GiftCard 
-                title="Claim a Gift"
-                description="Enter the secret message to claim your gift and reveal what's been sent to you."
+                title="Claim a Meep"
+                description="Enter the secret message to claim your meep and reveal what's been sent to you."
                 icon={<Gift className="w-8 h-8" />}
                 to="/claim"
                 variant="primary"
@@ -151,8 +150,8 @@ const Index = () => {
               transition={{ duration: 0.6 }}
             >
               <GiftCard 
-                title="Create a Gift"
-                description="Create a gift pack to send to someone special with a secret message."
+                title="Create a Meep"
+                description="Create a meep to send to someone special with a secret message."
                 icon={<Heart className="w-8 h-8" />}
                 to="/create"
                 variant="secondary"
@@ -173,7 +172,7 @@ const Index = () => {
               transition={{ duration: 0.6 }}
             >
               <h2 className="text-3xl sm:text-4xl font-display font-medium mb-4 text-white">Features</h2>
-              <p className="text-gray-300">Everything you need for perfect gift-giving experiences</p>
+              <p className="text-gray-300">Explore a category and send a Meep</p>
             </motion.div>
           </div>
           
@@ -214,7 +213,7 @@ const Index = () => {
           >
             <h2 className="text-3xl sm:text-4xl font-display font-medium mb-4 text-white">Ready to share some joy?</h2>
             <p className="text-gray-300 text-lg mb-8">
-              Create your first gift pack and surprise someone special today.
+              Create your first meep and surprise someone special today.
             </p>
             <Button 
               size="lg" 
@@ -235,38 +234,38 @@ const Index = () => {
 
 const features = [
   {
-    title: "Easy Gift Creation",
-    description: "Create beautiful gift packages in seconds with our intuitive interface.",
+    title: "Easy Meep Creation",
+    description: "Create beautiful meeps in seconds with our intuitive interface.",
     icon: <Gift className="w-6 h-6 text-primary" />,
     color: "primary"
   },
   {
     title: "Secure Messages",
-    description: "Your gift messages are encrypted and can only be seen by the recipient.",
+    description: "Your meeps are encrypted and can only be seen by the recipient.",
     icon: <Lock className="w-6 h-6 text-primary" />,
     color: "primary"
   },
   {
     title: "Instant Delivery",
-    description: "Your gifts are delivered instantly to your recipients via a secure link.",
+    description: "Your meeps are delivered instantly to your recipients via a secure link.",
     icon: <Send className="w-6 h-6 text-secondary" />,
     color: "secondary"
   },
   {
-    title: "Beautiful Presentation",
-    description: "Gifts are presented in a delightful unwrapping experience.",
+    title: "Chronicled",
+    description: "Meeps are presented in a delightful unwrapping experience.",
     icon: <Heart className="w-6 h-6 text-secondary" />,
     color: "secondary"
   },
   {
     title: "Personalization",
-    description: "Add personal touches to make your gift truly special and unique.",
+    description: "Add personal touches to make your meep truly special and unique.",
     icon: <Gift className="w-6 h-6 text-primary" />,
     color: "primary"
   },
   {
-    title: "Gift Tracking",
-    description: "Know when your gift has been claimed with real-time notifications.",
+    title: "Coinable",
+    description: "Know when your meep has been claimed with real-time notifications.",
     icon: <Send className="w-6 h-6 text-secondary" />,
     color: "secondary"
   },

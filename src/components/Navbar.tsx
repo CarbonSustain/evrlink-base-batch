@@ -50,10 +50,10 @@ const Navbar = () => {
               About Us
             </NavLink>
             <NavLink to="/create" active={location.pathname === "/create"} onClick={() => setIsOpen(false)}>
-              Create Gift
+              Create Meep
             </NavLink>
             <NavLink to="/claim" active={location.pathname === "/claim"} onClick={() => setIsOpen(false)}>
-              Claim Gift
+              Claim Meep
             </NavLink>
             <NavLink to="/create-background" active={location.pathname === "/create-background"} onClick={() => setIsOpen(false)}>
               Create Background
