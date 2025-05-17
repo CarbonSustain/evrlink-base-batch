@@ -22,7 +22,6 @@ import {
   setGiftCardSecret,
   transferGiftCard,
   checkApiHealth,
-  GiftCardSecretResponse,
 } from "../utils/api";
 import { useWallet } from "../contexts/WalletContext";
 import { API_BASE_URL } from "@/services/api";
@@ -98,6 +97,13 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
     };
     checkHealth();
   }, []);
+
+  useEffect(() => {
+    if (transferType) {
+      // When transferType is updated, handle next actions
+      handleNext();
+    }
+  }, [transferType]);
 
   // Fetch price breakdown whenever the modal opens or background price changes
   useEffect(() => {
@@ -308,6 +314,14 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
     }
   };
 
+  const handleNextDirect = () => {
+    setTransferType("direct");
+  }
+
+  const handleNexGiftcard = () => {
+    setTransferType("giftcard");
+  }
+
   const handleNext = () => {
     if (activeStep === 0 && !transferType) {
       setError("Please select a transfer type");
@@ -322,10 +336,7 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
       }
 
       // Validate Ethereum address format only for direct transfer
-      if (
-        transferType === "direct" &&
-        !ethers.utils.isAddress(recipientAddress)
-      ) {
+      if (transferType === "direct" && !ethers.utils.isAddress(recipientAddress)) {
         setError("Please enter a valid Ethereum address");
         return;
       }
@@ -368,9 +379,8 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             <Button
               variant="contained"
               fullWidth
-              onClick={() => {
-                setTransferType("direct");
-                handleNext();
+              onClick={() => {              
+                handleNextDirect();
               }}
               sx={{
                 mb: 2,
@@ -389,8 +399,7 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
               variant="outlined"
               fullWidth
               onClick={() => {
-                setTransferType("giftcard");
-                handleNext();
+                handleNexGiftcard();
               }}
               sx={{
                 color: "white",
@@ -808,7 +817,10 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
           </Button>
         ) : (
           <Button
-            onClick={handleNext}
+          onClick={() => {
+            handleNext();
+          }}
+            
             variant="contained"
             sx={{
               bgcolor: "#7F5AF0",
