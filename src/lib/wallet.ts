@@ -10,7 +10,7 @@ import { OpenloginAdapter } from '@web3auth/openlogin-adapter';
 // Update RPC Configuration with better defaults
 const RPC_URL = import.meta.env.VITE_RPC_URL || 'https://mainnet.infura.io/v3/your-infura-id';
 const CHAIN_ID = parseInt(import.meta.env.VITE_CHAIN_ID || '1', 10);
-const APP_NAME = 'OnChain-GiftPack';
+const APP_NAME = 'Evrlink';
 const APP_LOGO_URL = '/logo.png';
 
 // Initialize Coinbase Wallet SDK with better configuration
@@ -33,12 +33,12 @@ declare global {
 // Get MetaMask provider
 const getMetaMaskProvider = () => {
   if (typeof window === 'undefined') return null;
-  
+
   // First check if we have a direct MetaMask provider
   if (window.ethereum?.isMetaMask && !window.ethereum?.isCoinbaseWallet) {
     return window.ethereum;
   }
-  
+
   // Then check if we have MetaMask in the providers list
   if (window.ethereum?.providers?.length > 0) {
     const provider = window.ethereum.providers.find(
@@ -46,7 +46,7 @@ const getMetaMaskProvider = () => {
     );
     if (provider) return provider;
   }
-  
+
   // Fallback: check for provider with name or id
   if (window.ethereum?.providers?.length > 0) {
     const provider = window.ethereum.providers.find(
@@ -54,17 +54,17 @@ const getMetaMaskProvider = () => {
     );
     if (provider) return provider;
   }
-  
+
   return null;
 };
 
 // Enhanced Coinbase Wallet provider initialization
 const getCoinbaseWalletProvider = () => {
   if (typeof window === 'undefined') return null;
-  
+
   try {
     console.log('Initializing Coinbase Wallet SDK...');
-    
+
     // Create a single instance if not exists
     if (!coinbaseWalletInstance) {
       coinbaseWalletInstance = new CoinbaseWalletSDK({
@@ -76,7 +76,7 @@ const getCoinbaseWalletProvider = () => {
 
     // Create Web3 provider
     const provider = coinbaseWalletInstance.makeWeb3Provider();
-    
+
     console.log('Created Coinbase Web3 provider:', provider);
     return provider as CoinbaseWalletProvider;
   } catch (error) {
@@ -133,7 +133,7 @@ export const getMetaMaskChainId = async (): Promise<string> => {
   if (!isMetaMaskInstalled()) {
     throw new Error('MetaMask is not installed');
   }
-  
+
   try {
     const provider = getMetaMaskProvider();
     if (!provider) {
@@ -211,7 +211,7 @@ export const connectCoinbaseWallet = async (): Promise<string> => {
     }
 
     console.log('Requesting accounts...');
-    
+
     // Request account access
     const accounts = await provider.request({
       method: 'eth_requestAccounts'
@@ -227,7 +227,7 @@ export const connectCoinbaseWallet = async (): Promise<string> => {
 
     // Create ethers provider
     const ethersProvider = new ethers.providers.Web3Provider(provider);
-    
+
     // Verify network and switch if needed
     const network = await ethersProvider.getNetwork();
     console.log('Connected to network:', network.name);
@@ -345,10 +345,10 @@ export const connectSmartWallet = async (): Promise<string> => {
     const web3auth = new Web3Auth(web3AuthOptions);
     await web3auth.initModal();
     currentWeb3AuthInstance = web3auth;
-    
+
     const provider = await web3auth.connect();
     if (!provider) throw new Error('Failed to get provider');
-    
+
     // Create a fresh Web3Provider instance for this connection
     const ethersProvider = new ethers.providers.Web3Provider(provider, 'any');
     const signer = await ethersProvider.getSigner();
@@ -433,17 +433,17 @@ export const disconnectCoinbaseWallet = async (): Promise<void> => {
         provider.removeAllListeners?.('accountsChanged');
         provider.removeAllListeners?.('chainChanged');
         provider.removeAllListeners?.('disconnect');
-        
+
         // Clear any provider state
         await provider.close?.();
       }
-      
+
       // Clear the instance
       coinbaseWalletInstance = null;
-      
+
       // Clear all local storage
       localStorage.clear();
-      
+
       // Force a page reload to clear any cached data
       window.location.reload();
     }
@@ -468,7 +468,7 @@ export const createCoinbaseWallet = async (): Promise<string> => {
 
     // Get the provider
     const provider = coinbaseWalletInstance.makeWeb3Provider();
-    
+
     // Request wallet creation
     const accounts = await provider.request({
       method: 'eth_requestAccounts',
