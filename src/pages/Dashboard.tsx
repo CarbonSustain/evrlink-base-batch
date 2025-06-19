@@ -12,7 +12,7 @@ const Dashboard = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const navigate = useNavigate();
   const [isDesktop, setIsDesktop] = useState(false);
-  
+
   useEffect(() => {
     // Get wallet address from localStorage or context
     const storedAddress = address || localStorage.getItem('walletAddress');
@@ -20,20 +20,20 @@ const Dashboard = () => {
       setWalletAddress(storedAddress);
     }
   }, [address]);
-  
+
   useEffect(() => {
     // Set initial desktop state
     setIsDesktop(window.innerWidth >= 1024);
-    
+
     // Handle resize events
     const handleResize = () => {
       setIsDesktop(window.innerWidth >= 1024);
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
+
   // Function to abbreviate wallet address for display
   const abbreviateAddress = (address: string) => {
     if (!address) return '';
@@ -43,7 +43,7 @@ const Dashboard = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
-  
+
   const toggleWalletAddressDisplay = () => {
     setShowWalletAddress(!showWalletAddress);
   };
@@ -53,7 +53,7 @@ const Dashboard = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('walletAddress');
     localStorage.removeItem('userEmail');
-    
+
     // Disconnect wallet if connected
     if (disconnect) {
       disconnect();
@@ -165,364 +165,365 @@ const Dashboard = () => {
 </svg>`;
 
   return (
-    <div className="min-h-screen bg-white flex">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-64 bg-white border-r border-gray-200 sticky top-0 h-screen overflow-y-auto">
-        <div className="p-4 pb-0">
-          <img src={evrlinklogo} alt="Evrlink" className="h-12 mb-4" />
-        </div>
-        <nav className="p-4 space-y-2">
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-3 px-4 py-2 text-gray-900 bg-blue-50 rounded-lg"
-          >
-            <span className="material-icons">home</span>
-            <span>Home</span>
-          </Link>
-          <Link
-            to="/gallery"
-            className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-          >
-            <span className="material-icons">collections</span>
-            <span>My Gallery</span>
-          </Link>
-          <Link
-            to="/templates"
-            className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-          >
-            <span className="material-icons">grid_view</span>
-            <span>Templates</span>
-          </Link>
-          <Link
-            to="/settings"
-            className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-          >
-            <span className="material-icons">settings</span>
-            <span>Settings</span>
-          </Link>
-          <Link
-            to="/faqs"
-            className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-          >
-            <span className="material-icons">help</span>
-            <span>FAQs</span>
-          </Link>
-        </nav>
-        <div className="absolute bottom-4 left-4 right-4">
-          <button className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg w-full">
-            <span className="material-icons">logout</span>
-            <span>LogOut</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content Container */}
-      <div className="flex-1 w-full max-w-full overflow-x-hidden">
-        {/* Mobile Header */}
-        <header className="bg-white border-b border-gray-200 fixed top-0 w-full lg:w-[calc(100%-16rem)] z-10">
-          <div className="px-4 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {/* Mobile Menu Button */}
-              <button
-                onClick={toggleSidebar}
-                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
-              >
-                <span className="material-icons">{isSidebarOpen ? 'close' : 'menu'}</span>
-              </button>
-              {/* Logo - Mobile Only */}
-              <img src={evrlinklogo} alt="Evrlink" className="h-8 lg:hidden" />
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <button 
-                  className="p-2 hover:bg-gray-100 rounded-full relative"
-                  onClick={toggleWalletAddressDisplay}
-                  title={abbreviateAddress(walletAddress)}
-                >
-                  <img src={wallet} alt="wallet" className="w-6 h-6" />
-                </button>
-                
-                {showWalletAddress && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-3">
-                    <div className="text-sm font-medium text-gray-700 mb-1">Your Wallet</div>
-                    <div className="text-xs bg-gray-50 p-2 rounded break-all font-mono">
-                      {walletAddress || 'No wallet connected'}
-                    </div>
-                    <div className="mt-2 flex justify-end">
-                      <button 
-                        className="text-xs text-blue-600 hover:text-blue-800"
-                        onClick={() => {
-                          navigator.clipboard.writeText(walletAddress);
-                          // Could add toast notification here
-                        }}
-                      >
-                        Copy Address
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              <button className="p-2 hover:bg-gray-100 rounded-full">
-                <img src={bell} alt="bell" className="w-6 h-6" />
-              </button>
-              
-              <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center relative group">
-                <img src="/avatar.jpg" alt="Profile" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center transition-all duration-300">
-                  <span className="text-white opacity-0 group-hover:opacity-100 text-xs">
-                    {abbreviateAddress(walletAddress)}
-                  </span>
-                </div>
-              </div>
-            </div>
+      <div className="min-h-screen bg-white flex">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:block w-64 bg-white border-r border-gray-200 sticky top-0 h-screen overflow-y-auto">
+          <div className="p-4 pb-0">
+            <img src={evrlinklogo} alt="Evrlink" className="h-12 mb-4" />
           </div>
-        </header>
-
-        {/* Mobile Sidebar */}
-        <aside 
-          className={`fixed left-0 top-16 w-64 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 p-4 z-30 transition-transform duration-300 lg:hidden ${
-            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
-        >
-          <nav className="space-y-2">
+          <nav className="p-4 space-y-2">
             <Link
-              to="/dashboard"
-              className="flex items-center gap-3 px-4 py-2 text-gray-900 bg-blue-50 rounded-lg"
-              onClick={() => setIsSidebarOpen(false)}
+                to="/dashboard"
+                className="flex items-center gap-3 px-4 py-2 text-gray-900 bg-blue-50 rounded-lg"
             >
               <span className="material-icons">home</span>
               <span>Home</span>
             </Link>
             <Link
-              to="/gallery"
-              className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-              onClick={() => setIsSidebarOpen(false)}
+                to="/gallery"
+                className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
             >
               <span className="material-icons">collections</span>
               <span>My Gallery</span>
             </Link>
             <Link
-              to="/templates"
-              className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-              onClick={() => setIsSidebarOpen(false)}
+                to="/templates"
+                className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
             >
               <span className="material-icons">grid_view</span>
               <span>Templates</span>
             </Link>
             <Link
-              to="/settings"
-              className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-              onClick={() => setIsSidebarOpen(false)}
+                to="/settings"
+                className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
             >
               <span className="material-icons">settings</span>
               <span>Settings</span>
             </Link>
             <Link
-              to="/faqs"
-              className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-              onClick={() => setIsSidebarOpen(false)}
+                to="/faqs"
+                className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
             >
               <span className="material-icons">help</span>
               <span>FAQs</span>
             </Link>
           </nav>
           <div className="absolute bottom-4 left-4 right-4">
-            <button
-              className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg w-full"
-              onClick={handleLogout}
-            >
+            <button className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg w-full">
               <span className="material-icons">logout</span>
               <span>LogOut</span>
             </button>
           </div>
         </aside>
 
-        {/* Overlay for mobile sidebar */}
-        {isSidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
-        {/* Main Content */}
-        <main className="pt-16 px-4 lg:px-8 bg-white">
-          {/* Mobile Header Section */}
-          <div className="flex flex-col lg:hidden">
-            <div className="flex justify-between items-center mt-6 mb-4">
-              <h1 className="text-2xl font-bold">Home</h1>
-              <button className="px-3 py-2 rounded-lg bg-[#00B2C7] text-white flex items-center gap-1">
-                <span className="material-icons text-sm">add</span>
-                <span>Create Meep</span>
-              </button>
-            </div>
-            
-            {/* Mobile Search */}
-            <div className="relative mb-6">
-              <span className="absolute inset-y-0 left-3 flex items-center">
-                <span className="material-icons text-gray-400">search</span>
-              </span>
-              <input
-                type="text"
-                placeholder="Search for a meep or template..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00B2C7]"
-              />
-            </div>
-          </div>
-
-          {/* Desktop Search - Hidden on Mobile */}
-          <div className="hidden lg:block relative mb-8 mt-6 max-w-xl">
+        {/* Main Content Container */}
+        <div className="flex-1 w-full max-w-full overflow-x-hidden">
+          {/* Mobile Header */}
+          <header className="bg-white border-b border-gray-200 fixed top-0 w-full lg:w-[calc(100%-16rem)] z-10">
+            <div className="px-4 h-16 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {/* Mobile Menu Button */}
+                <button
+                    onClick={toggleSidebar}
+                    className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+                >
+                  <span className="material-icons">{isSidebarOpen ? 'close' : 'menu'}</span>
+                </button>
+                {/* Logo - Mobile Only */}
+                <img src={evrlinklogo} alt="Evrlink" className="h-8 lg:hidden" />
+              </div>
+              <div className="hidden lg:block relative mb-8 mt-6 w-full max-w-2xl">
             <span className="absolute inset-y-0 left-3 flex items-center">
               <span className="material-icons text-gray-400">search</span>
             </span>
-            <input
-              type="text"
-              placeholder="Search for a meep or template..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00B2C7]"
-            />
-          </div>
+                <input
+                    type="text"
+                    placeholder="Search for a meep or template..."
+                    className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00B2C7]"
+                />
+              </div>
+              {/* Mobile Search - Hidden on Desktop */}
+              <div className="lg:hidden relative mb-6">
+              <span className="absolute inset-y-0 left-3 flex items-center">
+                <span className="material-icons text-gray-400">search</span>
+              </span>
+                <input
+                    type="text"
+                    placeholder="Search for a meep or template..."
+                    className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00B2C7]"
+                />
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <button
+                      className="p-2 hover:bg-gray-100 rounded-full relative"
+                      onClick={toggleWalletAddressDisplay}
+                      title={abbreviateAddress(walletAddress)}
+                  >
+                    <img src={wallet} alt="wallet" className="w-6 h-6" />
+                  </button>
 
-          {/* Welcome Message */}
-          <div className="bg-[#00B2C71A] rounded-xl p-4 lg:p-8 mb-8 relative">
-            <div className="max-w-2xl mx-auto text-center">
-              <h1 className="text-xl lg:text-2xl font-semibold mb-4">A Meep Welcome ❤️</h1>
-              <p className="text-gray-600 mb-2 text-sm lg:text-base">
-                We've been thinking of ways to create lasting, meaningful moments for you-and we realized greeting
-                cards could be something truly special.
-              </p>
-              <p className="text-gray-600 mb-2 text-sm lg:text-base">
-                This Meep isn't just a card, it's a warm, everlasting welcome, etched into time.
-              </p>
-              <p className="text-gray-600 mb-2 text-sm lg:text-base">
-                We're so thrilled you're here, and we can't wait to share many unforgettable moments together.
-                Here's to new beginnings and the people who make life special.
-              </p>
-              <p className="text-gray-600 text-sm lg:text-base">XOXO, Evrlink</p>
-            </div>
-            <div className="absolute bottom-0 left-0 hidden md:block">
-              <div dangerouslySetInnerHTML={{ __html: svg1 }} />
-            </div>
-            <div className="absolute bottom-0 right-0 hidden md:block">
-              <div dangerouslySetInnerHTML={{ __html: svg2 }} />
-            </div>
-          </div>
+                  {showWalletAddress && (
+                      <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-3">
+                        <div className="text-sm font-medium text-gray-700 mb-1">Your Wallet</div>
+                        <div className="text-xs bg-gray-50 p-2 rounded break-all font-mono">
+                          {walletAddress || 'No wallet connected'}
+                        </div>
+                        <div className="mt-2 flex justify-end">
+                          <button
+                              className="text-xs text-blue-600 hover:text-blue-800"
+                              onClick={() => {
+                                navigator.clipboard.writeText(walletAddress);
+                                // Could add toast notification here
+                              }}
+                          >
+                            Copy Address
+                          </button>
+                        </div>
+                      </div>
+                  )}
+                </div>
 
-          {/* Categories Section */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg lg:text-xl font-semibold">Welcome to Evrlink!</h2>
-              <Link to="/categories" className="text-sm lg:text-base text-[#00B2C7] hover:text-[#008a9a]">
-                See All
-              </Link>
-            </div>
-            <p className="text-gray-600 mb-4 text-sm">See some of our categories, and create a Meep.</p>
-            <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 mb-8 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 lg:mx-0 px-4 lg:px-0">
-              {(isDesktop ? categories : categories.slice(0, 4)).map((category) => (
-                <button
-                  key={category}
-                  className="px-4 py-2 rounded-full border border-gray-200 hover:border-[#00B2C7] text-gray-600 hover:text-[#00B2C7] whitespace-nowrap text-sm flex-shrink-0"
-                >
-                  {category}
+                <button className="p-2 hover:bg-gray-100 rounded-full">
+                  <img src={bell} alt="bell" className="w-6 h-6" />
                 </button>
-              ))}
-              <button className="p-2 bg-gray-100 rounded-full flex-shrink-0 lg:hidden">
-                <span className="material-icons text-gray-500">chevron_right</span>
+
+                <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center relative group">
+                  <img src="/avatar.jpg" alt="Profile" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center transition-all duration-300">
+                  <span className="text-white opacity-0 group-hover:opacity-100 text-xs">
+                    {abbreviateAddress(walletAddress)}
+                  </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Mobile Sidebar */}
+          <aside
+              className={`fixed left-0 top-16 w-64 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 p-4 z-30 transition-transform duration-300 lg:hidden ${
+                  isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+              }`}
+          >
+            <nav className="space-y-2">
+              <Link
+                  to="/dashboard"
+                  className="flex items-center gap-3 px-4 py-2 text-gray-900 bg-blue-50 rounded-lg"
+                  onClick={() => setIsSidebarOpen(false)}
+              >
+                <span className="material-icons">home</span>
+                <span>Home</span>
+              </Link>
+              <Link
+                  to="/gallery"
+                  className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                  onClick={() => setIsSidebarOpen(false)}
+              >
+                <span className="material-icons">collections</span>
+                <span>My Gallery</span>
+              </Link>
+              <Link
+                  to="/templates"
+                  className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                  onClick={() => setIsSidebarOpen(false)}
+              >
+                <span className="material-icons">grid_view</span>
+                <span>Templates</span>
+              </Link>
+              <Link
+                  to="/settings"
+                  className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                  onClick={() => setIsSidebarOpen(false)}
+              >
+                <span className="material-icons">settings</span>
+                <span>Settings</span>
+              </Link>
+              <Link
+                  to="/faqs"
+                  className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                  onClick={() => setIsSidebarOpen(false)}
+              >
+                <span className="material-icons">help</span>
+                <span>FAQs</span>
+              </Link>
+            </nav>
+            <div className="absolute bottom-4 left-4 right-4">
+              <button
+                  className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg w-full"
+                  onClick={handleLogout}
+              >
+                <span className="material-icons">logout</span>
+                <span>LogOut</span>
               </button>
             </div>
-          </div>
+          </aside>
 
-          {/* Templates Card - Mobile Style */}
-          <div className="block lg:hidden">
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
-              <div className="flex items-center gap-3 p-4">
-                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0"></div>
-                <div>
-                  <h3 className="font-medium">Birthday Bling</h3>
-                  <p className="text-sm text-gray-500">by Evrlink</p>
-                  <div className="text-sm text-gray-400 mt-1">
-                    <span>#birthday</span>{" "}
-                    <span>#celebration</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="aspect-w-16 aspect-h-9 bg-gray-100">
-                {/* Template preview image will go here */}
-              </div>
-              
-              <div className="p-4 flex items-center justify-between">
-                <button className="flex items-center gap-2 text-gray-600">
-                  <span className="material-icons">favorite_border</span>
-                  <span>74</span>
+          {/* Overlay for mobile sidebar */}
+          {isSidebarOpen && (
+              <div
+                  className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+                  onClick={() => setIsSidebarOpen(false)}
+              />
+          )}
+
+          {/* Main Content */}
+          <main className="pt-16 px-4 lg:px-8 bg-white">
+            {/* Mobile Header Section */}
+            <div className="flex flex-col lg:hidden">
+              <div className="flex justify-between items-center mt-6 mb-4">
+                <h1 className="text-2xl font-bold">Home</h1>
+                <button className="px-3 py-2 rounded-lg bg-[#00B2C7] text-white flex items-center gap-1">
+                  <span className="material-icons text-sm">add</span>
+                  <span>Create Meep</span>
                 </button>
-                <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
-                  Generate Meep
+              </div>
+
+
+            </div>
+
+
+
+            {/* Welcome Message */}
+            <div className="bg-[#00B2C71A] rounded-xl p-4 lg:p-8 mb-8 relative">
+              <div className="max-w-2xl mx-auto text-center">
+                <h1 className="text-xl lg:text-2xl font-semibold mb-4">A Meep Welcome ❤️</h1>
+                <p className="text-gray-600 mb-2 text-sm lg:text-base">
+                  We've been thinking of ways to create lasting, meaningful moments for you-and we realized greeting
+                  cards could be something truly special.
+                </p>
+                <p className="text-gray-600 mb-2 text-sm lg:text-base">
+                  This Meep isn't just a card, it's a warm, everlasting welcome, etched into time.
+                </p>
+                <p className="text-gray-600 mb-2 text-sm lg:text-base">
+                  We're so thrilled you're here, and we can't wait to share many unforgettable moments together.
+                  Here's to new beginnings and the people who make life special.
+                </p>
+                <p className="text-gray-600 text-sm lg:text-base">XOXO, Evrlink</p>
+              </div>
+              <div className="absolute bottom-0 left-0 hidden md:block">
+                <div dangerouslySetInnerHTML={{ __html: svg1 }} />
+              </div>
+              <div className="absolute bottom-0 right-0 hidden md:block">
+                <div dangerouslySetInnerHTML={{ __html: svg2 }} />
+              </div>
+            </div>
+
+            {/* Categories Section */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg lg:text-xl font-semibold">Welcome to Evrlink!</h2>
+                <Link to="/categories" className="text-sm lg:text-base text-[#00B2C7] hover:text-[#008a9a]">
+                  See All
+                </Link>
+              </div>
+              <p className="text-gray-600 mb-4 text-sm">See some of our categories, and create a Meep.</p>
+              <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 mb-8 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 lg:mx-0 px-4 lg:px-0">
+                {(isDesktop ? categories : categories.slice(0, 4)).map((category) => (
+                    <button
+                        key={category}
+                        className="px-4 py-2 rounded-full border border-gray-200 hover:border-[#00B2C7] text-gray-600 hover:text-[#00B2C7] whitespace-nowrap text-sm flex-shrink-0"
+                    >
+                      {category}
+                    </button>
+                ))}
+                <button className="p-2 bg-gray-100 rounded-full flex-shrink-0 lg:hidden">
+                  <span className="material-icons text-gray-500">chevron_right</span>
                 </button>
               </div>
             </div>
-            
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
-              <div className="flex items-center gap-3 p-4">
-                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0"></div>
-                <div>
-                  <h3 className="font-medium">Birthday Bling</h3>
-                  <p className="text-sm text-gray-500">by Evrlink</p>
-                  <div className="text-sm text-gray-400 mt-1">
-                    <span>#birthday</span>{" "}
-                    <span>#celebration</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="aspect-w-16 aspect-h-9 bg-gray-100">
-                {/* Template preview image will go here */}
-              </div>
-              
-              <div className="p-4 flex items-center justify-between">
-                <button className="flex items-center gap-2 text-gray-600">
-                  <span className="material-icons">favorite_border</span>
-                  <span>74</span>
-                </button>
-                <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
-                  Generate Meep
-                </button>
-              </div>
-            </div>
-          </div>
 
-          {/* Templates Grid - Desktop Style */}
-          <div className="hidden lg:grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full">
-                  {/* Template preview image will go here */}
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-gray-200" />
-                    <div>
-                      <h3 className="font-medium">Birthday Bling</h3>
-                      <p className="text-sm text-gray-500">by Evrlink</p>
+            {/* Templates Card - Mobile Style */}
+            <div className="block lg:hidden">
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
+                <div className="flex items-center gap-3 p-4">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0"></div>
+                  <div>
+                    <h3 className="font-medium">Birthday Bling</h3>
+                    <p className="text-sm text-gray-500">by Evrlink</p>
+                    <div className="text-sm text-gray-400 mt-1">
+                      <span>#birthday</span>{" "}
+                      <span>#celebration</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <button className="flex items-center gap-2 text-gray-600">
-                      <span className="material-icons">favorite_border</span>
-                      <span>74</span>
-                    </button>
-                    <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
-                      Generate Meep
-                    </button>
-                  </div>
+                </div>
+
+                <div className="aspect-w-16 aspect-h-9 bg-gray-100">
+                  {/* Template preview image will go here */}
+                </div>
+
+                <div className="p-4 flex items-center justify-between">
+                  <button className="flex items-center gap-2 text-gray-600">
+                    <span className="material-icons">favorite_border</span>
+                    <span>74</span>
+                  </button>
+                  <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
+                    Generate Meep
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        </main>
+
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
+                <div className="flex items-center gap-3 p-4">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0"></div>
+                  <div>
+                    <h3 className="font-medium">Birthday Bling</h3>
+                    <p className="text-sm text-gray-500">by Evrlink</p>
+                    <div className="text-sm text-gray-400 mt-1">
+                      <span>#birthday</span>{" "}
+                      <span>#celebration</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="aspect-w-16 aspect-h-9 bg-gray-100">
+                  {/* Template preview image will go here */}
+                </div>
+
+                <div className="p-4 flex items-center justify-between">
+                  <button className="flex items-center gap-2 text-gray-600">
+                    <span className="material-icons">favorite_border</span>
+                    <span>74</span>
+                  </button>
+                  <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
+                    Generate Meep
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Templates Grid - Desktop Style */}
+            <div className="hidden lg:grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((item) => (
+                  <div key={item} className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full">
+                      {/* Template preview image will go here */}
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 rounded-full bg-gray-200" />
+                        <div>
+                          <h3 className="font-medium">Birthday Bling</h3>
+                          <p className="text-sm text-gray-500">by Evrlink</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <button className="flex items-center gap-2 text-gray-600">
+                          <span className="material-icons">favorite_border</span>
+                          <span>74</span>
+                        </button>
+                        <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
+                          Generate Meep
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+              ))}
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
