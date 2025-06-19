@@ -32,21 +32,23 @@ const CategoryNav: React.FC<CategoryNavProps> = ({
         >
           All Categories
         </button>
-        
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => onSelectCategory(category)}
-            className={cn(
-              "px-4 py-2 rounded-full transition-all text-sm font-medium",
-              selectedCategory === category
-                ? "bg-primary text-white shadow-md shadow-primary/20"
-                : "bg-white/10 backdrop-blur-sm text-white/70 hover:bg-white/20"
-            )}
-          >
-            {category}
-          </button>
-        ))}
+
+        {categories
+            .filter((category) => category)
+            .map((category) => (
+                <button
+                    key={category}
+                    onClick={() => onSelectCategory(category)}
+                    className={cn(
+                        "px-4 py-2 rounded-full transition-all text-sm font-medium",
+                        selectedCategory === category
+                            ? "bg-primary text-white shadow-md shadow-primary/20"
+                            : "bg-white/10 backdrop-blur-sm text-white/70 hover:bg-white/20"
+                    )}
+                >
+                  {category}
+                </button>
+            ))}
       </motion.div>
     </div>
   );

@@ -6,29 +6,35 @@ import Button from "@/components/Button";
 import Navbar from "@/components/Navbar";
 import CategoryNav from "@/components/CategoryNav";
 import BackgroundGallery from "@/components/BackgroundGallery";
-import { Background } from "@/services/api";
-import { eventBus, BackgroundUpdatedEvent } from "@/services/eventBus";
-import { useBackgroundsStore } from "@/services/store";
+import { ArtNFT } from "@/services/api";
+import { eventBus } from "@/services/eventBus";
+
+// Define ArtNftUpdatedEvent type locally if not exported from eventBus
+type ArtNftUpdatedEvent = {
+  artNft: ArtNFT;
+  action: "added" | "updated";
+};
+import { useArtNftsStore } from "@/services/store";
 
 interface CardModalProps {
-  background: Background | null;
+  artNft: ArtNFT | null;
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (background: Background) => void;
+  onSelect: (artNft: ArtNFT) => void;
 }
 
 const CardModal: React.FC<CardModalProps> = ({
-  background,
+  artNft,
   isOpen,
   onClose,
   onSelect,
 }) => {
-  if (!background) return null;
+  if (!artNft) return null;
 
-  // Convert imageURI to a full URL if it's just a relative path
-  const imageUrl = background.imageURI.startsWith("http")
-    ? background.imageURI
-    : `http://localhost:3001/${background.imageURI}`;
+  // Use imageUri (camelCase) as per updated api.ts/store.ts
+  const imageUrl = artNft.imageUri.startsWith("http")
+    ? artNft.imageUri
+    : `http://localhost:3001/${artNft.imageUri}`;
 
   return (
     <AnimatePresence>
@@ -57,33 +63,32 @@ const CardModal: React.FC<CardModalProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B14] to-transparent z-10" />
                 <img
                   src={imageUrl}
-                  alt={background.category}
+                  alt={`Category ${artNft.giftCardCategoryId}`}
                   className="w-full h-full object-cover"
                 />
               </div>
-
               <div className="p-8 -mt-16 relative z-20">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-3xl font-display font-medium text-white mb-2">
-                      {background.category}
+                      Category #{artNft.giftCardCategoryId}
                     </h3>
                     <p className="text-gray-400 text-lg">
-                      Created by {background.artistAddress.slice(0, 6)}...
-                      {background.artistAddress.slice(-4)}
+                      Created by {artNft.artistAddress.slice(0, 6)}...
+                      {artNft.artistAddress.slice(-4)}
                     </p>
                   </div>
                   <div className="bg-primary/20 px-6 py-3 rounded-full">
                     <span className="text-primary font-medium text-lg">
-                      {background.price} ETH
+                      {artNft.price} ETH
                     </span>
                   </div>
                 </div>
 
                 <p className="text-gray-300 text-lg leading-relaxed mb-8">
-                  Beautiful background from our {background.category}{" "}
-                  collection. Use this to create a unique gift card that will be
-                  minted on the blockchain.
+                  Beautiful background from our Category #
+                  {artNft.giftCardCategoryId} collection. Use this to create a
+                  unique gift card that will be minted on the blockchain.
                 </p>
 
                 <div className="bg-white/5 rounded-xl p-6 mb-8">
@@ -99,11 +104,12 @@ const CardModal: React.FC<CardModalProps> = ({
                       <span>Platform Fee</span>
                       <span className="text-secondary font-medium">60%</span>
                     </li>
-                    {background.blockchainId && (
+                    {/* If you want to display another property, replace 'blockchainId' with a valid ArtNFT property, e.g. 'id' */}
+                    {artNft.id && (
                       <li className="flex justify-between items-center">
-                        <span>Blockchain ID</span>
+                        <span>Background ID</span>
                         <span className="text-secondary font-medium">
-                          #{background.blockchainId}
+                          #{artNft.id}
                         </span>
                       </li>
                     )}
@@ -111,7 +117,7 @@ const CardModal: React.FC<CardModalProps> = ({
                 </div>
 
                 <Button
-                  onClick={() => onSelect(background)}
+                  onClick={() => onSelect(artNft)}
                   className="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-xl text-lg font-medium hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
                 >
                   Create Gift Card
@@ -128,81 +134,91 @@ const CardModal: React.FC<CardModalProps> = ({
 const CategoryCards: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const navigate = useNavigate();
-  const [selectedBackground, setSelectedBackground] =
-    useState<Background | null>(null);
+  const [selectedArtNft, setSelectedArtNft] = useState<ArtNFT | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // Use the backgrounds store
+  // Use the art NFTs store
   const {
-    backgroundsByCategory,
+    artNftsByCategory,
     isLoading,
     error,
-    fetchCategoryBackgrounds,
-    fetchAllBackgrounds,
-    addBackground,
-    updateBackground,
-  } = useBackgroundsStore();
+    fetchCategoryArtNfts,
+    fetchAllArtNfts,
+    addArtNft,
+    updateArtNft,
+  } = useArtNftsStore();
 
-  // Get the backgrounds for the current category
-  const backgrounds = selectedCategory
-    ? backgroundsByCategory[selectedCategory] || []
-    : [];
+  // Use categoryId as string (category name) for filtering, as per updated api.ts/store.ts
+  const artNfts = selectedCategory
+    ? Object.values(artNftsByCategory)
+        .flat()
+        .filter(
+          (nft) =>
+            String(nft.giftCardCategoryId) === String(selectedCategory) ||
+            nft.giftCardCategoryId === Number(selectedCategory)
+        )
+    : Object.values(artNftsByCategory).flat();
 
   useEffect(() => {
-    // Fetch all backgrounds on first load to populate categories
-    fetchAllBackgrounds();
+    fetchAllArtNfts().catch((err) => {
+      console.error("Failed to load art NFTs:", err);
+    });
   }, []);
 
   useEffect(() => {
-    // Set the selected category from URL param
     if (categoryId) {
       const decodedCategory = decodeURIComponent(categoryId);
       setSelectedCategory(decodedCategory);
-      // Fetch backgrounds for this category if not already loaded
-      fetchCategoryBackgrounds(decodedCategory);
+      // Fetch by category name (string) as per updated api.ts
+      fetchCategoryArtNfts(Number(decodedCategory)).catch((err) => {
+        console.error(
+          "Failed to load art NFTs for category:",
+          decodedCategory,
+          err
+        );
+      });
     }
   }, [categoryId]);
 
   useEffect(() => {
-    // Subscribe to background update events
-    const unsubscribe = eventBus.onBackgroundUpdated(handleBackgroundChange);
+    // Subscribe to art NFT update events
+    const unsubscribe = eventBus.onArtNftUpdated(handleArtNftChange);
 
     // Clean up event listener on component unmount
-    return () => {
-      unsubscribe();
-    };
+    return typeof unsubscribe === "function" ? unsubscribe : undefined;
   }, [selectedCategory]);
 
-  // Handler for background changes
-  const handleBackgroundChange = (data: BackgroundUpdatedEvent) => {
-    console.log("Background change detected:", data);
+  // Handler for art NFT changes
+  const handleArtNftChange = (data: ArtNftUpdatedEvent) => {
+    console.log("Art NFT change detected:", data);
 
-    // Only refresh if we're in the same category as the changed background
+    // Only refresh if we're in the same category as the changed art NFT
     // or if no category is selected yet
     if (
-      data.background &&
-      data.background.category &&
-      (!selectedCategory || data.background.category === selectedCategory)
+      data.artNft &&
+      data.artNft.giftCardCategoryId &&
+      (!selectedCategory ||
+        String(data.artNft.giftCardCategoryId) === String(selectedCategory))
     ) {
       if (data.action === "added") {
-        // Add the new background to our store
-        addBackground(data.background);
+        // Add the new art NFT to our store
+        addArtNft(data.artNft);
       } else if (data.action === "updated") {
-        // Update the existing background in our store
-        updateBackground(data.background);
+        // Update the existing art NFT in our store
+        updateArtNft(data.artNft);
       }
     }
   };
 
-  const handleCardSelect = (background: Background) => {
-    // Navigate to create gift page with background
+  const handleCardSelect = (artNft: ArtNFT) => {
+    // Navigate to create gift page with art NFT
     navigate(`/create-gift`, {
       state: {
-        backgroundId: background.id,
-        backgroundPrice: background.price,
-        backgroundImage: background.imageURI.startsWith("http")
-          ? background.imageURI
-          : `http://localhost:3001/${background.imageURI}`,
+        backgroundId: artNft.id,
+        backgroundPrice: artNft.price,
+        backgroundImage: artNft.imageUri.startsWith("http")
+          ? artNft.imageUri
+          : `http://localhost:3001/${artNft.imageUri}`,
       },
     });
   };
@@ -247,27 +263,28 @@ const CategoryCards: React.FC = () => {
 
         {/* Category Navigation */}
         <CategoryNav
-          categories={Object.keys(backgroundsByCategory)}
+          categories={Object.keys(artNftsByCategory)}
           selectedCategory={selectedCategory}
           onSelectCategory={handleCategorySelect}
         />
 
         {/* Background Gallery using our reusable component */}
         <BackgroundGallery
-          backgrounds={backgrounds}
+          backgrounds={artNfts}
           isLoading={isLoading}
           error={error}
-          onSelectBackground={setSelectedBackground}
-          emptyStateMessage={`No backgrounds found in ${
-            selectedCategory || "this category"
-          }`}
+          onSelectBackground={setSelectedArtNft}
+          emptyStateMessage={
+            error
+              ? "Failed to load art NFTs"
+              : `No backgrounds found in ${selectedCategory || "this category"}`
+          }
         />
       </div>
-
       <CardModal
-        background={selectedBackground}
-        isOpen={!!selectedBackground}
-        onClose={() => setSelectedBackground(null)}
+        artNft={selectedArtNft}
+        isOpen={!!selectedArtNft}
+        onClose={() => setSelectedArtNft(null)}
         onSelect={handleCardSelect}
       />
     </div>

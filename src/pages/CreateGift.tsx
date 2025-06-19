@@ -68,6 +68,17 @@ const CreateGift = () => {
   const [copied, setCopied] = useState(false);
   const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 
+  // Transfer method state: "secret", "address", "username"
+  const [transferMethod, setTransferMethod] = useState<
+    "setSecretKey" | "transfer" | "transferByBaseUsername"
+  >("setSecretKey");
+  const [recipientUsername, setRecipientUsername] = useState("");
+  const [recipientAddress, setRecipientAddress] = useState("");
+  const [secretKey, setSecretKey] = useState("");
+
+  // Payment method state
+  const [paymentMethod, setPaymentMethod] = useState<"eth" | "usdc">("eth");
+
   useEffect(() => {
     // If no background was selected, and the user navigated directly to this page
     if (!backgroundId && view === "form") {
@@ -115,25 +126,51 @@ const CreateGift = () => {
       return;
     }
 
-    if (!backgroundId) {
-      toast.error(
-        "No background selected. Please go back and select a background."
-      );
+    // Ensure backgroundIds is always an array of string or number
+    const backgroundIds =
+      backgroundId !== undefined && backgroundId !== null ? [backgroundId] : [];
+
+    // Validate required fields for backend
+    if (!Array.isArray(backgroundIds) || backgroundIds.length === 0) {
+      toast.error("No art NFT selected. Please go back and select an art NFT.");
+      return;
+    }
+    if (
+      !paymentMethod ||
+      (paymentMethod !== "eth" && paymentMethod !== "usdc")
+    ) {
+      toast.error("Please select a valid payment method (ETH or USDC).");
       return;
     }
 
     setLoading(true);
 
     try {
-      // Call API to create gift card
-      const result = await createGiftCard({
-        backgroundId,
-        price: backgroundPrice || "0.01",
+      // Prepare payload for API
+      const payload: any = {
+        backgroundIds,
         message: `To: ${giftDetails.recipientName}\nFrom: ${giftDetails.yourName}\n\n${giftDetails.message}`,
-      });
+        price: backgroundPrice || "0.01",
+        paymentMethod,
+      };
+
+      if (transferMethod === "setSecretKey") {
+        payload.transferMethod = "setSecretKey";
+        payload.secret = secretKey.trim();
+      } else if (transferMethod === "transfer") {
+        payload.transferMethod = "transfer";
+        payload.recipientAddress = recipientAddress.trim();
+      } else if (transferMethod === "transferByBaseUsername") {
+        payload.transferMethod = "transferByBaseUsername";
+        payload.recipientUsername = recipientUsername.trim();
+      }
+
+      const result = await createGiftCard(payload);
 
       // Set success data
-      setSecretCode(result.id.toString());
+      setSecretCode(
+        result.id?.toString() || result.giftCardId?.toString() || ""
+      );
       setTransactionHash(result.transactionHash || "");
       setView("success");
       toast.success("Gift card created successfully!");
@@ -200,127 +237,7 @@ const CreateGift = () => {
       <div className="flex-1 pt-32 pb-24 relative z-10">
         <div className="content-container">
           <div className="max-w-2xl mx-auto">
-            {view === "options" ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="text-center mb-16">
-                  <div className="w-20 h-20 mx-auto mb-6 relative">
-                    <div className="absolute inset-0 bg-secondary/30 rounded-full animate-pulse-slow" />
-                    <div className="relative w-full h-full flex items-center justify-center">
-                      <Gift className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
-
-                  <h1 className="text-4xl sm:text-5xl font-display font-medium mb-3 text-white bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">
-                    Create a Gift Pack
-                  </h1>
-                </div>
-
-                <div className="flex flex-col items-center space-y-6">
-                  {!isConnected ? (
-                    <>
-                      <div className="w-full flex justify-center gap-4">
-                        <motion.div
-                          whileHover={{ y: -5 }}
-                          className="flex-1 max-w-xs"
-                        >
-                          <Button
-                            variant="primary"
-                            size="lg"
-                            fullWidth
-                            className="h-14 text-lg bg-gradient-to-r from-primary/90 to-secondary/90 hover:from-primary hover:to-secondary text-white font-medium shadow-xl shadow-primary/20"
-                            icon={<Wallet className="w-5 h-5" />}
-                            onClick={async () => {
-                              try {
-                                // Create a new Coinbase Wallet
-                                const address = await createCoinbaseWallet();
-                                // Connect the newly created wallet
-                                handleWalletConnect(address);
-                                toast.success(
-                                  "Wallet created and connected successfully!"
-                                );
-                              } catch (error: any) {
-                                toast.error(
-                                  error.message || "Failed to create wallet"
-                                );
-                              }
-                            }}
-                          >
-                            Create a Wallet
-                          </Button>
-                        </motion.div>
-
-                        <motion.div
-                          whileHover={{ y: -5 }}
-                          className="flex-1 max-w-xs"
-                        >
-                          <Button
-                            variant="outline"
-                            size="lg"
-                            fullWidth
-                            className="h-14 text-lg border-white/30 bg-white/10 text-white hover:bg-white/20 font-medium shadow-xl"
-                            icon={<Wallet className="w-5 h-5" />}
-                            onClick={async () => {
-                              try {
-                                setWalletDialogOpen(true);
-                                const address = await connectCoinbaseWallet();
-                                handleWalletConnect(address);
-                              } catch (error: any) {
-                                toast.error(
-                                  error.message || "Failed to connect wallet"
-                                );
-                              }
-                            }}
-                          >
-                            Connect a Wallet
-                          </Button>
-                        </motion.div>
-                      </div>
-
-                      <div className="text-center text-base text-white/80">
-                        Create a wallet with{" "}
-                        <span className="font-medium text-white">Face ID</span>{" "}
-                        or{" "}
-                        <span className="font-medium text-white">Touch ID</span>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="text-center text-base text-white">
-                      Wallet connected:{" "}
-                      <span className="font-medium text-primary">
-                        {address?.slice(0, 6)}...{address?.slice(-4)}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="pt-8 pb-8 w-full">
-                    <h2 className="text-3xl font-display font-medium text-center mb-10 text-white">
-                      Make Gift Giving Special
-                    </h2>
-
-                    <motion.div
-                      whileHover={{ y: -5 }}
-                      className="max-w-xs mx-auto"
-                    >
-                      <Button
-                        variant="secondary"
-                        size="lg"
-                        fullWidth
-                        className="h-14 text-lg bg-gradient-to-r from-secondary/90 to-primary/90 hover:from-secondary hover:to-primary text-white font-medium shadow-xl shadow-secondary/20"
-                        icon={<Gift className="w-5 h-5" />}
-                        onClick={() => navigate("/marketplace")}
-                      >
-                        Choose Background First
-                      </Button>
-                    </motion.div>
-                  </div>
-                </div>
-              </motion.div>
-            ) : view === "form" ? (
+            {view === "form" ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -339,7 +256,7 @@ const CreateGift = () => {
                     Create a Gift Card
                   </h1>
                   <p className="text-gray-300">
-                    Send a special gift with a personalized message
+                    Send a special gift with a personalized message and art NFT
                   </p>
                 </div>
 
@@ -347,12 +264,12 @@ const CreateGift = () => {
                   <div className="mb-8 rounded-xl overflow-hidden">
                     <img
                       src={getImageUrl(backgroundImage)}
-                      alt="Selected background"
+                      alt="Selected art NFT"
                       className="w-full h-48 object-cover"
                     />
                     <div className="bg-white/5 p-4 text-center">
                       <p className="text-gray-300">
-                        Selected background - Price: {backgroundPrice} ETH
+                        Selected art NFT - Price: {backgroundPrice} USDC
                       </p>
                     </div>
                   </div>
@@ -411,6 +328,115 @@ const CreateGift = () => {
                           onChange={handleInputChange}
                           className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                         />
+                      </div>
+
+                      {/* Payment method selection */}
+                      <div>
+                        <label className="block text-sm font-medium mb-1 text-gray-300">
+                          Pay With
+                        </label>
+                        <div className="flex gap-4 mb-2">
+                          <button
+                            type="button"
+                            className={`px-4 py-2 rounded-lg border ${
+                              paymentMethod === "eth"
+                                ? "bg-primary text-white border-primary"
+                                : "bg-white/10 text-white border-white/20"
+                            }`}
+                            onClick={() => setPaymentMethod("eth")}
+                          >
+                            ETH
+                          </button>
+                          <button
+                            type="button"
+                            className={`px-4 py-2 rounded-lg border ${
+                              paymentMethod === "usdc"
+                                ? "bg-primary text-white border-primary"
+                                : "bg-white/10 text-white border-white/20"
+                            }`}
+                            onClick={() => setPaymentMethod("usdc")}
+                          >
+                            USDC
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Transfer method selection */}
+                      <div>
+                        <label className="block text-sm font-medium mb-1 text-gray-300">
+                          Transfer Method
+                        </label>
+                        <div className="flex gap-4 mb-2">
+                          <button
+                            type="button"
+                            className={`px-4 py-2 rounded-lg border ${
+                              transferMethod === "setSecretKey"
+                                ? "bg-primary text-white border-primary"
+                                : "bg-white/10 text-white border-white/20"
+                            }`}
+                            onClick={() => setTransferMethod("setSecretKey")}
+                          >
+                            Set Secret Key
+                          </button>
+                          <button
+                            type="button"
+                            className={`px-4 py-2 rounded-lg border ${
+                              transferMethod === "transfer"
+                                ? "bg-primary text-white border-primary"
+                                : "bg-white/10 text-white border-white/20"
+                            }`}
+                            onClick={() => setTransferMethod("transfer")}
+                          >
+                            Wallet Address
+                          </button>
+                          <button
+                            type="button"
+                            className={`px-4 py-2 rounded-lg border ${
+                              transferMethod === "transferByBaseUsername"
+                                ? "bg-primary text-white border-primary"
+                                : "bg-white/10 text-white border-white/20"
+                            }`}
+                            onClick={() =>
+                              setTransferMethod("transferByBaseUsername")
+                            }
+                          >
+                            Base Username
+                          </button>
+                        </div>
+                        {transferMethod === "setSecretKey" && (
+                          <Input
+                            id="secretKey"
+                            name="secretKey"
+                            placeholder="Enter a secret key (min 6 chars)"
+                            value={secretKey}
+                            onChange={(e) => setSecretKey(e.target.value)}
+                            className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                          />
+                        )}
+                        {transferMethod === "transfer" && (
+                          <Input
+                            id="recipientAddress"
+                            name="recipientAddress"
+                            placeholder="Enter recipient's wallet address (0x...)"
+                            value={recipientAddress}
+                            onChange={(e) =>
+                              setRecipientAddress(e.target.value)
+                            }
+                            className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                          />
+                        )}
+                        {transferMethod === "transferByBaseUsername" && (
+                          <Input
+                            id="recipientUsername"
+                            name="recipientUsername"
+                            placeholder="Enter recipient's Base username (e.g. alice.base)"
+                            value={recipientUsername}
+                            onChange={(e) =>
+                              setRecipientUsername(e.target.value)
+                            }
+                            className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                          />
+                        )}
                       </div>
                     </div>
 

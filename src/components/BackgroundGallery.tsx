@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
-import Button from '@/components/Button';
-import { Background } from '@/services/api';
-import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '@/config';
-import { getSignedS3Url, extractFilenameFromUrl } from '@/utils/s3Helpers';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
+import Button from "@/components/Button";
+import { ArtNFT } from "@/services/api";
+import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "@/config";
+import { getSignedS3Url, extractFilenameFromUrl } from "@/utils/s3Helpers";
 
+// Updated props to use ArtNFT
 interface BackgroundGalleryProps {
-  backgrounds: Background[];
+  backgrounds: ArtNFT[];
   isLoading: boolean;
   error: string | null;
-  onSelectBackground: (background: Background) => void;
+  onSelectBackground: (background: ArtNFT) => void;
   emptyStateMessage?: string;
 }
 
@@ -25,51 +26,40 @@ interface ImageUrlCache {
 // URL cache to avoid generating new signed URLs unnecessarily
 const urlCache: ImageUrlCache = {};
 
-const getImageUrl = async (imageURI: string): Promise<string> => {
-  if (!imageURI) return '';
+const getImageUrl = async (imageUri: string): Promise<string> => {
+  if (!imageUri) return "";
 
-  // Check if we have a cached URL that hasn't expired
-  if (urlCache[imageURI] && urlCache[imageURI].expiresAt > Date.now()) {
-    return urlCache[imageURI].url;
+  if (urlCache[imageUri] && urlCache[imageUri].expiresAt > Date.now()) {
+    return urlCache[imageUri].url;
   }
 
   try {
-    let filename = '';
-    
-    if (imageURI.startsWith('http')) {
-      // Extract filename from URL
-      filename = extractFilenameFromUrl(imageURI);
-      if (!filename) return imageURI; // If we can't extract the filename, return the original URL
+    let filename = "";
+
+    if (imageUri.startsWith("http")) {
+      filename = extractFilenameFromUrl(imageUri);
+      if (!filename) return imageUri;
     } else {
-      // For relative paths (e.g., just the filename)
-      filename = imageURI.split('/').pop() || '';
-      if (!filename) return '';
-      
-      // If no extension, default to jpeg
-      filename = filename.includes('.') ? filename : `${filename}.jpeg`;
+      filename = imageUri.split("/").pop() || "";
+      if (!filename) return "";
+      filename = filename.includes(".") ? filename : `${filename}.jpeg`;
     }
 
-    // Generate signed URL for S3 access
     const signedUrl = await getSignedS3Url(filename);
-    
-    // Cache the URL with an expiry time slightly shorter than the actual signed URL expiry
-    // (default is 1 hour, so we cache for 50 minutes)
-    urlCache[imageURI] = {
+
+    urlCache[imageUri] = {
       url: signedUrl,
-      expiresAt: Date.now() + 50 * 60 * 1000 // 50 minutes
+      expiresAt: Date.now() + 50 * 60 * 1000,
     };
-    
+
     return signedUrl;
   } catch (error) {
-    console.error('Error getting signed URL:', error);
-    
-    // Fallback to API URL if S3 URL generation fails
-    const filename = extractFilenameFromUrl(imageURI);
+    console.error("Error getting signed URL:", error);
+    const filename = extractFilenameFromUrl(imageUri);
     if (filename) {
       return `${API_BASE_URL}/uploads/${filename}`;
     }
-    
-    return '';
+    return "";
   }
 };
 
@@ -78,7 +68,7 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
   isLoading,
   error,
   onSelectBackground,
-  emptyStateMessage = 'No backgrounds found in this category'
+  emptyStateMessage = "No backgrounds found in this category",
 }) => {
   const navigate = useNavigate();
   const [imageUrls, setImageUrls] = useState<{ [key: string]: string }>({});
@@ -93,21 +83,20 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
       }
 
       setLoadingImages(true);
-      
+
       try {
         const urlPromises = backgrounds.map(async (background) => {
-          if (!background.imageURI) return [background.id, ''];
-          
-          const url = await getImageUrl(background.imageURI);
+          if (!background.imageUri) return [background.id, ""];
+          const url = await getImageUrl(background.imageUri);
           return [background.id, url];
         });
-        
+
         const urlResults = await Promise.all(urlPromises);
         const urlMap = Object.fromEntries(urlResults);
-        
+
         setImageUrls(urlMap);
       } catch (error) {
-        console.error('Error loading image URLs:', error);
+        console.error("Error loading image URLs:", error);
       } finally {
         setLoadingImages(false);
       }
@@ -129,10 +118,7 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
     return (
       <div className="text-center py-10">
         <div className="text-red-400 mb-3">{error}</div>
-        <Button 
-          onClick={() => window.location.reload()}
-          variant="outline"
-        >
+        <Button onClick={() => window.location.reload()} variant="outline">
           Try Again
         </Button>
       </div>
@@ -144,7 +130,7 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
       <div className="text-center py-20">
         <p className="text-gray-300 text-lg mb-6">{emptyStateMessage}</p>
         <Button
-          onClick={() => navigate('/create-background')}
+          onClick={() => navigate("/create-background")}
           className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3"
         >
           Create the First One
@@ -156,8 +142,8 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {backgrounds.map((background, index) => {
-        const imageUrl = imageUrls[background.id] || '/placeholder-loading.jpg';
-          
+        const imageUrl = imageUrls[background.id] || "/placeholder-loading.jpg";
+
         return (
           <motion.div
             key={background.id}
@@ -171,15 +157,13 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
               <div className="relative h-48">
                 <img
                   src={imageUrl}
-                  alt={background.category}
+                  alt={background.giftCardCategoryId?.toString() || ""}
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     const currentSrc = target.src;
-                  
-                    // If all fails, use placeholder
-                    target.onerror = null; // Prevent infinite loop
-                    target.src = '/placeholder.jpg';
+                    target.onerror = null;
+                    target.src = "/placeholder.jpg";
                     console.error(`Failed to load image: ${currentSrc}`);
                   }}
                 />
@@ -188,22 +172,27 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
                   {background.price} ETH
                 </div>
               </div>
-              
+
               <div className="p-6">
                 <h3 className="text-xl font-medium text-white mb-2 group-hover:text-primary transition-colors">
-                  {background.category}
+                  Category #{background.giftCardCategoryId}
                 </h3>
                 <p className="text-gray-400 text-sm line-clamp-2 mb-4">
                   Beautiful background for creating unique gift cards.
                 </p>
-                
+
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-400">
-                    By {background.artistAddress.slice(0, 6)}...{background.artistAddress.slice(-4)}
+                    By{" "}
+                    {background.artistAddress &&
+                    background.artistAddress.length >= 10
+                      ? `${background.artistAddress.slice(
+                          0,
+                          6
+                        )}...${background.artistAddress.slice(-4)}`
+                      : background.artistAddress || ""}
                   </span>
-                  <span className="text-primary font-medium">
-                    Used {background.usageCount} time{background.usageCount !== 1 ? 's' : ''}
-                  </span>
+                  {/* Usage count is not in ArtNFT, so omit or add if you extend ArtNFT */}
                 </div>
               </div>
             </div>
@@ -214,4 +203,4 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
   );
 };
 
-export default BackgroundGallery; 
+export default BackgroundGallery;

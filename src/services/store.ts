@@ -1,130 +1,146 @@
-import { create } from 'zustand';
-import { Background } from './api';
-import { fetchBackgrounds } from './api';
+import { create } from "zustand";
+import { ArtNFT } from "./api";
+import { fetchArtNFTs } from "./api";
 
-interface BackgroundsState {
-  // Store backgrounds by category
-  backgroundsByCategory: Record<string, Background[]>;
-  // Track which categories have been loaded
-  loadedCategories: Set<string>;
-  // Loading states
+// Use ArtNFT and giftCardCategoryId instead of Background/category
+interface ArtNFTsState {
+  artNftsByCategory: Record<number, ArtNFT[]>;
+  loadedCategories: Set<number>;
   isLoading: boolean;
   error: string | null;
-  
-  // Actions
-  fetchCategoryBackgrounds: (category: string) => Promise<void>;
-  addBackground: (background: Background) => void;
-  updateBackground: (background: Background) => void;
-  fetchAllBackgrounds: () => Promise<void>;
+
+  fetchCategoryArtNfts: (giftCardCategoryId: number) => Promise<void>;
+  addArtNft: (artNft: ArtNFT) => void;
+  updateArtNft: (artNft: ArtNFT) => void;
+  fetchAllArtNfts: () => Promise<void>;
   clearCache: () => void;
 }
 
-export const useBackgroundsStore = create<BackgroundsState>((set, get) => ({
-  backgroundsByCategory: {},
-  loadedCategories: new Set<string>(),
+export const useArtNftsStore = create<ArtNFTsState>((set, get) => ({
+  artNftsByCategory: {},
+  loadedCategories: new Set<number>(),
   isLoading: false,
   error: null,
-  
-  fetchCategoryBackgrounds: async (category: string) => {
-    // Skip if already loaded
-    if (get().loadedCategories.has(category)) {
+
+  fetchCategoryArtNfts: async (giftCardCategoryId: number) => {
+    if (get().loadedCategories.has(giftCardCategoryId)) {
       return;
     }
-    
     set({ isLoading: true, error: null });
-    
     try {
-      const backgrounds = await fetchBackgrounds(category);
-      
+      const artNfts = await fetchArtNFTs(String(giftCardCategoryId));
       set((state) => ({
-        backgroundsByCategory: {
-          ...state.backgroundsByCategory,
-          [category]: backgrounds,
+        artNftsByCategory: {
+          ...state.artNftsByCategory,
+          [giftCardCategoryId]: artNfts,
         },
-        loadedCategories: new Set([...state.loadedCategories, category]),
+        loadedCategories: new Set([
+          ...state.loadedCategories,
+          giftCardCategoryId,
+        ]),
         isLoading: false,
       }));
-      
-      console.log(`Loaded ${backgrounds.length} backgrounds for category: ${category}`);
+      console.log(
+        `Loaded ${artNfts.length} art NFTs for category: ${giftCardCategoryId}`
+      );
     } catch (error) {
-      console.error(`Failed to load backgrounds for category: ${category}`, error);
-      set({ 
-        error: `Failed to load backgrounds for category: ${category}`, 
-        isLoading: false 
+      console.error(
+        `Failed to load art NFTs for category: ${giftCardCategoryId}`,
+        error
+      );
+      set({
+        error: `Failed to load art NFTs for category: ${giftCardCategoryId}`,
+        isLoading: false,
       });
     }
   },
-  
-  fetchAllBackgrounds: async () => {
+
+  fetchAllArtNfts: async () => {
     set({ isLoading: true, error: null });
-    
     try {
-      const backgrounds = await fetchBackgrounds();
-      
-      // Group backgrounds by category
-      const byCategory: Record<string, Background[]> = {};
-      
-      backgrounds.forEach(bg => {
-        const category = bg.category;
-        if (!byCategory[category]) {
-          byCategory[category] = [];
+      // Fetch all art NFTs (no category filter)
+      const artNftsRaw = await fetchArtNFTs();
+      // Normalize the result to always be an array of ArtNFT
+      let nftArray: ArtNFT[] = [];
+      if (Array.isArray(artNftsRaw)) {
+        nftArray = artNftsRaw;
+      } else if (artNftsRaw && Array.isArray((artNftsRaw as any).artNfts)) {
+        nftArray = (artNftsRaw as any).artNfts;
+      } else if (artNftsRaw && Array.isArray((artNftsRaw as any).backgrounds)) {
+        nftArray = (artNftsRaw as any).backgrounds;
+      } else if (artNftsRaw && typeof artNftsRaw === "object") {
+        // Try to extract from any array property
+        const arr = Object.values(artNftsRaw).find((v) => Array.isArray(v));
+        if (Array.isArray(arr)) {
+          nftArray = arr as ArtNFT[];
         }
-        byCategory[category].push(bg);
+      }
+      // Filter out invalid/empty records
+      nftArray = nftArray.filter(
+        (nft) =>
+          nft &&
+          typeof nft.id === "number" &&
+          typeof nft.giftCardCategoryId !== "undefined"
+      );
+      // Group by giftCardCategoryId
+      const byCategory: Record<number, ArtNFT[]> = {};
+      nftArray.forEach((nft) => {
+        const catId = Number(nft.giftCardCategoryId);
+        if (!isNaN(catId) && catId !== 0) {
+          if (!byCategory[catId]) byCategory[catId] = [];
+          byCategory[catId].push(nft);
+        }
       });
-      
-      set({ 
-        backgroundsByCategory: byCategory,
-        loadedCategories: new Set(Object.keys(byCategory)),
-        isLoading: false 
+      set({
+        artNftsByCategory: byCategory,
+        loadedCategories: new Set(Object.keys(byCategory).map(Number)),
+        isLoading: false,
       });
-      
-      console.log(`Loaded backgrounds for ${Object.keys(byCategory).length} categories`);
+      console.log(
+        `Loaded art NFTs for ${Object.keys(byCategory).length} categories`
+      );
     } catch (error) {
-      console.error('Failed to load all backgrounds', error);
-      set({ 
-        error: 'Failed to load backgrounds', 
-        isLoading: false 
+      console.error("Failed to load all art NFTs", error);
+      set({
+        error: "Failed to load art NFTs",
+        isLoading: false,
       });
     }
   },
-  
-  addBackground: (background: Background) => {
+
+  addArtNft: (artNft: ArtNFT) => {
     set((state) => {
-      const category = background.category;
-      const existingCategoryBackgrounds = state.backgroundsByCategory[category] || [];
-      
+      const catId = artNft.giftCardCategoryId;
+      const existing = state.artNftsByCategory[catId] || [];
       return {
-        backgroundsByCategory: {
-          ...state.backgroundsByCategory,
-          [category]: [...existingCategoryBackgrounds, background],
+        artNftsByCategory: {
+          ...state.artNftsByCategory,
+          [catId]: [...existing, artNft],
         },
-        loadedCategories: new Set([...state.loadedCategories, category]),
+        loadedCategories: new Set([...state.loadedCategories, catId]),
       };
     });
   },
-  
-  updateBackground: (background: Background) => {
+
+  updateArtNft: (artNft: ArtNFT) => {
     set((state) => {
-      const category = background.category;
-      const existingCategoryBackgrounds = state.backgroundsByCategory[category] || [];
-      
+      const catId = artNft.giftCardCategoryId;
+      const existing = state.artNftsByCategory[catId] || [];
       return {
-        backgroundsByCategory: {
-          ...state.backgroundsByCategory,
-          [category]: existingCategoryBackgrounds.map(bg => 
-            bg.id === background.id ? background : bg
-          ),
+        artNftsByCategory: {
+          ...state.artNftsByCategory,
+          [catId]: existing.map((nft) => (nft.id === artNft.id ? artNft : nft)),
         },
       };
     });
   },
-  
+
   clearCache: () => {
     set({
-      backgroundsByCategory: {},
-      loadedCategories: new Set<string>(),
+      artNftsByCategory: {},
+      loadedCategories: new Set<number>(),
       isLoading: false,
       error: null,
     });
   },
-})); 
+}));

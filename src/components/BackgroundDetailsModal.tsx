@@ -21,6 +21,7 @@ import {
   createGiftCard,
   setGiftCardSecret,
   transferGiftCard,
+  transferGiftCardByBaseUsername,
   checkApiHealth,
 } from "../utils/api";
 import { useWallet } from "../contexts/WalletContext";
@@ -56,9 +57,10 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
   const mountedRef = React.useRef(true);
   const [activeStep, setActiveStep] = useState(0);
   const [transferType, setTransferType] = useState<
-    "direct" | "giftcard" | null
+    "direct" | "giftcard" | "baseusername" | null
   >(null);
   const [recipientAddress, setRecipientAddress] = useState("");
+  const [recipientUsername, setRecipientUsername] = useState(""); // <-- add this line
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +79,7 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
   }>(null);
   const [loadingPrice, setLoadingPrice] = useState(false);
   const [priceError, setPriceError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"eth" | "usdc">("eth");
 
   // Add cleanup for async operations
   React.useEffect(() => {
@@ -185,6 +188,13 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
         return;
       }
     }
+    // Validate for baseusername transfer
+    if (transferType === "baseusername") {
+      if (!recipientUsername) {
+        setError("Please enter a recipient Base username");
+        return;
+      }
+    }
 
     // Always require secret key for gift card option
     if (transferType === "giftcard" && !secretKey) {
@@ -207,15 +217,20 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
       // Always use the background price
       const price = parseFloat(background.price);
 
+      // Prepare required arrays for backend
+      const backgroundId = background.id;
+      // const artNftPricesUSDC = [background.price]; // Removed as not needed
+
       if (transferType === "direct") {
         // Workflow 1: Create gift card and transfer it directly
 
         // Step 1: Create the gift card
         console.log("Creating gift card for direct transfer...");
         const createResult = await createGiftCard({
-          backgroundId: background.id,
+          backgroundId,
           price: price,
           message: message || "",
+          paymentMethod, // Pass selected payment method
         });
 
         if (!createResult.success) {
@@ -253,15 +268,44 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             transferResult.error || "Failed to transfer gift card"
           );
         }
+      } else if (transferType === "baseusername") {
+        // Workflow 3: Create gift card and transfer using base username
+        console.log("Creating gift card for baseusername transfer...");
+        const createResult = await createGiftCard({
+          backgroundId,
+          price: price,
+          message: message || "",
+          paymentMethod,
+        });
+        if (!createResult.success) {
+          throw new Error(createResult.error || "Failed to create gift card");
+        }
+        console.log("Gift card created successfully:", createResult.data.id);
+
+        // Step 2: Transfer the gift card using base username
+        console.log("Transferring gift card to base username...");
+        const transferResult = await transferGiftCardByBaseUsername({
+          giftCardId: createResult.data.id,
+          baseUsername: recipientUsername, // backend should resolve username to address
+        });
+
+        if (transferResult.success) {
+          toast.success("Gift card transferred using Base username!");
+          onClose();
+        } else {
+          throw new Error(
+            transferResult.error || "Failed to transfer gift card"
+          );
+        }
       } else {
         // Workflow 2: Create gift card with secret key
         console.log("Creating gift card with secret key...");
         const createResult = await createGiftCard({
-          backgroundId: background.id,
+          backgroundId,
           price: price,
           message: message || "",
+          paymentMethod, // Pass selected payment method
         });
-
         if (!createResult.success) {
           throw new Error(createResult.error || "Failed to create gift card");
         }
@@ -316,18 +360,17 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
 
   const handleNextDirect = () => {
     setTransferType("direct");
-  }
+  };
 
   const handleNexGiftcard = () => {
     setTransferType("giftcard");
-  }
+  };
 
   const handleNext = () => {
     if (activeStep === 0 && !transferType) {
       setError("Please select a transfer type");
       return;
     }
-
     if (activeStep === 1) {
       // Only require recipient address for direct transfer
       if (transferType === "direct" && !recipientAddress) {
@@ -336,18 +379,23 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
       }
 
       // Validate Ethereum address format only for direct transfer
-      if (transferType === "direct" && !ethers.utils.isAddress(recipientAddress)) {
+      if (
+        transferType === "direct" &&
+        !ethers.utils.isAddress(recipientAddress)
+      ) {
         setError("Please enter a valid Ethereum address");
         return;
       }
-
+      if (transferType === "baseusername" && !recipientUsername) {
+        setError("Please enter a recipient Base username");
+        return;
+      }
       // For gift card with secret key, require the secret
       if (transferType === "giftcard" && !secretKey) {
         setError("Please enter a secret key");
         return;
       }
     }
-
     if (activeStep === 2) {
       return handleTransferGiftCard();
     }
@@ -379,9 +427,7 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             <Button
               variant="contained"
               fullWidth
-              onClick={() => {              
-                handleNextDirect();
-              }}
+              onClick={() => setTransferType("direct")}
               sx={{
                 mb: 2,
                 bgcolor: "#7F5AF0",
@@ -398,9 +444,7 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             <Button
               variant="outlined"
               fullWidth
-              onClick={() => {
-                handleNexGiftcard();
-              }}
+              onClick={() => setTransferType("giftcard")}
               sx={{
                 color: "white",
                 borderColor: "rgba(255,255,255,0.23)",
@@ -417,6 +461,27 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             >
               Create Gift Card with Secret Key
             </Button>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={() => setTransferType("baseusername")}
+              sx={{
+                color: "white",
+                borderColor: "rgba(255,255,255,0.23)",
+                "&:hover": {
+                  borderColor: "rgba(255,255,255,0.5)",
+                  bgcolor: "rgba(255,255,255,0.05)",
+                },
+                display: "flex",
+                gap: 2,
+                alignItems: "center",
+                justifyContent: "center",
+                mt: 2,
+              }}
+              startIcon={<Send size={20} />}
+            >
+              Transfer Using Base Username
+            </Button>
           </Box>
         );
       case 1:
@@ -425,6 +490,8 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             <Typography variant="h6" gutterBottom sx={{ color: "white" }}>
               {transferType === "direct"
                 ? "Enter Recipient Details"
+                : transferType === "baseusername"
+                ? "Enter Base Username"
                 : "Create Gift Card"}
             </Typography>
             {transferType === "direct" ? (
@@ -438,6 +505,18 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
                 required
                 error={!!error && error.includes("address")}
                 helperText="Enter a valid Ethereum address"
+                sx={{ mb: 3 }}
+              />
+            ) : transferType === "baseusername" ? (
+              <TextField
+                fullWidth
+                label="Recipient Base Username"
+                value={recipientUsername}
+                onChange={(e) => setRecipientUsername(e.target.value)}
+                margin="normal"
+                required
+                error={!!error && error.includes("Base username")}
+                helperText="Enter the recipient's Base username (e.g. alice.base)"
                 sx={{ mb: 3 }}
               />
             ) : (
@@ -481,6 +560,28 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
               error={!!error && error.includes("message")}
               helperText="Enter a message for the recipient"
             />
+            {/* Payment method selection */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Pay With
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Button
+                  variant={paymentMethod === "eth" ? "contained" : "outlined"}
+                  color="primary"
+                  onClick={() => setPaymentMethod("eth")}
+                >
+                  ETH
+                </Button>
+                <Button
+                  variant={paymentMethod === "usdc" ? "contained" : "outlined"}
+                  color="primary"
+                  onClick={() => setPaymentMethod("usdc")}
+                >
+                  USDC
+                </Button>
+              </Box>
+            </Box>
           </Box>
         );
       case 2:
@@ -510,6 +611,13 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
                   sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
                 >
                   Recipient: {recipientAddress}
+                </Typography>
+              ) : transferType === "baseusername" ? (
+                <Typography
+                  variant="body1"
+                  sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
+                >
+                  Base Username: {recipientUsername}
                 </Typography>
               ) : (
                 <Typography
@@ -600,6 +708,12 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
                   </Box>
                 </Box>
               )}
+              <Typography
+                variant="body1"
+                sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
+              >
+                Payment Method: {paymentMethod === "eth" ? "ETH" : "USDC"}
+              </Typography>
             </Box>
           </Box>
         );
@@ -817,10 +931,9 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
           </Button>
         ) : (
           <Button
-          onClick={() => {
-            handleNext();
-          }}
-            
+            onClick={() => {
+              handleNext();
+            }}
             variant="contained"
             sx={{
               bgcolor: "#7F5AF0",

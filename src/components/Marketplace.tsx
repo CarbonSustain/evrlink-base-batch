@@ -4,94 +4,53 @@ import {
   Card,
   CardContent,
   CardMedia,
-  Grid,
   Typography,
   CircularProgress,
   Alert,
 } from "@mui/material";
 import BackgroundDetailsModal from "./BackgroundDetailsModal";
+import { ArtNFT } from "@/services/api";
+import { useArtNftsStore } from "@/services/store";
 
-// Interface used in this component
-interface Background {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  category: string;
-  price: string;
-}
-
-// Interface expected by BackgroundDetailsModal
-interface BackgroundModalProps {
-  id: string;
-  artistAddress: string;
-  imageURI: string;
-  category: string;
-  price: string;
-  usageCount: number;
-  blockchainId?: string;
-  blockchainTxHash?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
+// Marketplace component
 const Marketplace: React.FC = () => {
-  const [backgrounds, setBackgrounds] = useState<Background[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedBackground, setSelectedBackground] =
-    useState<Background | null>(null);
+  const [selectedArtNft, setSelectedArtNft] = useState<ArtNFT | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
+  // Use Zustand store for ArtNFTs
+  const { artNftsByCategory, fetchAllArtNfts, isLoading, error } =
+    useArtNftsStore();
+
+  // Flatten all NFTs for display
+  const allArtNfts: ArtNFT[] = Object.values(artNftsByCategory).flat();
+
   useEffect(() => {
-    fetchBackgrounds();
-  }, []);
+    fetchAllArtNfts();
+  }, [fetchAllArtNfts]);
 
-  const fetchBackgrounds = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch("http://localhost:3001/api/backgrounds");
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || "Failed to fetch backgrounds");
-      }
-
-      setBackgrounds(data.backgrounds);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch backgrounds"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBackgroundClick = (background: Background) => {
-    setSelectedBackground(background);
+  const handleArtNftClick = (artNft: ArtNFT) => {
+    setSelectedArtNft(artNft);
     setModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setModalOpen(false);
-    setSelectedBackground(null);
+    setSelectedArtNft(null);
   };
 
-  // Transform Background to BackgroundModalProps
-  const transformBackground = (bg: Background): BackgroundModalProps => {
-    return {
-      id: bg.id,
-      artistAddress: "0x0000000000000000000000000000000000000000", // Default value
-      imageURI: bg.imageUrl,
-      category: bg.category,
-      price: bg.price,
-      usageCount: 0, // Default value
-      createdAt: new Date().toISOString(), // Default value
-    };
-  };
+  // Transform ArtNFT to BackgroundModalProps (legacy modal)
+  const transformArtNft = (nft: ArtNFT) => ({
+    id: nft.id.toString(),
+    artistAddress: nft.artistAddress,
+    imageURI: nft.imageUri,
+    category: nft.giftCardCategoryId.toString(),
+    price: nft.price,
+    usageCount: 0,
+    createdAt: nft.createdAt,
+    updatedAt: nft.updatedAt,
+  });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Box
         sx={{
@@ -131,8 +90,8 @@ const Marketplace: React.FC = () => {
           },
         }}
       >
-        {backgrounds.map((background) => (
-          <Box key={background.id}>
+        {allArtNfts.map((artNft) => (
+          <Box key={artNft.id}>
             <Card
               sx={{
                 cursor: "pointer",
@@ -141,24 +100,24 @@ const Marketplace: React.FC = () => {
                   transform: "scale(1.02)",
                 },
               }}
-              onClick={() => handleBackgroundClick(background)}
+              onClick={() => handleArtNftClick(artNft)}
             >
               <CardMedia
                 component="img"
                 height="200"
-                image={background.imageUrl}
-                alt={background.name}
+                image={artNft.imageUri}
+                alt={`ArtNFT #${artNft.id}`}
                 sx={{ objectFit: "cover" }}
               />
               <CardContent>
                 <Typography variant="h6" noWrap>
-                  {background.name}
+                  ArtNFT #{artNft.id}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" noWrap>
-                  {background.description}
+                  Category: {artNft.giftCardCategoryId}
                 </Typography>
                 <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
-                  {background.price} ETH
+                  {artNft.price} ETH
                 </Typography>
               </CardContent>
             </Card>
@@ -166,11 +125,11 @@ const Marketplace: React.FC = () => {
         ))}
       </Box>
 
-      {selectedBackground && (
+      {selectedArtNft && (
         <BackgroundDetailsModal
           open={modalOpen}
           onClose={handleCloseModal}
-          background={transformBackground(selectedBackground)}
+          background={transformArtNft(selectedArtNft)}
         />
       )}
     </Box>

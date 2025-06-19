@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,30 +12,32 @@ import {
   TextField,
   Chip,
   Divider,
-} from '@mui/material';
-import { getGiftCardDetails } from '../utils/api';
-import { formatAddress, formatDate, formatPrice } from '../utils/format';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { ContentCopy, Check } from '@mui/icons-material';
+} from "@mui/material";
+import { getGiftCardDetails } from "../utils/api";
+import { formatAddress, formatDate, formatPrice } from "../utils/format";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import { ContentCopy, Check } from "@mui/icons-material";
 
 interface GiftCardDetailsModalProps {
   open: boolean;
   onClose: () => void;
   giftCardId: string | null;
-  mode?: 'view' | 'transfer' | 'secret';
+  mode?: "view" | "transfer" | "secret";
 }
 
 const GiftCardDetailsModal: React.FC<GiftCardDetailsModalProps> = ({
   open,
   onClose,
   giftCardId,
-  mode = 'view'
+  mode = "view",
 }) => {
   const [giftCard, setGiftCard] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
-  const [recipientAddress, setRecipientAddress] = useState<string>('');
+  const [recipientAddress, setRecipientAddress] = useState<string>("");
+  // Add payment method state
+  const [paymentMethod, setPaymentMethod] = useState<"eth" | "usdc">("eth");
 
   useEffect(() => {
     if (open && giftCardId) {
@@ -50,20 +52,20 @@ const GiftCardDetailsModal: React.FC<GiftCardDetailsModalProps> = ({
 
   const loadGiftCardDetails = async () => {
     if (!giftCardId) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await getGiftCardDetails(giftCardId);
       if (response.success) {
         setGiftCard(response.data);
       } else {
-        setError(response.error || 'Failed to load gift card details');
+        setError(response.error || "Failed to load gift card details");
       }
     } catch (err) {
-      setError('An unexpected error occurred');
-      console.error('Error loading gift card:', err);
+      setError("An unexpected error occurred");
+      console.error("Error loading gift card:", err);
     } finally {
       setLoading(false);
     }
@@ -76,37 +78,37 @@ const GiftCardDetailsModal: React.FC<GiftCardDetailsModalProps> = ({
 
   const handleTransfer = () => {
     // Implement transfer functionality
-    console.log('Transferring gift card', giftCardId, 'to', recipientAddress);
+    console.log("Transferring gift card", giftCardId, "to", recipientAddress);
     // Call the transfer API here
     onClose();
   };
 
   const getModalTitle = () => {
     switch (mode) {
-      case 'transfer':
-        return 'Transfer Gift Card';
-      case 'secret':
-        return 'Secret Key';
+      case "transfer":
+        return "Transfer Gift Card";
+      case "secret":
+        return "Secret Key";
       default:
-        return 'Gift Card Details';
+        return "Gift Card Details";
     }
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="sm" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
       fullWidth
-      PaperProps={{ 
-        sx: { 
+      PaperProps={{
+        sx: {
           borderRadius: 2,
-          overflow: 'hidden'
-        } 
+          overflow: "hidden",
+        },
       }}
     >
       {loading ? (
-        <DialogContent sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <DialogContent sx={{ display: "flex", justifyContent: "center", p: 4 }}>
           <CircularProgress />
         </DialogContent>
       ) : error ? (
@@ -115,71 +117,84 @@ const GiftCardDetailsModal: React.FC<GiftCardDetailsModalProps> = ({
         </DialogContent>
       ) : giftCard ? (
         <>
-          <Box sx={{ position: 'relative' }}>
-            <img 
+          <Box sx={{ position: "relative" }}>
+            <img
               src={giftCard.imageURI}
               alt="Gift Card"
-              style={{ 
-                width: '100%',
+              style={{
+                width: "100%",
                 height: 180,
-                objectFit: 'cover'
+                objectFit: "cover",
               }}
             />
-            <Box 
-              sx={{ 
-                position: 'absolute',
+            <Box
+              sx={{
+                position: "absolute",
                 bottom: 0,
                 left: 0,
                 right: 0,
                 p: 2,
-                background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
-                color: 'white'
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,0.7), transparent)",
+                color: "white",
               }}
             >
-              <Typography variant="h6">
-                Gift Card
-              </Typography>
+              <Typography variant="h6">Gift Card</Typography>
               <Typography variant="body2">
                 ID: {formatAddress(giftCard.id)}
               </Typography>
             </Box>
             {giftCard.hasSecretKey && (
-              <Chip 
-                label="Secret Key" 
-                color="primary" 
-                size="small" 
-                sx={{ 
-                  position: 'absolute',
+              <Chip
+                label="Secret Key"
+                color="primary"
+                size="small"
+                sx={{
+                  position: "absolute",
                   top: 12,
-                  right: 12
-                }} 
+                  right: 12,
+                }}
               />
             )}
           </Box>
-          
+
           <DialogContent>
             <Box sx={{ mt: 1, mb: 3 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 0.5 }}
+              >
                 <strong>Owner:</strong> {formatAddress(giftCard.owner)}
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 0.5 }}
+              >
                 <strong>Price:</strong> {formatPrice(giftCard.price)}
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                <strong>Status:</strong> {giftCard.status?.charAt(0).toUpperCase() + giftCard.status?.slice(1) || 'Unknown'}
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 0.5 }}
+              >
+                <strong>Status:</strong>{" "}
+                {giftCard.status?.charAt(0).toUpperCase() +
+                  giftCard.status?.slice(1) || "Unknown"}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 <strong>Created:</strong> {formatDate(giftCard.createdAt)}
               </Typography>
             </Box>
-            
+
             {giftCard.message && (
-              <Box 
-                sx={{ 
-                  p: 2, 
-                  bgcolor: 'rgba(0,0,0,0.04)', 
+              <Box
+                sx={{
+                  p: 2,
+                  bgcolor: "rgba(0,0,0,0.04)",
                   borderRadius: 1,
-                  mb: 3
+                  mb: 3,
                 }}
               >
                 <Typography variant="body1" fontStyle="italic">
@@ -187,33 +202,36 @@ const GiftCardDetailsModal: React.FC<GiftCardDetailsModalProps> = ({
                 </Typography>
               </Box>
             )}
-            
-            {mode === 'secret' && giftCard.secretKey && (
+
+            {mode === "secret" && giftCard.secretKey && (
               <>
                 <Divider sx={{ mb: 2 }} />
                 <Typography variant="subtitle1" gutterBottom>
                   Secret Key
                 </Typography>
-                <Box 
-                  sx={{ 
-                    display: 'flex',
-                    alignItems: 'center',
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
                     gap: 1,
-                    mb: 2
+                    mb: 2,
                   }}
                 >
                   <TextField
                     fullWidth
-                    value={giftCard.secretKey || ''}
+                    value={giftCard.secretKey || ""}
                     variant="outlined"
                     size="small"
                     InputProps={{
                       readOnly: true,
                     }}
                   />
-                  <CopyToClipboard text={giftCard.secretKey || ''} onCopy={handleCopy}>
-                    <Button 
-                      variant="contained" 
+                  <CopyToClipboard
+                    text={giftCard.secretKey || ""}
+                    onCopy={handleCopy}
+                  >
+                    <Button
+                      variant="contained"
                       color={copied ? "success" : "primary"}
                       startIcon={copied ? <Check /> : <ContentCopy />}
                     >
@@ -222,12 +240,13 @@ const GiftCardDetailsModal: React.FC<GiftCardDetailsModalProps> = ({
                   </CopyToClipboard>
                 </Box>
                 <Alert severity="warning" sx={{ mb: 2 }}>
-                  Keep this secret key secure. Anyone with this key can claim this gift card.
+                  Keep this secret key secure. Anyone with this key can claim
+                  this gift card.
                 </Alert>
               </>
             )}
-            
-            {mode === 'transfer' && (
+
+            {mode === "transfer" && (
               <>
                 <Divider sx={{ mb: 2 }} />
                 <Typography variant="subtitle1" gutterBottom>
@@ -245,38 +264,60 @@ const GiftCardDetailsModal: React.FC<GiftCardDetailsModalProps> = ({
                 />
               </>
             )}
+            {/* Payment method selection */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Pay With
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Button
+                  variant={paymentMethod === "eth" ? "contained" : "outlined"}
+                  color="primary"
+                  onClick={() => setPaymentMethod("eth")}
+                >
+                  ETH
+                </Button>
+                <Button
+                  variant={paymentMethod === "usdc" ? "contained" : "outlined"}
+                  color="primary"
+                  onClick={() => setPaymentMethod("usdc")}
+                >
+                  USDC
+                </Button>
+              </Box>
+            </Box>
           </DialogContent>
-          
+
           <DialogActions sx={{ p: 2, pt: 0 }}>
             <Button onClick={onClose} color="inherit">
               Close
             </Button>
-            {mode === 'view' && giftCard.hasSecretKey && (
-              <Button 
+            {mode === "view" && giftCard.hasSecretKey && (
+              <Button
                 color="primary"
                 variant="outlined"
                 onClick={() => {
                   // You would implement logic to show the secret key
-                  console.log('Show secret key for gift card', giftCardId);
+                  console.log("Show secret key for gift card", giftCardId);
                 }}
               >
                 View Secret Key
               </Button>
             )}
-            {mode === 'view' && (
-              <Button 
+            {mode === "view" && (
+              <Button
                 color="primary"
                 variant="contained"
                 onClick={() => {
                   // You would implement logic to transfer the gift card
-                  console.log('Transfer gift card', giftCardId);
+                  console.log("Transfer gift card", giftCardId);
                 }}
               >
                 Transfer
               </Button>
             )}
-            {mode === 'transfer' && (
-              <Button 
+            {mode === "transfer" && (
+              <Button
                 color="primary"
                 variant="contained"
                 onClick={handleTransfer}
@@ -296,4 +337,4 @@ const GiftCardDetailsModal: React.FC<GiftCardDetailsModalProps> = ({
   );
 };
 
-export default GiftCardDetailsModal; 
+export default GiftCardDetailsModal;

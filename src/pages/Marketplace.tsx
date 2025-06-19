@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -12,15 +12,11 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { fetchBackgrounds, DatabaseEvents } from "@/services/api";
-import { Background } from "@/services/api";
+import { useArtNftsStore } from "@/services/store";
+import { API_BASE_URL, ArtNFT } from "@/services/api";
 import Button from "@/components/Button";
-import { useBackgroundAddedEvent } from "@/hooks/useDatabaseEvents";
-import { toast } from "react-hot-toast";
-import { useBackgroundsStore } from "@/services/store";
 import CategoryNav from "@/components/CategoryNav";
 import BackgroundGallery from "@/components/BackgroundGallery";
-import { API_BASE_URL } from "@/services/api";
 import BackgroundDetailsModal from "@/components/BackgroundDetailsModal";
 
 interface Category {
@@ -32,22 +28,11 @@ interface Category {
 }
 
 interface BackgroundModalProps {
-  background: Background | null;
+  background: ArtNFT | null;
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (background: Background) => void;
+  onSelect: (background: ArtNFT) => void;
 }
-
-// Add placeholder images for categories to ensure they always display something
-const DEFAULT_CATEGORY_IMAGES = {
-  "Birthday Cards": "/categories/birthday.jpg",
-  "Wedding Cards": "/categories/wedding.jpg",
-  "Holiday Cards": "/categories/holiday.jpg",
-  "Love Cards": "/categories/love.jpg",
-  "Thank You Cards": "/categories/thankyou.jpg",
-  "Anniversary Cards": "/categories/anniversary.jpg",
-  default: "/categories/default.jpg",
-};
 
 // Update getImageUrl to handle backend URLs and Windows paths
 const getImageUrl = (imageURI: string): string => {
@@ -74,8 +59,11 @@ const BackgroundModal: React.FC<BackgroundModalProps> = ({
 }) => {
   if (!background) return null;
 
+  // Use optional chaining and fallback for artistAddress
+  const artistAddress = background.artistAddress || "";
+
   // Use the getImageUrl function for consistent image URL handling
-  const imageUrl = getImageUrl(background.imageURI);
+  const imageUrl = getImageUrl(background.imageUri);
 
   return (
     <>
@@ -104,7 +92,7 @@ const BackgroundModal: React.FC<BackgroundModalProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B14] to-transparent z-10" />
                 <img
                   src={imageUrl}
-                  alt={background.category}
+                  alt={`Category ${background.giftCardCategoryId}`}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -113,12 +101,9 @@ const BackgroundModal: React.FC<BackgroundModalProps> = ({
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-3xl font-display font-medium text-white mb-2">
-                      {background.category}
+                      {background.giftCardCategoryId}
                     </h3>
-                    <p className="text-gray-400 text-lg">
-                      By {background.artistAddress.slice(0, 6)}...
-                      {background.artistAddress.slice(-4)}
-                    </p>
+                    <p className="text-gray-400 text-lg"></p>
                   </div>
                   <div className="bg-primary/20 px-6 py-3 rounded-full">
                     <span className="text-primary font-medium text-lg">
@@ -128,7 +113,7 @@ const BackgroundModal: React.FC<BackgroundModalProps> = ({
                 </div>
 
                 <p className="text-gray-300 text-lg leading-relaxed mb-8">
-                  Beautiful background from our {background.category}{" "}
+                  Beautiful background from our {background.giftCardCategoryId}{" "}
                   collection. Use this to create a unique gift card that will be
                   minted on the blockchain.
                 </p>
@@ -142,20 +127,6 @@ const BackgroundModal: React.FC<BackgroundModalProps> = ({
                       <span>Creator Earnings</span>
                       <span className="text-primary font-medium">40%</span>
                     </li>
-                    <li className="flex justify-between items-center">
-                      <span>Used</span>
-                      <span className="text-secondary font-medium">
-                        {background.usageCount} times
-                      </span>
-                    </li>
-                    {background.blockchainId && (
-                      <li className="flex justify-between items-center">
-                        <span>Blockchain ID</span>
-                        <span className="text-secondary font-medium">
-                          #{background.blockchainId}
-                        </span>
-                      </li>
-                    )}
                   </ul>
                 </div>
 
@@ -174,135 +145,71 @@ const BackgroundModal: React.FC<BackgroundModalProps> = ({
   );
 };
 
-const categories: Category[] = [
-  {
-    id: "Birthday Cards",
-    name: "Birthday Cards",
-    image: "/categories/birthday.jpg",
-    description: "Celebrate special days with unique blockchain cards",
-    icon: <Gift className="w-6 h-6" />,
-  },
-  {
-    id: "Wedding Cards",
-    name: "Wedding Cards",
-    image: "/categories/wedding.jpg",
-    description: "Commemorate beautiful unions forever on-chain",
-    icon: <Heart className="w-6 h-6" />,
-  },
-  {
-    id: "Holiday Cards",
-    name: "Holiday Cards",
-    image: "/categories/holiday.jpg",
-    description: "Welcome new beginnings with digital memories",
-    icon: <Sparkles className="w-6 h-6" />,
-  },
-  {
-    id: "Love Cards",
-    name: "Love & Romance",
-    image: "/categories/love.jpg",
-    description: "Express your feelings with blockchain permanence",
-    icon: <Heart className="w-6 h-6" />,
-  },
-  {
-    id: "Thank You Cards",
-    name: "Thank You Cards",
-    image: "/categories/thankyou.jpg",
-    description: "Show gratitude with unique digital cards",
-    icon: <Star className="w-6 h-6" />,
-  },
-  {
-    id: "Anniversary Cards",
-    name: "Anniversary Cards",
-    image: "/categories/anniversary.jpg",
-    description: "Celebrate milestones with digital keepsakes",
-    icon: <Lock className="w-6 h-6" />,
-  },
-];
-
 const Marketplace: React.FC = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedBackground, setSelectedBackground] =
-    useState<Background | null>(null);
+  const [selectedArtNft, setSelectedArtNft] = useState<ArtNFT | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  // Use the backgrounds store
+  // Use the artNfts store
   const {
-    backgroundsByCategory,
+    artNftsByCategory,
     isLoading,
     error,
-    fetchCategoryBackgrounds,
-    fetchAllBackgrounds,
-    addBackground,
-    updateBackground,
-  } = useBackgroundsStore();
+    fetchCategoryArtNfts,
+    fetchAllArtNfts,
+    addArtNft,
+    updateArtNft,
+  } = useArtNftsStore();
 
-  // Get backgrounds for the selected category, or all backgrounds if no category is selected
-  const backgrounds = selectedCategory
-    ? backgroundsByCategory[selectedCategory] || []
-    : Object.values(backgroundsByCategory).flat();
+  // Get artNfts for the selected category, or all artNfts if no category is selected
+  const artNfts =
+    selectedCategory !== null
+      ? artNftsByCategory[Number(selectedCategory)] || []
+      : Object.values(artNftsByCategory).flat();
 
   useEffect(() => {
-    // Load all backgrounds on first load
-    fetchAllBackgrounds();
-
-    // Subscribe to background added/updated events
-    const unsubscribeAdded = DatabaseEvents.onBackgroundAdded(
-      handleBackgroundAdded
-    );
-    const unsubscribeUpdated = DatabaseEvents.onBackgroundUpdated(
-      handleBackgroundUpdated
-    );
-
-    // Clean up event listeners on component unmount
-    return () => {
-      unsubscribeAdded();
-      unsubscribeUpdated();
-    };
+    fetchAllArtNfts();
+    // If you want to handle events, subscribe here
+    // ...existing code...
   }, []);
 
-  // When category changes, load backgrounds for that category if needed
   useEffect(() => {
     if (
-      selectedCategory &&
-      (!backgroundsByCategory[selectedCategory] ||
-        backgroundsByCategory[selectedCategory].length === 0)
+      selectedCategory !== null &&
+      (!artNftsByCategory[Number(selectedCategory)] ||
+        artNftsByCategory[Number(selectedCategory)].length === 0)
     ) {
-      fetchCategoryBackgrounds(selectedCategory);
+      fetchCategoryArtNfts(Number(selectedCategory));
     }
   }, [selectedCategory]);
 
-  // Handlers for background changes
-  const handleBackgroundAdded = (background: Background) => {
-    console.log("Background added:", background);
-    addBackground(background);
+  const handleArtNftAdded = (artNft: ArtNFT) => {
+    addArtNft(artNft);
   };
 
-  const handleBackgroundUpdated = (background: Background) => {
-    console.log("Background updated:", background);
-    updateBackground(background);
+  const handleArtNftUpdated = (artNft: ArtNFT) => {
+    updateArtNft(artNft);
   };
 
-  const handleBackgroundSelect = (background: Background) => {
-    setSelectedBackground(background);
+  const handleArtNftSelect = (artNft: ArtNFT) => {
+    setSelectedArtNft(artNft);
     setIsDetailsModalOpen(true);
   };
 
   const handleCloseDetailsModal = () => {
     setIsDetailsModalOpen(false);
-    setSelectedBackground(null);
+    setSelectedArtNft(null);
   };
 
-  // Handle category selection
-  const handleCategorySelect = (category: string) => {
+  const handleCategorySelect = (category: string | null) => {
     setSelectedCategory(category);
-
-    // Load backgrounds for this category if not already loaded
     if (
-      !backgroundsByCategory[category] ||
-      backgroundsByCategory[category].length === 0
+      category !== null &&
+      (!artNftsByCategory[Number(category)] ||
+        artNftsByCategory[Number(category)].length === 0)
     ) {
-      fetchCategoryBackgrounds(category);
+      fetchCategoryArtNfts(Number(category));
     }
   };
 
@@ -334,7 +241,7 @@ const Marketplace: React.FC = () => {
 
       <main className="flex-1 pt-32 pb-20">
         <div className="content-container relative z-10">
-          {!selectedCategory ? (
+          {selectedCategory === null ? (
             <>
               <div className="max-w-3xl mx-auto text-center mb-16">
                 <motion.div
@@ -374,23 +281,22 @@ const Marketplace: React.FC = () => {
                 </motion.div>
               </div>
 
-              {/* Category Navigation for selection */}
               <CategoryNav
-                categories={Object.keys(backgroundsByCategory)}
+                categories={Object.keys(artNftsByCategory)}
                 selectedCategory={selectedCategory}
                 onSelectCategory={handleCategorySelect}
               />
 
-              {/* Show all backgrounds if no category is selected */}
+              {/* Show all artNfts if no category is selected */}
               <div className="mt-12">
                 <h2 className="text-2xl font-display font-medium text-white mb-6">
                   All Backgrounds
                 </h2>
                 <BackgroundGallery
-                  backgrounds={backgrounds}
+                  backgrounds={artNfts}
                   isLoading={isLoading}
                   error={error}
-                  onSelectBackground={handleBackgroundSelect}
+                  onSelectBackground={handleArtNftSelect}
                   emptyStateMessage="No backgrounds available yet. Be the first to create one!"
                 />
               </div>
@@ -420,24 +326,23 @@ const Marketplace: React.FC = () => {
                     Back to Categories
                   </button>
                   <h1 className="text-3xl font-display font-medium text-white">
-                    {selectedCategory}
+                    Category #{selectedCategory}
                   </h1>
                 </div>
               </div>
 
-              {/* Category Navigation for switching between categories */}
               <CategoryNav
-                categories={Object.keys(backgroundsByCategory)}
+                categories={Object.keys(artNftsByCategory)}
                 selectedCategory={selectedCategory}
                 onSelectCategory={handleCategorySelect}
               />
 
-              {/* Background gallery for the selected category */}
+              {/* ArtNFT gallery for the selected category */}
               <BackgroundGallery
-                backgrounds={backgrounds}
+                backgrounds={artNfts}
                 isLoading={isLoading}
                 error={error}
-                onSelectBackground={handleBackgroundSelect}
+                onSelectBackground={handleArtNftSelect}
                 emptyStateMessage={`No backgrounds found in ${
                   selectedCategory || "this category"
                 }`}
@@ -447,11 +352,20 @@ const Marketplace: React.FC = () => {
         </div>
       </main>
 
-      {selectedBackground && (
+      {selectedArtNft && (
         <BackgroundDetailsModal
           open={isDetailsModalOpen}
           onClose={handleCloseDetailsModal}
-          background={selectedBackground}
+          background={{
+            id: selectedArtNft.id.toString(),
+            artistAddress: selectedArtNft.artistAddress,
+            imageURI: selectedArtNft.imageUri,
+            category: selectedArtNft.giftCardCategoryId.toString(),
+            price: selectedArtNft.price,
+            usageCount: 0,
+            createdAt: selectedArtNft.createdAt,
+            updatedAt: selectedArtNft.updatedAt,
+          }}
         />
       )}
     </div>

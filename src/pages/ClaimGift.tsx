@@ -49,9 +49,11 @@ const ClaimGift = () => {
     setLoading(true);
 
     try {
+      console.log("Claiming gift card with ID:", giftCardId);
       const response = await claimGiftCard({
-        giftCardId,
+        giftCardId: Number(giftCardId),
         secret: secretMessage,
+        claimerAddress: walletAddress,
       });
 
       if (response.success) {
@@ -61,16 +63,28 @@ const ClaimGift = () => {
           "Gift claimed successfully! Click the card to see it flip in 3D!"
         );
       } else {
+        // Show a user-friendly error if the backend returns a revert reason
+        let backendError = "Failed to claim gift card";
+        if (response?.error && typeof response.error === "string") {
+          // Try to extract a readable reason from the error string
+          const match = response.error.match(/reason="([^"]+)"/);
+          if (match && match[1]) {
+            backendError = match[1];
+          } else {
+            backendError = response.error;
+          }
+        }
+        toast.error(backendError);
         console.error("Claim response:", response);
-        if (giftCardId === "TEST-2024-001" && secretMessage === "birthday2024") {
-          // For test case, simulate success
+
+        // Keep the test case for demo
+        if (
+          giftCardId === "TEST-2024-001" &&
+          secretMessage === "birthday2024"
+        ) {
           setClaimed(true);
           toast.success("Test gift card claimed successfully!");
           toast.success("Click the card to see it flip in 3D!");
-        } else {
-          toast.error(
-            'Invalid secret message. Try using "birthday2024" with gift card ID "TEST-2024-001" to see a sample gift.'
-          );
         }
       }
     } catch (error: any) {
@@ -94,12 +108,12 @@ const ClaimGift = () => {
 
   const handleConnectWallet = async () => {
     try {
-      setIsWalletConnecting(true);
+      setIsWalletConnected(true);
       // Check if MetaMask is installed
       if (typeof window.ethereum !== "undefined") {
         // Request account access
         await window.ethereum.request({ method: "eth_requestAccounts" });
-        setIsWalletConnecting(true);
+        setIsWalletConnected(true);
         toast.success("Wallet connected successfully!");
       } else {
         toast.error("Please install MetaMask to connect your wallet");
@@ -108,7 +122,7 @@ const ClaimGift = () => {
       toast.error("Failed to connect wallet");
       console.error("Wallet connection error:", error);
     } finally {
-      setIsWalletConnecting(false);
+      setIsWalletConnected(false);
     }
   };
 
@@ -317,7 +331,3 @@ const ClaimGift = () => {
 };
 
 export default ClaimGift;
-function setIsWalletConnecting(arg0: boolean) {
-  throw new Error("Function not implemented.");
-  // Removed unused function definition
-}

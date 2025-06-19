@@ -283,7 +283,7 @@ export const getUserProfile = async (
   address: string
 ): Promise<ApiResponse<UserProfileData>> => {
   if (!address) {
-    throw new Error('Wallet address is required');
+    throw new Error("Wallet address is required");
   }
 
   const url = `${API_BASE_URL}/api/user/${address}`;
@@ -300,7 +300,9 @@ export const getUserProfile = async (
         status: response.status,
         error: errorText,
       });
-      throw new Error(`Failed to fetch profile: ${response.status} ${errorText}`);
+      throw new Error(
+        `Failed to fetch profile: ${response.status} ${errorText}`
+      );
     }
 
     const data = await response.json();
@@ -311,7 +313,8 @@ export const getUserProfile = async (
       data: {
         id: data.id || null,
         walletAddress: data.walletAddress || address,
-        username: data.username || `${address.slice(0, 6)}...${address.slice(-4)}`,
+        username:
+          data.username || `${address.slice(0, 6)}...${address.slice(-4)}`,
         bio: data.bio || "",
         profileImageUrl: data.profileImageUrl || "",
         stats: {
@@ -475,8 +478,10 @@ export interface CreateGiftCardParams {
   backgroundId: string;
   price: number | string;
   message?: string;
+  paymentMethod?: "eth" | "usdc";
 }
 
+// --- PATCH: Ensure backgroundIds and artNftPricesUSDC are sent as required by backend ---
 export const createGiftCard = async (
   params: CreateGiftCardParams
 ): Promise<ApiResponse<{ id: string }>> => {
@@ -484,21 +489,55 @@ export const createGiftCard = async (
     const url = `${API_BASE_URL}/api/gift-cards/create`;
     console.log("Creating gift card at:", url);
 
+    // Debug: log params and token
+    console.log("Gift card creation params:", params);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Not authenticated. Please connect your wallet.");
+    }
+
+    // Defensive: check required fields
+    if (!params.backgroundId || !params.price) {
+      throw new Error("Missing backgroundId or price for gift card creation.");
+    }
+
+    // Backend expects backgroundIds (array) and artNftPricesUSDC (array)
+    const backgroundIds = [params.backgroundId];
+    const artNftPricesUSDC = [params.price.toString()];
+
+    const payload = {
+      ...params,
+      backgroundIds,
+      artNftPricesUSDC,
+    };
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(params),
+      body: JSON.stringify(payload),
     });
+
+    // Debug: log response status
+    console.log("Gift card creation response status:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Gift card creation failed:", errorText);
+      throw new Error(
+        `Failed to create gift card: ${response.status} ${errorText}`
+      );
+    }
 
     return await handleApiResponse(response);
   } catch (error) {
     console.error("Create gift card error:", error);
     return {
       success: false,
-      error: "Failed to create gift card",
+      error:
+        error instanceof Error ? error.message : "Failed to create gift card",
     };
   }
 };
@@ -538,6 +577,36 @@ export const transferGiftCard = async (
   }
 };
 
+/**
+ * Transfer a gift card using a Base username.
+ */
+export const transferGiftCardByBaseUsername = async ({
+  giftCardId,
+  baseUsername,
+}: {
+  giftCardId: string | number;
+  baseUsername: string;
+}): Promise<ApiResponse<any>> => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/giftcard/transfer-by-baseusername`,
+      {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ giftCardId, baseUsername }),
+      }
+    );
+
+    return await handleApiResponse(response);
+  } catch (error) {
+    console.error("Transfer by base username error:", error);
+    return {
+      success: false,
+      error: "Failed to transfer gift card by base username",
+    };
+  }
+};
+
 export interface GiftCardSecretResponse {
   success: boolean;
   data?: any;
@@ -550,19 +619,28 @@ export interface GiftCardSecretResponse {
 export const setGiftCardSecret = async ({
   giftCardId,
   secret,
+  ownerAddress,
+  artNftId,
 }: {
   giftCardId: string;
   secret: string;
+  ownerAddress?: string;
+  artNftId?: string | number;
 }): Promise<GiftCardSecretResponse> => {
   try {
-    // Use the correct endpoint with the proper path structure
-    const url = `${API_BASE_URL}/api/gift-cards/set-secret`;
+    // Use the RESTful endpoint with giftCardId in the path
+    const url = `${API_BASE_URL}/api/gift-cards/${giftCardId}/set-secret`;
     console.log(
       "Setting gift card secret at:",
       url,
       "for gift card:",
       giftCardId
     );
+
+    // Build request body with optional ownerAddress and artNftId
+    const body: any = { secret };
+    if (ownerAddress) body.ownerAddress = ownerAddress;
+    if (artNftId) body.artNftId = artNftId;
 
     // Use fetch with authentication headers
     const response = await fetch(url, {
@@ -571,10 +649,7 @@ export const setGiftCardSecret = async ({
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      body: JSON.stringify({
-        giftCardId,
-        secret,
-      }),
+      body: JSON.stringify(body),
     });
 
     console.log("Set gift card secret response status:", response.status);
@@ -618,11 +693,18 @@ export const setGiftCardSecret = async ({
 /**
  * Claim a gift card using a secret key
  */
-export const claimGiftCard = async (giftCardId: string, secret: string) => {
+export const claimGiftCard = async ({
+  giftCardId,
+  secret,
+  claimerAddress,
+}: {
+  giftCardId: string | number;
+  secret: string;
+  claimerAddress: string;
+}) => {
   try {
-    const url = `${API_BASE_URL}/api/gift-cards/claim`;
-    console.log("Claiming gift card at:", url, "for gift card:", giftCardId);
-
+    // The backend expects POST /api/giftcard/claim with { giftCardId, secret, claimerAddress }
+    const url = `${API_BASE_URL}/api/giftcard/claim`;
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -632,6 +714,7 @@ export const claimGiftCard = async (giftCardId: string, secret: string) => {
       body: JSON.stringify({
         giftCardId,
         secret,
+        claimerAddress,
       }),
     });
 
@@ -761,11 +844,11 @@ export const getUserBackgrounds = async (
   address: string
 ): Promise<ApiResponse<any[]>> => {
   if (!address) {
-    throw new Error('Wallet address is required');
+    throw new Error("Wallet address is required");
   }
 
   const url = `${API_BASE_URL}/backgrounds?creator=${address}`;
-  console.log('Fetching user backgrounds from:', url);
+  console.log("Fetching user backgrounds from:", url);
 
   try {
     const response = await fetchWithRetry(url, {
@@ -778,18 +861,20 @@ export const getUserBackgrounds = async (
         status: response.status,
         error: errorText,
       });
-      throw new Error(`Failed to fetch backgrounds: ${response.status} ${errorText}`);
+      throw new Error(
+        `Failed to fetch backgrounds: ${response.status} ${errorText}`
+      );
     }
 
     const data = await response.json();
-    console.log('Backgrounds API response:', data);
+    console.log("Backgrounds API response:", data);
 
     return {
       success: true,
       data: data.backgrounds || [],
     };
   } catch (error) {
-    console.error('Error in getUserBackgrounds:', error);
+    console.error("Error in getUserBackgrounds:", error);
     throw error;
   }
 };
@@ -976,7 +1061,7 @@ export interface GiftCard {
   id: string;
   tokenId: string;
   price: number;
-  status: 'available' | 'sold' | 'redeemed';
+  status: "available" | "sold" | "redeemed";
   backgroundUrl: string;
   message?: string;
   currentOwner: string;
@@ -1001,13 +1086,15 @@ export interface ProfileResponse {
 /**
  * Get detailed profile including sent/received cards
  */
-export const getDetailedProfile = async (address: string): Promise<ProfileResponse> => {
+export const getDetailedProfile = async (
+  address: string
+): Promise<ProfileResponse> => {
   if (!address) {
-    throw new Error('Wallet address is required');
+    throw new Error("Wallet address is required");
   }
 
   const url = `${API_BASE_URL}/api/profile/${address}`;
-  console.log('Fetching detailed profile from:', url);
+  console.log("Fetching detailed profile from:", url);
 
   try {
     const response = await fetchWithRetry(url, {
@@ -1020,19 +1107,21 @@ export const getDetailedProfile = async (address: string): Promise<ProfileRespon
         status: response.status,
         error: errorText,
       });
-      throw new Error(`Failed to fetch detailed profile: ${response.status} ${errorText}`);
+      throw new Error(
+        `Failed to fetch detailed profile: ${response.status} ${errorText}`
+      );
     }
 
     const data = await response.json();
-    console.log('Detailed profile API response:', data);
+    console.log("Detailed profile API response:", data);
 
     if (!data.success || !data.profile) {
-      throw new Error('Invalid response format from detailed profile API');
+      throw new Error("Invalid response format from detailed profile API");
     }
 
     return data;
   } catch (error) {
-    console.error('Error in getDetailedProfile:', error);
+    console.error("Error in getDetailedProfile:", error);
     throw error;
   }
 };

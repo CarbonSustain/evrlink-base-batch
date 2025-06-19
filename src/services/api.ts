@@ -41,93 +41,112 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL;
 // Event system for database changes
 export class DatabaseEvents {
   private static listeners = {
-    backgroundAdded: [] as ((background: Background) => void)[],
-    backgroundUpdated: [] as ((background: Background) => void)[],
+    artNftAdded: [] as ((artNft: ArtNFT) => void)[],
+    artNftUpdated: [] as ((artNft: ArtNFT) => void)[],
   };
 
   // Methods to register listeners
-  static onBackgroundAdded(callback: (background: Background) => void) {
-    this.listeners.backgroundAdded.push(callback);
-    return () => this.offBackgroundAdded(callback); // Return unsubscribe function
+  static onArtNftAdded(callback: (artNft: ArtNFT) => void) {
+    this.listeners.artNftAdded.push(callback);
+    return () => this.offArtNftAdded(callback); // Return unsubscribe function
   }
 
-  static onBackgroundUpdated(callback: (background: Background) => void) {
-    this.listeners.backgroundUpdated.push(callback);
-    return () => this.offBackgroundUpdated(callback); // Return unsubscribe function
+  static onArtNftUpdated(callback: (artNft: ArtNFT) => void) {
+    this.listeners.artNftUpdated.push(callback);
+    return () => this.offArtNftUpdated(callback); // Return unsubscribe function
   }
 
   // Methods to remove listeners
-  static offBackgroundAdded(callback: (background: Background) => void) {
-    this.listeners.backgroundAdded = this.listeners.backgroundAdded.filter(
+  static offArtNftAdded(callback: (artNft: ArtNFT) => void) {
+    this.listeners.artNftAdded = this.listeners.artNftAdded.filter(
       (cb) => cb !== callback
     );
   }
 
-  static offBackgroundUpdated(callback: (background: Background) => void) {
-    this.listeners.backgroundUpdated = this.listeners.backgroundUpdated.filter(
+  static offArtNftUpdated(callback: (artNft: ArtNFT) => void) {
+    this.listeners.artNftUpdated = this.listeners.artNftUpdated.filter(
       (cb) => cb !== callback
     );
   }
 
   // Methods to emit events
-  static emitBackgroundAdded(background: Background) {
-    this.listeners.backgroundAdded.forEach((callback) => callback(background));
+  static emitArtNftAdded(artNft: ArtNFT) {
+    this.listeners.artNftAdded.forEach((callback) => callback(artNft));
   }
 
-  static emitBackgroundUpdated(background: Background) {
-    this.listeners.backgroundUpdated.forEach((callback) =>
-      callback(background)
-    );
+  static emitArtNftUpdated(artNft: ArtNFT) {
+    this.listeners.artNftUpdated.forEach((callback) => callback(artNft));
   }
 }
 
-export interface Background {
-  id: string;
+// --- ArtNFT interface (replaces Background) ---
+export interface ArtNFT {
+  id: number;
   artistAddress: string;
-  imageURI: string;
-  category: string;
+  imageUri: string;
   price: string;
-  blockchainId?: string;
-  blockchainTxHash?: string;
-  usageCount: number;
+  giftCardCategoryId: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
+// --- Updated GiftCard interface for new DB schema ---
 export interface GiftCard {
-  id: string;
+  id: number;
   creatorAddress: string;
-  currentOwner: string;
+  issuerAddress: string;
   price: string;
   message: string;
-  secretHash?: string;
-  backgroundId: string;
-  background?: Background;
-  isClaimable: boolean;
+  giftCardCategoryId: number;
   createdAt: string;
   updatedAt: string;
+  // Optionally, if your API includes these relations:
+  artNfts?: ArtNFT[];
+  secrets?: GiftCardSecret[];
+  settlement?: GiftCardSettlement;
 }
 
-export interface User {
-  id: string;
-  walletAddress: string;
-  username?: string;
-  email?: string;
-  bio?: string;
-  profileImageUrl?: string;
-  totalGiftCardsCreated?: number;
-  totalGiftCardsSold?: number;
-  totalBackgroundsCreated?: number;
+// --- New interfaces for related tables (optional, for type safety) ---
+export interface GiftCardSecret {
+  id: number;
+  giftCardId: number;
+  secretHash: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface Transaction {
-  id: string;
-  giftCardId: string;
-  fromAddress: string;
-  toAddress: string;
-  transactionType: "purchase" | "transfer" | "claim";
+export interface GiftCardSettlement {
+  id: number;
+  giftCardId: number;
+  fromAddr: string;
+  toAddr: string;
+  taxFee: number;
+  evrlinkFee: number;
+  createdAt?: string;
+  updatedAt?: string;
+  blockchainTransaction?: BlockchainTransaction;
+}
+
+export interface BlockchainTransaction {
+  id: number;
+  txHash: string;
+  giftCardSettlementId: number;
+  blockchainTxId: number;
+  gasFee: number;
+  fromAddr: string;
+  toAddr: string;
   amount: string;
-  timestamp: string;
+  txTimestamp?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  category?: BlockchainTransactionCategory;
+}
+
+export interface BlockchainTransactionCategory {
+  id: number;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Get token from localStorage with more robust error handling
@@ -184,41 +203,65 @@ export const getAuthHeaders = () => {
   return headers;
 };
 
-// Fetch backgrounds (all or by category)
-export const fetchBackgrounds = async (
-  category?: string,
+// Fetch art NFTs (all or by category)
+export const fetchArtNFTs = async (
+  giftCardCategoryName?: string, // Now expects category name (string) if filtering
   page: number = 1,
   limit: number = 20
-): Promise<Background[]> => {
+): Promise<ArtNFT[]> => {
   try {
     const params: any = { page, limit };
-    if (category) params.category = category;
+    // The backend expects 'category' as category name (string)
+    if (giftCardCategoryName) params.category = giftCardCategoryName;
 
-    const response = await axios.get(`${API_BASE_URL}/api/background`, {
+    const response = await axios.get(`${API_BASE_URL}/api/backgrounds`, {
       params,
+      headers: getAuthHeaders(), // <-- Add this line to ensure Authorization header is sent
     });
-    return response.data.backgrounds || response.data;
+
+    // The backend response shape: { success, backgrounds, ... }
+    if (Array.isArray(response.data.backgrounds)) {
+      // Map backend fields to ArtNFT interface
+      return response.data.backgrounds.map((bg: any) => ({
+        id: bg.id,
+        artistAddress: bg.artist_address,
+        imageUri: bg.image_uri,
+        price: bg.price,
+        giftCardCategoryId: bg.gift_card_category_id,
+        createdAt: bg.created_at,
+        updatedAt: bg.updated_at,
+      }));
+    }
+    // Fallback for legacy or error cases
+    if (Array.isArray(response.data.artNfts)) {
+      return response.data.artNfts;
+    }
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+    return [];
   } catch (error) {
-    console.error("Fetch backgrounds error:", error);
-    throw new Error("Failed to fetch backgrounds");
+    console.error("Fetch art NFTs error:", error);
+    // Add more detailed error message if available
+    if (error.response?.data?.error) {
+      throw new Error("Failed to fetch art NFTs: " + error.response.data.error);
+    }
+    throw new Error("Failed to fetch art NFTs");
   }
 };
 
-// Get background by ID
-export const getBackgroundById = async (id: string): Promise<Background> => {
+// Get art NFT by ID
+export const getArtNFTById = async (id: number): Promise<ArtNFT> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/background/${id}`);
+    const response = await axios.get(`${API_BASE_URL}/api/artnft/${id}`);
 
-    // Emit background updated event
-    eventBus.emitBackgroundUpdated({
-      background: response.data,
-      action: "updated",
-    });
+    // Emit artNft updated event
+    DatabaseEvents.emitArtNftUpdated(response.data);
 
     return response.data;
   } catch (error) {
-    console.error("Get background error:", error);
-    throw new Error("Failed to get background");
+    console.error("Get art NFT error:", error);
+    throw new Error("Failed to get art NFT");
   }
 };
 
@@ -235,52 +278,38 @@ export const getBackgroundCategories = async (): Promise<string[]> => {
   }
 };
 
-// Create gift card
-export const createGiftCard = async (data: {
-  backgroundId: string | number;
+// Create art NFT
+export const createArtNFT = async (data: {
+  image: File;
+  giftCardCategoryId: number;
   price: string;
-  message: string;
-}): Promise<any> => {
+}) => {
   try {
-    // Get the total required price from backend (including fees)
-    const totalResult = await getGiftCardTotalRequired(
-      data.backgroundId,
-      data.price
+    const formData = new FormData();
+    formData.append("image", data.image);
+    formData.append("giftCardCategoryId", data.giftCardCategoryId.toString());
+    formData.append("price", data.price);
+    formData.append(
+      "artistAddress",
+      localStorage.getItem("walletAddress") || ""
     );
-    if (!totalResult.success) {
-      return {
-        success: false,
-        error: totalResult.error || "Failed to calculate total required price",
-      };
+
+    const response = await axios.post(`${API_BASE_URL}/api/artnft`, formData, {
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    // Emit artNft added event
+    if (response.data && response.data.artNft) {
+      DatabaseEvents.emitArtNftAdded(response.data.artNft);
     }
-    // Set price to totalRequired (in wei)
-    const payload = {
-      ...data,
-      price: totalResult.totalRequired,
-    };
-    const response = await axios.post(
-      `${API_BASE_URL}/api/gift-cards/create`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    // Add success field to the response
-    return {
-      success: true,
-      data: response.data,
-      totalRequired: totalResult.totalRequired,
-      totalRequiredEth: totalResult.totalRequiredEth,
-      breakdown: totalResult.breakdown,
-    };
-  } catch (error: any) {
-    console.error("Create gift card error:", error.response?.data || error);
-    return {
-      success: false,
-      error: error.response?.data?.error || "Failed to create gift card",
-    };
+
+    return response.data;
+  } catch (error) {
+    console.error("Create art NFT error:", error);
+    throw new Error("Failed to create art NFT");
   }
 };
 
@@ -306,169 +335,9 @@ export const uploadImage = async (file: File): Promise<string> => {
   }
 };
 
-export const createBackground = async (data: {
-  image: File;
-  category: string;
-  price: string;
-}) => {
-  try {
-    const formData = new FormData();
-    formData.append("image", data.image);
-    formData.append("category", data.category);
-    formData.append("price", data.price);
-    formData.append(
-      "artistAddress",
-      localStorage.getItem("walletAddress") || ""
-    );
-
-    // Log the request details for debugging
-    console.log("Sending background creation request:", {
-      category: data.category,
-      price: data.price,
-      artistAddress: localStorage.getItem("walletAddress"),
-    });
-
-    const response = await axios.post(
-      `${API_BASE_URL}/api/backgrounds`,
-      formData,
-      {
-        headers: {
-          ...getAuthHeaders(),
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    console.log("Background created successfully:", response.data);
-
-    // Emit background added event
-    if (response.data && response.data.background) {
-      DatabaseEvents.emitBackgroundAdded(response.data.background);
-    }
-
-    return response.data;
-  } catch (error) {
-    console.error("Create background error:", error);
-    throw new Error("Failed to create background");
-  }
-};
-
-export const mintBackgroundNFT = async (data: {
-  image: File;
-  category: string;
-  price: string;
-}): Promise<any> => {
-  try {
-    // Check if user is authenticated
-    const token = getToken();
-    if (!token) {
-      authLog("No auth token found when attempting to mint NFT", null, "error");
-      throw new Error("Authentication required - please login first");
-    }
-
-    const walletAddress = localStorage.getItem("walletAddress");
-    if (!walletAddress) {
-      authLog(
-        "No wallet address found when attempting to mint NFT",
-        null,
-        "error"
-      );
-      throw new Error("No wallet address found - please connect your wallet");
-    }
-
-    authLog("Starting NFT minting process", {
-      category: data.category,
-      price: data.price,
-      imageFilename: data.image.name,
-      walletAddress,
-    });
-
-    const formData = new FormData();
-    formData.append("image", data.image);
-    formData.append("category", data.category);
-    formData.append("price", data.price);
-    formData.append("artistAddress", walletAddress);
-
-    apiLog("Sending mint request to backend", {
-      endpoint: `${API_BASE_URL}/api/background/mint`,
-      walletAddress,
-    });
-
-    const response = await axios.post(
-      `${API_BASE_URL}/api/background/mint`,
-      formData,
-      {
-        headers: {
-          ...getAuthHeaders(),
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    apiLog("Mint request successful", {
-      statusCode: response.status,
-      dataPreview: JSON.stringify(response.data).substring(0, 100) + "...",
-    });
-
-    // Emit background added event if successful
-    if (response.data && response.data.success) {
-      const backgroundData = response.data.background || response.data;
-      eventBus.emitBackgroundUpdated({
-        background: backgroundData,
-        action: "added",
-      });
-
-      apiLog("Background created and event emitted", {
-        backgroundId: backgroundData.id,
-      });
-    }
-
-    return response.data;
-  } catch (error: any) {
-    authLog("Error during NFT minting", error, "error");
-
-    // Handle authentication errors specifically
-    if (error.response && error.response.status === 401) {
-      authLog(
-        "Authentication error during minting - token may be invalid",
-        {
-          statusCode: error.response.status,
-          statusText: error.response.statusText,
-          errorDetails: error.response.data,
-        },
-        "error"
-      );
-
-      throw new Error("Authentication failed - please login again");
-    }
-
-    // Provide more specific error message from the server response when available
-    if (error.response && error.response.data && error.response.data.error) {
-      throw new Error(error.response.data.error);
-    }
-
-    // Otherwise throw a generic error
-    throw new Error("Failed to mint background NFT");
-  }
-};
-
-export const verifyBackgroundStatus = async (
-  backgroundId: string | number
-): Promise<any> => {
-  try {
-    const id = backgroundId.toString();
-    const response = await axios.get(
-      `${API_BASE_URL}/api/background/verify/${id}`,
-      {
-        headers: getAuthHeaders(),
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Verify background status error:", error);
-    throw new Error("Failed to verify background status");
-  }
-};
+// Remove or deprecate all Background-related code below this line
+// (fetchBackgrounds, getBackgroundById, createBackground, mintBackgroundNFT, verifyBackgroundStatus, etc.)
+// and replace usages in your app with the new ArtNFT versions above.
 
 // =====================
 // GIFT CARD ENDPOINTS
@@ -557,13 +426,16 @@ export const setGiftCardSecret = async (data: {
 export const claimGiftCard = async (data: {
   giftCardId: string | number;
   secret: string;
+  claimerAddress: string;
 }): Promise<any> => {
   try {
+    // The backend expects POST /api/giftcard/claim with { giftCardId, secret, claimerAddress }
     const response = await axios.post(
-      `${API_BASE_URL}/api/gift-cards/claim`,
+      `${API_BASE_URL}/api/giftcard/claim`,
       {
         giftCardId: data.giftCardId,
         secret: data.secret,
+        claimerAddress: data.claimerAddress,
       },
       {
         headers: getAuthHeaders(),
@@ -745,22 +617,6 @@ export const getUserActivity = async (
 // =====================
 
 // Get recent transactions
-export const getRecentTransactions = async (
-  limit: number = 10
-): Promise<Transaction[]> => {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/user/transactions/recent?limit=${limit}`,
-      {
-        headers: getAuthHeaders(),
-      }
-    );
-    return response.data.transactions || response.data;
-  } catch (error) {
-    console.error("Get recent transactions error:", error);
-    throw new Error("Failed to get recent transactions");
-  }
-};
 
 // =====================
 // AUTHENTICATION
@@ -1165,5 +1021,164 @@ export const getGiftCardTotalRequired = async (
       error:
         error.response?.data?.error || "Failed to get total required price",
     };
+  }
+};
+
+// --- Updated User interface for new DB schema ---
+export interface User {
+  id: number;
+  roleId: number;
+  walletAddress: string;
+  username?: string;
+  email?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  // Optional fields for UI/legacy
+  bio?: string;
+  profileImageUrl?: string;
+  totalGiftCardsCreated?: number;
+  totalGiftCardsSold?: number;
+  totalBackgroundsCreated?: number;
+}
+
+// --- Optionally, UserRole interface for type safety ---
+export interface UserRole {
+  id: number;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// --- ArtNFT store hook (for correct import in CategoryCards.tsx) ---
+// (Already exported as useArtNftsStore in store.ts, do not re-export here.)
+
+// --- CreateGiftCard API for CreateGift.tsx ---
+// Updated to match backend: accepts backgroundIds (array), paymentMethod, artNftPricesUSDC, etc.
+export const createGiftCard = async ({
+  backgroundIds,
+  message,
+  paymentMethod,
+  artNftPricesUSDC,
+  price,
+  recipientAddress,
+  secret,
+  transferMethod,
+  backgroundId, // Accept single backgroundId for compatibility
+}: {
+  backgroundIds?: (string | number)[];
+  backgroundId?: string | number;
+  message?: string;
+  paymentMethod?: string;
+  artNftPricesUSDC?: string[]; // Array of prices in USDC for each art NFT
+  price?: string; // Optional, for ETH payment
+  recipientAddress?: string;
+  secret?: string;
+  transferMethod?: string;
+}) => {
+  try {
+    // Support both backgroundIds (array) and backgroundId (single)
+    let ids: (string | number)[] = [];
+    if (Array.isArray(backgroundIds) && backgroundIds.length > 0) {
+      ids = backgroundIds;
+    } else if (backgroundId !== undefined && backgroundId !== null) {
+      ids = [backgroundId];
+    }
+
+    if (!ids.length || !price) {
+      throw new Error("Missing backgroundId or price for gift card creation.");
+    }
+
+    // --- Ensure artNftPricesUSDC is provided and matches backgroundIds length ---
+    let pricesUSDC: string[] = [];
+    if (
+      Array.isArray(artNftPricesUSDC) &&
+      artNftPricesUSDC.length === ids.length
+    ) {
+      pricesUSDC = artNftPricesUSDC;
+    } else {
+      // fallback: use price for each backgroundId as string
+      pricesUSDC = ids.map(() => price.toString());
+    }
+
+    const payload: any = {
+      backgroundIds: ids,
+      artNftPricesUSDC: pricesUSDC,
+      message,
+      price,
+    };
+    if (paymentMethod) payload.paymentMethod = paymentMethod;
+    if (recipientAddress) payload.recipientAddress = recipientAddress;
+    if (secret) payload.secret = secret;
+    if (transferMethod) payload.transferMethod = transferMethod;
+
+    const response = await axios.post(
+      `${API_BASE_URL}/api/gift-cards/create`,
+      payload,
+      {
+        headers: {
+          ...getAuthHeaders(),
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Create gift card error:", error.response?.data || error);
+    throw new Error(
+      error.response?.data?.error || "Failed to create gift card"
+    );
+  }
+};
+
+// --- MintBackgroundNFT API for CreateBackground.tsx ---
+export const mintBackgroundNFT = async (data: {
+  image: File;
+  category: string;
+  price: string;
+}): Promise<any> => {
+  try {
+    const formData = new FormData();
+    formData.append("image", data.image);
+    formData.append("category", data.category);
+    formData.append("price", data.price);
+    formData.append(
+      "artistAddress",
+      localStorage.getItem("walletAddress") || ""
+    );
+
+    const response = await axios.post(
+      `${API_BASE_URL}/api/background/mint`,
+      formData,
+      {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Mint background NFT error:", error.response?.data || error);
+    throw new Error(
+      error.response?.data?.error || "Failed to mint background NFT"
+    );
+  }
+};
+
+// --- VerifyBackgroundStatus API for CreateBackground.tsx ---
+export const verifyBackgroundStatus = async (
+  backgroundId: string | number
+): Promise<any> => {
+  try {
+    const id = backgroundId.toString();
+    const response = await axios.get(
+      `${API_BASE_URL}/api/background/verify/${id}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Verify background status error:", error);
+    throw new Error("Failed to verify background status");
   }
 };

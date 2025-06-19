@@ -1,7 +1,7 @@
-import React from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Gift, ExternalLink, Copy, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Gift, ExternalLink, Copy, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface GiftCard {
   id: string;
@@ -20,7 +20,11 @@ interface GiftCardDetailsDialogProps {
   gift: GiftCard | null;
 }
 
-const GiftCardDetailsDialog = ({ open, onOpenChange, gift }: GiftCardDetailsDialogProps) => {
+const GiftCardDetailsDialog = ({
+  open,
+  onOpenChange,
+  gift,
+}: GiftCardDetailsDialogProps) => {
   const [copied, setCopied] = React.useState(false);
 
   if (!gift) return null;
@@ -32,7 +36,7 @@ const GiftCardDetailsDialog = ({ open, onOpenChange, gift }: GiftCardDetailsDial
   };
 
   const viewOnExplorer = () => {
-    window.open(`https://etherscan.io/tx/${gift.transactionHash}`, '_blank');
+    window.open(`https://etherscan.io/tx/${gift.transactionHash}`, "_blank");
   };
 
   return (
@@ -41,8 +45,8 @@ const GiftCardDetailsDialog = ({ open, onOpenChange, gift }: GiftCardDetailsDial
         <div className="relative aspect-video">
           {gift.imageUrl ? (
             <>
-              <img 
-                src={gift.imageUrl} 
+              <img
+                src={gift.imageUrl}
                 alt={`Gift from ${gift.senderName}`}
                 className="w-full h-full object-cover"
               />
@@ -57,7 +61,9 @@ const GiftCardDetailsDialog = ({ open, onOpenChange, gift }: GiftCardDetailsDial
           <div className="absolute bottom-0 left-0 right-0 p-6">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-lg font-medium text-white">From {gift.senderName}</p>
+                <p className="text-lg font-medium text-white">
+                  From {gift.senderName}
+                </p>
                 <p className="text-sm text-white/60">To {gift.recipientName}</p>
               </div>
               <div className="text-right">
@@ -83,16 +89,16 @@ const GiftCardDetailsDialog = ({ open, onOpenChange, gift }: GiftCardDetailsDial
                 {gift.transactionHash}
               </code>
               <Button
-                size="icon"
-                variant="outline"
                 className="shrink-0 border-white/10 bg-white/5 hover:bg-white/10"
                 onClick={copyHash}
               >
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
               </Button>
               <Button
-                size="icon"
-                variant="outline"
                 className="shrink-0 border-white/10 bg-white/5 hover:bg-white/10"
                 onClick={viewOnExplorer}
               >

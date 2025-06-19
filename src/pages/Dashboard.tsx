@@ -232,27 +232,6 @@ const Dashboard = () => {
               {/* Logo - Mobile Only */}
               <img src={evrlinklogo} alt="Evrlink" className="h-8 lg:hidden" />
             </div>
-            <div className="hidden lg:block relative mb-8 mt-6 w-full max-w-2xl">
-            <span className="absolute inset-y-0 left-3 flex items-center">
-              <span className="material-icons text-gray-400">search</span>
-            </span>
-            <input
-              type="text"
-              placeholder="Search for a meep or template..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00B2C7]"
-            />
-          </div>
-          {/* Mobile Search - Hidden on Desktop */}
-          <div className="lg:hidden relative mb-6">
-              <span className="absolute inset-y-0 left-3 flex items-center">
-                <span className="material-icons text-gray-400">search</span>
-              </span>
-              <input
-                type="text"
-                placeholder="Search for a meep or template..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00B2C7]"
-              />
-            </div>
             <div className="flex items-center gap-4">
               <div className="relative">
                 <button 
@@ -379,10 +358,30 @@ const Dashboard = () => {
               </button>
             </div>
             
-            
+            {/* Mobile Search */}
+            <div className="relative mb-6">
+              <span className="absolute inset-y-0 left-3 flex items-center">
+                <span className="material-icons text-gray-400">search</span>
+              </span>
+              <input
+                type="text"
+                placeholder="Search for a meep or template..."
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00B2C7]"
+              />
+            </div>
           </div>
 
-          
+          {/* Desktop Search - Hidden on Mobile */}
+          <div className="hidden lg:block relative mb-8 mt-6 max-w-xl">
+            <span className="absolute inset-y-0 left-3 flex items-center">
+              <span className="material-icons text-gray-400">search</span>
+            </span>
+            <input
+              type="text"
+              placeholder="Search for a meep or template..."
+              className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00B2C7]"
+            />
+          </div>
 
           {/* Welcome Message */}
           <div className="bg-[#00B2C71A] rounded-xl p-4 lg:p-8 mb-8 relative">
