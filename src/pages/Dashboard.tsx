@@ -4,6 +4,10 @@ import evrlinklogo from '../../public/images/g-Logo.png';
 import bell from '../../public/images/Bell.png';
 import wallet from '../../public/images/Frame 14.png';
 import { useWallet } from '@/contexts/WalletContext';
+import { useArtNftsStore } from '@/services/store';
+import { API_BASE_URL } from '@/services/api';
+
+
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -12,6 +16,7 @@ const Dashboard = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const navigate = useNavigate();
   const [isDesktop, setIsDesktop] = useState(false);
+
 
   useEffect(() => {
     // Get wallet address from localStorage or context
@@ -163,6 +168,28 @@ const Dashboard = () => {
     </filter>
   </defs>
 </svg>`;
+
+const getImageUrl = (imageURI: string): string => {
+  if (imageURI.startsWith("http")) return imageURI;
+  const normalizedPath = imageURI.replace(/\\\\/g, "/").replace(/\\/g, "/");
+  const cleanPath = normalizedPath.replace(/^\/+/, "");
+  return `${API_BASE_URL}/${cleanPath}`;
+};
+
+const {
+  artNftsByCategory,
+  fetchAllArtNfts,
+  isLoading,
+  error,
+} = useArtNftsStore();
+
+const artNfts = Object.values(artNftsByCategory).flat();
+
+useEffect(() => {
+  fetchAllArtNfts();
+}, []);
+
+console.log("artNfts: ", artNfts);
 
   return (
       <div className="min-h-screen bg-white flex">
@@ -410,6 +437,7 @@ const Dashboard = () => {
             </div>
 
             {/* Categories Section */}
+            {/* Categories Section */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg lg:text-xl font-semibold">Welcome to Evrlink!</h2>
@@ -418,108 +446,129 @@ const Dashboard = () => {
                 </Link>
               </div>
               <p className="text-gray-600 mb-4 text-sm">See some of our categories, and create a Meep.</p>
+
               <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 mb-8 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 lg:mx-0 px-4 lg:px-0">
-                {(isDesktop ? categories : categories.slice(0, 4)).map((category) => (
-                    <button
-                        key={category}
-                        className="px-4 py-2 rounded-full border border-gray-200 hover:border-[#00B2C7] text-gray-600 hover:text-[#00B2C7] whitespace-nowrap text-sm flex-shrink-0"
-                    >
-                      {category}
-                    </button>
+                {(isDesktop
+                  ? Object.keys(artNftsByCategory)
+                  : Object.keys(artNftsByCategory).slice(0, 4)
+                ).map((category) => (
+                  <button
+                    key={category}
+                    className="px-4 py-2 rounded-full border border-gray-200 hover:border-[#00B2C7] text-gray-600 hover:text-[#00B2C7] whitespace-nowrap text-sm flex-shrink-0"
+                  >
+                    Category #{category}
+                  </button>
                 ))}
+                
                 <button className="p-2 bg-gray-100 rounded-full flex-shrink-0 lg:hidden">
                   <span className="material-icons text-gray-500">chevron_right</span>
                 </button>
               </div>
             </div>
 
+
             {/* Templates Card - Mobile Style */}
-            <div className="block lg:hidden">
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
-                <div className="flex items-center gap-3 p-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0"></div>
-                  <div>
-                    <h3 className="font-medium">Birthday Bling</h3>
-                    <p className="text-sm text-gray-500">by Evrlink</p>
-                    <div className="text-sm text-gray-400 mt-1">
-                      <span>#birthday</span>{" "}
-                      <span>#celebration</span>
+            {/* Templates Card - Mobile Style */}
+            <div className="block lg:hidden mt-6">
+              {isLoading && <p className="text-center text-gray-500">Loading...</p>}
+              {error && <p className="text-center text-red-500">Failed to load templates</p>}
+              {!isLoading && artNfts.length === 0 && (
+                <p className="text-center text-gray-400">No templates available.</p>
+              )}
+
+              {artNfts.map((nft) => (
+                <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
+                  <div className="flex items-center gap-3 p-4">
+                  <Link to={`/meep/${nft.id}`}>
+  <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full cursor-pointer hover:opacity-90 transition">
+    <img
+      src={getImageUrl(nft.imageUri)}
+      alt={`Meep ${nft.id}`}
+      className="w-full h-full object-cover"
+    />
+  </div>
+</Link>
+
+                    <div>
+                      <h3 className="font-medium">{nft.giftCardCategoryId}</h3>
+                      <p className="text-sm text-gray-500">by {nft.artistAddress}</p>
+                      <div className="text-sm text-gray-400 mt-1">
+                        <span>#{nft.giftCardCategoryId?.toString().toLowerCase()}</span>{" "}
+                        <span>#celebration</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="aspect-w-16 aspect-h-9 bg-gray-100">
-                  {/* Template preview image will go here */}
-                </div>
-
-                <div className="p-4 flex items-center justify-between">
-                  <button className="flex items-center gap-2 text-gray-600">
-                    <span className="material-icons">favorite_border</span>
-                    <span>74</span>
-                  </button>
-                  <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
-                    Generate Meep
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
-                <div className="flex items-center gap-3 p-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0"></div>
-                  <div>
-                    <h3 className="font-medium">Birthday Bling</h3>
-                    <p className="text-sm text-gray-500">by Evrlink</p>
-                    <div className="text-sm text-gray-400 mt-1">
-                      <span>#birthday</span>{" "}
-                      <span>#celebration</span>
+                  <Link to={`/meep/${nft.id}`}>
+                    <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full cursor-pointer hover:opacity-90 transition">
+                      <img
+                        src={getImageUrl(nft.imageUri)}
+                        alt={`Meep ${nft.id}`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
+                  </Link>
+
+                  <div className="p-4 flex items-center justify-between">
+                    <button className="flex items-center gap-2 text-gray-600">
+                      <span className="material-icons">favorite_border</span>
+                      <span>74</span>
+                    </button>
+                    <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
+                      Generate Meep
+                    </button>
                   </div>
                 </div>
-
-                <div className="aspect-w-16 aspect-h-9 bg-gray-100">
-                  {/* Template preview image will go here */}
-                </div>
-
-                <div className="p-4 flex items-center justify-between">
-                  <button className="flex items-center gap-2 text-gray-600">
-                    <span className="material-icons">favorite_border</span>
-                    <span>74</span>
-                  </button>
-                  <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
-                    Generate Meep
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Templates Grid - Desktop Style */}
+            {/* Templates Grid - Desktop Style */}
             <div className="hidden lg:grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((item) => (
-                  <div key={item} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full">
-                      {/* Template preview image will go here */}
+              {isLoading && (
+                <div className="col-span-3 text-center text-gray-500">Loading...</div>
+              )}
+              {error && (
+                <div className="col-span-3 text-center text-red-500">Failed to load templates</div>
+              )}
+              {!isLoading && artNfts.length === 0 && (
+                <div className="col-span-3 text-center text-gray-400">No templates available.</div>
+              )}
+
+              {artNfts.map((nft) => (
+                <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+                  <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full">
+                    <Link to={`/meep/${nft.id}`}>
+                      <img
+                        src={getImageUrl(nft.imageUri)}
+                        alt={nft.giftCardCategoryId.toString()}
+                        className="w-full h-full object-cover"
+                      />
+                    </Link>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-3 mb-4">
+                    <Link to={`/meep/${nft.id}`}>
+                      <div>
+                        <h3 className="font-medium">{nft.giftCardCategoryId}</h3>
+                        <p className="text-sm text-gray-500">by {nft.artistAddress}</p>
+                      </div>
+                    </Link>
                     </div>
-                    <div className="p-4">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 rounded-full bg-gray-200" />
-                        <div>
-                          <h3 className="font-medium">Birthday Bling</h3>
-                          <p className="text-sm text-gray-500">by Evrlink</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <button className="flex items-center gap-2 text-gray-600">
-                          <span className="material-icons">favorite_border</span>
-                          <span>74</span>
-                        </button>
-                        <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
-                          Generate Meep
-                        </button>
-                      </div>
+                    <div className="flex items-center justify-between">
+                      <button className="flex items-center gap-2 text-gray-600">
+                        <span className="material-icons">favorite_border</span>
+                        <span>74</span>
+                      </button>
+                      <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
+                        Generate Meep
+                      </button>
                     </div>
                   </div>
+                </div>
               ))}
             </div>
+
           </main>
         </div>
       </div>
