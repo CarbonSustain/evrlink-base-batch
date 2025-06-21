@@ -86,7 +86,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ className = '' }) => {
         
 <Button
   onClick={handleCreateCard}
-  className="bg-meepblue text-white px-10 py-4 text-lg rounded-full hover:bg-meepblue-hover shadow-md transition-all duration-300"
+  className="bg-[#221c5c] text-white px-12 py-4 text-lg rounded-full hover:bg-[#1a1548] shadow-md transition-all duration-300"
 >
   Create a Card
 </Button>
