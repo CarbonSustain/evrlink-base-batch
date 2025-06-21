@@ -53,11 +53,7 @@ interface BackgroundDetailsModalProps {
 
 const steps = ["Select Option", "Details", "Confirm"];
 
-const BackgroundDetailsModal = ({
-  open,
-  onClose,
-  background,
-}) => {
+const BackgroundDetailsModal = ({ open, onClose, background }) => {
   const { address: userAddress } = useWallet();
   const mountedRef = React.useRef(true);
   const [activeStep, setActiveStep] = useState(0);
@@ -587,10 +583,16 @@ const BackgroundDetailsModal = ({
                   variant="contained"
                   onClick={() => setPaymentMethod("eth")}
                   sx={{
-                    bgcolor: paymentMethod === "eth" ? "#60cedc" : "transparent",
+                    bgcolor:
+                      paymentMethod === "eth" ? "#60cedc" : "transparent",
                     color: paymentMethod === "eth" ? "black" : "#00b2c7",
                     border: "2px solid #00b2c7",
-                    "&:hover": { bgcolor: paymentMethod === "eth" ? "#4cbbc9" : "rgba(0, 178, 199, 0.04)" },
+                    "&:hover": {
+                      bgcolor:
+                        paymentMethod === "eth"
+                          ? "#4cbbc9"
+                          : "rgba(0, 178, 199, 0.04)",
+                    },
                   }}
                 >
                   ETH
@@ -599,10 +601,16 @@ const BackgroundDetailsModal = ({
                   variant="contained"
                   onClick={() => setPaymentMethod("usdc")}
                   sx={{
-                    bgcolor: paymentMethod === "usdc" ? "#60cedc" : "transparent",
+                    bgcolor:
+                      paymentMethod === "usdc" ? "#60cedc" : "transparent",
                     color: paymentMethod === "usdc" ? "black" : "#00b2c7",
                     border: "2px solid #00b2c7",
-                    "&:hover": { bgcolor: paymentMethod === "usdc" ? "#4cbbc9" : "rgba(0, 178, 199, 0.04)" },
+                    "&:hover": {
+                      bgcolor:
+                        paymentMethod === "usdc"
+                          ? "#4cbbc9"
+                          : "rgba(0, 178, 199, 0.04)",
+                    },
                   }}
                 >
                   USDC
@@ -677,10 +685,7 @@ const BackgroundDetailsModal = ({
                 Price Breakdown
               </Typography>
               {loadingPrice && (
-                <Typography
-                  variant="body2"
-                  sx={{ color: "rgba(0,0,0,0.7)" }}
-                >
+                <Typography variant="body2" sx={{ color: "rgba(0,0,0,0.7)" }}>
                   Loading price breakdown...
                 </Typography>
               )}
@@ -788,16 +793,29 @@ const BackgroundDetailsModal = ({
         USDC_ADDRESS,
         [
           "function approve(address spender, uint256 amount) public returns (bool)",
+          "function allowance(address owner, address spender) view returns (uint256)",
         ],
         signer
       );
-      // Default approve 1000 USDC (or you can use a dynamic value)
+      // Default approve 3,000,000 USDC (or you can use a dynamic value)
       const amount = ethers.utils.parseUnits("3000000", USDC_DECIMALS);
       const tx = await usdc.approve(GIFT_CARD_CONTRACT_ADDRESS, amount);
       await tx.wait();
-      toast.success("USDC allowance approved!");
-      setShowApprove(false);
-      setError(null);
+      // Re-check allowance after approval
+      const allowance = await usdc.allowance(
+        userAddress,
+        GIFT_CARD_CONTRACT_ADDRESS
+      );
+      if (allowance.gte(ethers.utils.parseUnits("100", USDC_DECIMALS))) {
+        setUsdcApproved(true);
+        setShowApprove(false);
+        setError(null);
+        toast.success("USDC allowance approved!");
+      } else {
+        setUsdcApproved(false);
+        setShowApprove(true);
+        setError("USDC allowance not updated. Please try again.");
+      }
     } catch (err: any) {
       toast.error(err.message || "USDC approval failed");
     } finally {
@@ -869,7 +887,7 @@ const BackgroundDetailsModal = ({
               objectPosition: "center",
               borderTopLeftRadius: "16px",
               borderTopRightRadius: "16px",
-              display: "block"
+              display: "block",
             }}
           />
           <Box
@@ -889,10 +907,7 @@ const BackgroundDetailsModal = ({
             >
               {background.category} Background
             </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{ color: "rgba(0,0,0,0.7)" }}
-            >
+            <Typography variant="subtitle1" sx={{ color: "rgba(0,0,0,0.7)" }}>
               By {background.artistAddress.slice(0, 6)}...
               {background.artistAddress.slice(-4)}
             </Typography>
