@@ -86,7 +86,7 @@ const Faq = () => {
             <span>My Gallery</span>
           </Link>
           <Link
-            to="/templates"
+            to="/marketplace"
             className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
           >
             <span className="material-icons">grid_view</span>
