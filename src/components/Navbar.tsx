@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
@@ -8,21 +8,40 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Check if the menu is open when component mounts and when route changes
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+  
+  // Ensure toggle button stays hidden when navbar is open
+  useEffect(() => {
+    const toggleButton = document.getElementById('navbar-toggle-button');
+    if (toggleButton) {
+      if (isOpen) {
+        toggleButton.style.display = 'none';
+      } else {
+        toggleButton.style.display = 'flex';
+      }
+    }
+  }, [isOpen]);
 
   return (
     <>
       {/* Menu Toggle Button - only shown when navbar is closed */}
-      {!isOpen && (
-        <button
-          onClick={toggleMenu}
-          className="fixed z-50 p-2 rounded-lg bg-white border border-gray-200 transition-all duration-300 left-4 top-20"
-        >
-          <Menu className="h-6 w-6 text-black" />
-        </button>
-      )}
+      <button
+        id="navbar-toggle-button"
+        onClick={toggleMenu}
+        className={cn(
+          "fixed z-50 p-2 rounded-lg bg-white border border-gray-200 transition-all duration-300 left-4 top-20",
+          isOpen && "opacity-0 pointer-events-none hidden"
+        )}
+      >
+        <Menu className="h-6 w-6 text-black" />
+      </button>
 
       {/* Navbar */}
       <nav className={cn(

@@ -7,9 +7,7 @@ import AccountMenu from './AccountMenu';
 import Button from './Button';
 import { useWallet } from '@/contexts/WalletContext';
 import { toast } from 'react-hot-toast';
-import evrlinklogo from '../../public/images/g-Logo.png';
 import bell from '../../public/images/Bell.png';
-import walletImg from '../../public/images/Frame 14.png';
 
 const Layout = () => {
   const [walletDialogOpen, setWalletDialogOpen] = useState(false);
@@ -88,7 +86,7 @@ const Layout = () => {
               </Button>
             </Link>
 
-            {/* Wallet Logic (unchanged, just icon replaced) */}
+            {/* Wallet Logic */}
             {address ? (
               <AccountMenu address={address} />
             ) : (
