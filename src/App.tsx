@@ -27,7 +27,7 @@ import Dashboard from "./pages/Dashboard";
 // import { User } from "lucide-react";
 import MyGallery from "./pages/MyGallery";
 // import MyGalleryNewUser from "./pages/MyGalleryNewUser";
-// import Faq from "./pages/Faq";
+import Faq from "./pages/Faq";
 import MeepDetails from "./pages/MeepDetails";
 
 
@@ -73,6 +73,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/gallery" element={<MyGallery />} />
               <Route path="/meep/:id" element={<MeepDetails />} />
+              <Route path="/faqs" element={<Faq />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
