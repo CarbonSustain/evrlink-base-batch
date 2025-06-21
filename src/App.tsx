@@ -29,6 +29,7 @@ import MyGallery from "./pages/MyGallery";
 // import MyGalleryNewUser from "./pages/MyGalleryNewUser";
 import Faq from "./pages/Faq";
 import MeepDetails from "./pages/MeepDetails";
+import HomePage from "./pages/landing-page/src/pages/Home/index";
 
 
 const queryClient = new QueryClient();
@@ -75,6 +76,8 @@ const App = () => (
               <Route path="/meep/:id" element={<MeepDetails />} />
               <Route path="/faqs" element={<Faq />} />
               <Route path="*" element={<NotFound />} />
+              {/* Landing page route */}
+              <Route path="/landing" element={<HomePage />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
