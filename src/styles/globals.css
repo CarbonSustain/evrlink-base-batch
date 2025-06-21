@@ -1,14 +1,15 @@
+/* postcss-tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
+    --background: 0 0% 98%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --card: 0 0% 98%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
+    --popover: 0 0% 98%;
     --popover-foreground: 0 0% 98%;
     --primary: 240 5.9% 10%;
     --primary-foreground: 0 0% 98%;

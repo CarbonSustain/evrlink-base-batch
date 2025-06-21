@@ -94,13 +94,12 @@ const Marketplace: React.FC = () => {
           <Box key={artNft.id}>
             <Card
               sx={{
-                cursor: "pointer",
                 transition: "transform 0.2s",
+                bgcolor: "#fafafa",
                 "&:hover": {
                   transform: "scale(1.02)",
                 },
               }}
-              onClick={() => handleArtNftClick(artNft)}
             >
               <CardMedia
                 component="img"
@@ -116,9 +115,30 @@ const Marketplace: React.FC = () => {
                 <Typography variant="body2" color="text.secondary" noWrap>
                   Category: {artNft.giftCardCategoryId}
                 </Typography>
-                <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
+                <Typography variant="h6" color="primary" sx={{ mt: 1, mb: 2 }}>
                   {artNft.price} ETH
                 </Typography>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card click
+                    handleArtNftClick(artNft);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: '#00b2c7',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#00a0b3'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#00b2c7'}
+                >
+                  Generate Meep
+                </button>
               </CardContent>
             </Card>
           </Box>

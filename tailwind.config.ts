@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -22,21 +23,21 @@ export default {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
-				background: '#0A0B14',
+				background: '#fafafa',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#6366F1',
+					DEFAULT: '#00b2c7',
 					foreground: '#ffffff',
-					50: '#F5F5FF',
-					100: '#EBEBFF',
-					200: '#D1D1FF',
-					300: '#B8B8FF',
-					400: '#9E9EFF',
-					500: '#6366F1',
-					600: '#4F46E5',
-					700: '#4338CA',
-					800: '#3730A3',
-					900: '#312E81'
+					50: '#e6f8fb',
+					100: '#ccf1f7',
+					200: '#99e3ef',
+					300: '#66d5e7',
+					400: '#33c7df',
+					500: '#00b2c7',
+					600: '#008e9f',
+					700: '#006b77',
+					800: '#00474f',
+					900: '#002428'
 				},
 				secondary: {
 					DEFAULT: '#22D3EE',
@@ -65,11 +66,11 @@ export default {
 					foreground: 'hsl(var(--accent-foreground))'
 				},
 				popover: {
-					DEFAULT: '#1A1B23',
+					DEFAULT: '#fafafa',
 					foreground: 'hsl(var(--popover-foreground))'
 				},
 				card: {
-					DEFAULT: '#1A1B23',
+					DEFAULT: '#fafafa',
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				sidebar: {
@@ -150,5 +151,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [tailwindcssAnimate],
 } satisfies Config;

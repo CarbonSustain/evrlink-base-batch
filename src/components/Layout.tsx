@@ -32,9 +32,9 @@ const Layout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0B14] flex">
+    <div className="min-h-screen bg-[#fafafa] flex">
       {/* Header with Logo and Wallet */}
-      <div className="fixed top-0 left-0 right-0 h-16 z-50 px-4 flex items-center justify-between bg-[#0A0B14]/80 backdrop-blur-sm border-b border-white/10">
+      <div className="fixed top-0 left-0 right-0 h-16 z-50 px-4 flex items-center justify-between bg-[#fafafa] backdrop-blur-sm border-b border-gray-200">
         {/* Logo */}
         <Link 
           to="/" 
@@ -51,7 +51,7 @@ const Layout = () => {
           <Link to="/sign-in">
             <Button 
               variant="outline"
-              className="flex items-center gap-2 border-white/30 bg-white/10 text-white hover:bg-white/20"
+              className="flex items-center gap-2 border-[#00b2c7] bg-transparent text-[#00b2c7] hover:bg-[#e6f7f9]"
             >
               Sign In
             </Button>
