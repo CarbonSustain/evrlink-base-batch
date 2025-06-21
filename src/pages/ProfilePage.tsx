@@ -1,13 +1,13 @@
-import { Box, Typography, Button } from '@mui/material';
-import { useWallet } from '../contexts/WalletContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Box, Typography, Button } from "@mui/material";
+import { useWallet } from "../contexts/WalletContext";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Gift as GiftIcon, Send, Download, User } from 'lucide-react';
-import GiftCardDetailsDialog from '@/components/GiftCardDetailsDialog';
-import { useState, useEffect } from 'react';
+import { Gift as GiftIcon, Send, Download, User } from "lucide-react";
+import GiftCardDetailsDialog from "@/components/GiftCardDetailsDialog";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getUserProfile, getDetailedProfile, GiftCard } from '@/utils/api';
-import { API_BASE_URL } from '@/services/api';
+import { getUserProfile, getDetailedProfile, GiftCard } from "@/utils/api";
+import { API_BASE_URL } from "@/services/api";
 
 interface UserStats {
   totalGiftCardsCreated: number;
@@ -29,7 +29,7 @@ interface MappedGiftCard {
   message: string;
   amount: string;
   date: string;
-  status: 'Sent' | 'Received';
+  status: "Sent" | "Received";
 }
 
 interface GiftCardItemProps {
@@ -65,61 +65,96 @@ export const ProfilePage = () => {
       const fetchProfileData = async () => {
         setLoading(true);
         setError(null);
-        
+
         try {
           // Fetch user profile and detailed profile data in parallel
           const [profileData, detailedProfile] = await Promise.all([
             getUserProfile(address),
-            getDetailedProfile(address)
+            getDetailedProfile(address),
           ]);
 
-          console.log('Profile Data:', profileData);
-          console.log('Detailed Profile:', detailedProfile);
+          console.log("Profile Data:", profileData);
+          console.log("Detailed Profile:", detailedProfile);
 
           setUserProfile({
             username: profileData.data.username,
             stats: {
-              totalGiftCardsCreated: profileData.data.stats.totalGiftCardsCreated,
+              totalGiftCardsCreated:
+                profileData.data.stats.totalGiftCardsCreated,
               totalGiftCardsSent: profileData.data.stats.totalGiftCardsSent,
-              totalGiftCardsReceived: profileData.data.stats.totalGiftCardsReceived,
-              totalBackgroundsMinted: profileData.data.stats.totalBackgroundsMinted
-            }
+              totalGiftCardsReceived:
+                profileData.data.stats.totalGiftCardsReceived,
+              totalBackgroundsMinted:
+                profileData.data.stats.totalBackgroundsMinted,
+            },
           });
 
           // Map received cards
-          const mappedReceivedCards = detailedProfile.profile.receivedCards.map((card: GiftCard) => ({
-            id: card.id,
-            imageUrl: getImageUrl(card.Background?.imageURI || card.backgroundUrl),
-            senderName: card.creatorAddress?.slice(0, 6) + '...' + card.creatorAddress?.slice(-4),
-            recipientName: card.currentOwner?.slice(0, 6) + '...' + card.currentOwner?.slice(-4),
-            message: card.message || '',
-            amount: `${card.price} ETH`,
-            date: new Date(card.createdAt).toISOString().split('T')[0],
-            status: 'Received'
-          }));
+          const mappedReceivedCards = detailedProfile.profile.receivedCards.map(
+            (card: GiftCard) => ({
+              id: card.id,
+              imageUrl: getImageUrl(
+                card.Background?.imageURI || card.backgroundUrl
+              ),
+              senderName:
+                card.creatorAddress?.slice(0, 6) +
+                "..." +
+                card.creatorAddress?.slice(-4),
+              recipientName:
+                card.currentOwner?.slice(0, 6) +
+                "..." +
+                card.currentOwner?.slice(-4),
+              message: card.message || "",
+              amount: `${card.price} USDC`,
+              date: (() => {
+                const dateStr = card.createdAt;
+                return dateStr
+                  ? new Date(dateStr).toISOString().split("T")[0]
+                  : "";
+              })(),
+              status: "Received",
+            })
+          );
 
           // Map sent cards
-          const mappedSentCards = detailedProfile.profile.sentCards.map((card: GiftCard) => ({
-            id: card.id,
-            imageUrl: getImageUrl(card.Background?.imageURI || card.backgroundUrl),
-            senderName: card.creatorAddress?.slice(0, 6) + '...' + card.creatorAddress?.slice(-4),
-            recipientName: card.currentOwner?.slice(0, 6) + '...' + card.currentOwner?.slice(-4),
-            message: card.message || '',
-            amount: `${card.price} ETH`,
-            date: new Date(card.createdAt).toISOString().split('T')[0],
-            status: 'Sent'
-          }));
+          const mappedSentCards = detailedProfile.profile.sentCards.map(
+            (card: GiftCard) => ({
+              id: card.id,
+              imageUrl: getImageUrl(
+                card.Background?.imageURI || card.backgroundUrl
+              ),
+              senderName:
+                card.creatorAddress?.slice(0, 6) +
+                "..." +
+                card.creatorAddress?.slice(-4),
+              recipientName:
+                card.currentOwner?.slice(0, 6) +
+                "..." +
+                card.currentOwner?.slice(-4),
+              message: card.message || "",
+              amount: `${card.price} USDC`,
+              date: (() => {
+                const dateStr = card.createdAt;
+                return dateStr
+                  ? new Date(dateStr).toISOString().split("T")[0]
+                  : "";
+              })(),
+              status: "Sent",
+            })
+          );
 
-          console.log('Mapped Received Cards:', mappedReceivedCards);
-          console.log('Mapped Sent Cards:', mappedSentCards);
+          console.log("Mapped Received Cards:", mappedReceivedCards);
+          console.log("Mapped Sent Cards:", mappedSentCards);
 
           setSentGifts(mappedSentCards);
           setReceivedGifts(mappedReceivedCards);
-
-
         } catch (error) {
-          console.error('Error fetching profile data:', error);
-          setError(error instanceof Error ? error.message : 'Failed to load profile data');
+          console.error("Error fetching profile data:", error);
+          setError(
+            error instanceof Error
+              ? error.message
+              : "Failed to load profile data"
+          );
         } finally {
           setLoading(false);
         }
@@ -131,9 +166,9 @@ export const ProfilePage = () => {
 
   const handleConnect = async () => {
     try {
-      await connect('mock_signature');
+      await connect("mock_signature");
     } catch (error) {
-      console.error('Failed to connect wallet:', error);
+      console.error("Failed to connect wallet:", error);
     }
   };
 
@@ -144,14 +179,14 @@ export const ProfilePage = () => {
 
   if (!isConnected) {
     return (
-      <Box 
-        sx={{ 
-          minHeight: '60vh', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 2
+      <Box
+        sx={{
+          minHeight: "60vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 2,
         }}
       >
         <Typography variant="h5" color="text.secondary">
@@ -166,12 +201,12 @@ export const ProfilePage = () => {
 
   if (!address) {
     return (
-      <Box 
-        sx={{ 
-          minHeight: '60vh', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center' 
+      <Box
+        sx={{
+          minHeight: "60vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <Typography variant="h5" color="text.secondary">
@@ -190,7 +225,7 @@ export const ProfilePage = () => {
       whileTap={{ scale: 0.98 }}
       className="relative"
     >
-      <Card 
+      <Card
         onClick={() => handleGiftClick(gift)}
         className="cursor-pointer bg-white/5 border-white/10 hover:bg-white/10 transition-all duration-200 overflow-hidden"
       >
@@ -198,8 +233,8 @@ export const ProfilePage = () => {
           <div className="aspect-video relative">
             {gift.imageUrl ? (
               <>
-                <img 
-                  src={gift.imageUrl} 
+                <img
+                  src={gift.imageUrl}
                   alt={`Gift Card`}
                   className="w-full h-full object-cover"
                 />
@@ -210,12 +245,12 @@ export const ProfilePage = () => {
                 <GiftIcon className="w-12 h-12 text-white/50" />
               </div>
             )}
-            
+
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-white/90">
-                    {gift.status === 'Sent' ? (
+                    {gift.status === "Sent" ? (
                       <>To: {gift.recipientName}</>
                     ) : (
                       <>From: {gift.senderName}</>
@@ -223,7 +258,9 @@ export const ProfilePage = () => {
                   </p>
                   <p className="text-xs text-white/60">{gift.date}</p>
                   {gift.message && (
-                    <p className="text-xs text-white/70 mt-1 italic">"{gift.message}"</p>
+                    <p className="text-xs text-white/70 mt-1 italic">
+                      "{gift.message}"
+                    </p>
                   )}
                 </div>
                 <div className="text-right">
@@ -247,7 +284,10 @@ export const ProfilePage = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
       ) : error ? (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <div
+          className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
           <strong className="font-bold">Error!</strong>
           <span className="block sm:inline"> {error}</span>
         </div>
@@ -266,10 +306,19 @@ export const ProfilePage = () => {
                     {userProfile?.username || address}
                   </h2>
                   <div className="flex gap-4 text-sm text-white/70">
-                    <span>{userProfile?.stats.totalGiftCardsCreated || 0} Created</span>
-                    <span>{userProfile?.stats.totalGiftCardsSent || 0} Sent</span>
-                    <span>{userProfile?.stats.totalGiftCardsReceived || 0} Received</span>
-                    <span>{userProfile?.stats.totalBackgroundsMinted || 0} Backgrounds</span>
+                    <span>
+                      {userProfile?.stats.totalGiftCardsCreated || 0} Created
+                    </span>
+                    <span>
+                      {userProfile?.stats.totalGiftCardsSent || 0} Sent
+                    </span>
+                    <span>
+                      {userProfile?.stats.totalGiftCardsReceived || 0} Received
+                    </span>
+                    <span>
+                      {userProfile?.stats.totalBackgroundsMinted || 0}{" "}
+                      Backgrounds
+                    </span>
                   </div>
                 </div>
               </div>
@@ -280,15 +329,15 @@ export const ProfilePage = () => {
           <Tabs defaultValue="received" className="w-full">
             <TabsList className="w-full bg-white/5 border-b border-white/10 p-0 h-auto">
               <div className="max-w-7xl mx-auto w-full flex">
-                <TabsTrigger 
-                  value="received" 
+                <TabsTrigger
+                  value="received"
                   className="flex-1 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white/5"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Received ({receivedGifts.length})
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="sent" 
+                <TabsTrigger
+                  value="sent"
                   className="flex-1 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white/5"
                 >
                   <Send className="w-4 h-4 mr-2" />
@@ -333,4 +382,4 @@ export const ProfilePage = () => {
   );
 };
 
-export default ProfilePage; 
+export default ProfilePage;
