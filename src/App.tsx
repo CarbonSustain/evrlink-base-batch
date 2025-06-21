@@ -70,6 +70,7 @@ const App = () => (
                 <Route path="debug" element={<Debug />} />
               </Route>
               {/* Auth routes outside of Layout */}
+
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/gallery" element={<MyGallery />} />

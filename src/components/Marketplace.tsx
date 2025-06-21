@@ -116,7 +116,7 @@ const Marketplace: React.FC = () => {
                   Category: {artNft.giftCardCategoryId}
                 </Typography>
                 <Typography variant="h6" color="primary" sx={{ mt: 1, mb: 2 }}>
-                  {artNft.price} ETH
+                  {artNft.price} USDC
                 </Typography>
                 <button
                   onClick={(e) => {

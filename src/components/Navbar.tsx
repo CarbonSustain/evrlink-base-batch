@@ -40,24 +40,24 @@ const Navbar = () => {
         <div className="py-6 px-4 flex flex-col h-full">
           {/* Main Menu */}
           <div className="flex flex-col space-y-2 flex-1 pt-8">
-            <NavLink to="/" active={location.pathname === "/"} onClick={() => setIsOpen(false)}>
-              Home
+            <NavLink to="/dashboard" active={location.pathname === "/dashboard"} onClick={() => setIsOpen(false)}>
+              Dashboard
+            </NavLink>
+            <NavLink to="/gallery" active={location.pathname.startsWith("/gallery")} onClick={() => setIsOpen(false)}>
+              My Gallery
             </NavLink>
             <NavLink to="/marketplace" active={location.pathname.startsWith("/marketplace")} onClick={() => setIsOpen(false)}>
               Templates
             </NavLink>
-            <NavLink to="/about" active={location.pathname === "/about"} onClick={() => setIsOpen(false)}>
-              About Us
+            <NavLink to="/settings" active={location.pathname === "/settings"} onClick={() => setIsOpen(false)}>
+              Settings
             </NavLink>
-            <NavLink to="/create" active={location.pathname === "/create"} onClick={() => setIsOpen(false)}>
-              Create Meep
+            <NavLink to="/faqs" active={location.pathname === "/faqs"} onClick={() => setIsOpen(false)}>
+              FAQs
             </NavLink>
-            <NavLink to="/claim" active={location.pathname === "/claim"} onClick={() => setIsOpen(false)}>
-              Claim Meep
-            </NavLink>
-            <NavLink to="/create-background" active={location.pathname === "/create-background"} onClick={() => setIsOpen(false)}>
+            {/* <NavLink to="/create-background" active={location.pathname === "/create-background"} onClick={() => setIsOpen(false)}>
               Create Background
-            </NavLink>
+            </NavLink> */}
           </div>
         </div>
       </nav>
