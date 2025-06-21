@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -26,6 +26,11 @@ import {
 } from "../utils/api";
 import { useWallet } from "../contexts/WalletContext";
 import { API_BASE_URL } from "@/services/api";
+
+// Add your USDC and gift card contract addresses here
+const USDC_ADDRESS = import.meta.env.VITE_USDC_TOKEN_ADDRESS; // <-- FILL THIS IN
+const GIFT_CARD_CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS; // Example from your prompt
+const USDC_DECIMALS = 6;
 
 interface Background {
   id: string;
@@ -80,6 +85,9 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
   const [loadingPrice, setLoadingPrice] = useState(false);
   const [priceError, setPriceError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"eth" | "usdc">("eth");
+  const [showApprove, setShowApprove] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [usdcApproved, setUsdcApproved] = useState(false);
 
   // Add cleanup for async operations
   React.useEffect(() => {
@@ -332,7 +340,14 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
 
       let errorMessage = "An unexpected error occurred";
 
+      // Custom handling for USDC allowance error
       if (
+        error.message &&
+        error.message.includes("Insufficient USDC allowance")
+      ) {
+        errorMessage =
+          "Insufficient USDC allowance. Please approve the required amount for the contract in your wallet (e.g. MetaMask) before creating a gift card.";
+      } else if (
         error.message.includes("<!DOCTYPE") ||
         error.message.includes("API server")
       ) {
@@ -582,6 +597,17 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
                 </Button>
               </Box>
             </Box>
+            {paymentMethod === "usdc" && !usdcApproved && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleApproveUSDC}
+                disabled={isApproving}
+                sx={{ mb: 2 }}
+              >
+                {isApproving ? <CircularProgress size={18} /> : "Approve USDC"}
+              </Button>
+            )}
           </Box>
         );
       case 2:
@@ -721,6 +747,82 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
         return "Unknown step";
     }
   };
+
+  // Show Approve button if USDC allowance error
+  useEffect(() => {
+    if (
+      error &&
+      error.includes("Insufficient USDC allowance") &&
+      paymentMethod === "usdc"
+    ) {
+      setShowApprove(true);
+    } else {
+      setShowApprove(false);
+    }
+  }, [error, paymentMethod]);
+
+  const handleApproveUSDC = async () => {
+    console.log("Handling USDC approval...");
+    if (!window.ethereum || !userAddress) {
+      toast.error("Wallet not connected");
+      return;
+    }
+    setIsApproving(true);
+    console.log("Starting USDC approval transaction...");
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const usdc = new ethers.Contract(
+        USDC_ADDRESS,
+        [
+          "function approve(address spender, uint256 amount) public returns (bool)",
+        ],
+        signer
+      );
+      // Default approve 1000 USDC (or you can use a dynamic value)
+      const amount = ethers.utils.parseUnits("3000000", USDC_DECIMALS);
+      const tx = await usdc.approve(GIFT_CARD_CONTRACT_ADDRESS, amount);
+      await tx.wait();
+      toast.success("USDC allowance approved!");
+      setShowApprove(false);
+      setError(null);
+    } catch (err: any) {
+      toast.error(err.message || "USDC approval failed");
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
+  // Check USDC allowance when payment method is USDC and step is 1
+  useEffect(() => {
+    const checkAllowance = async () => {
+      if (paymentMethod !== "usdc" || activeStep !== 1 || !userAddress) {
+        setUsdcApproved(false);
+        return;
+      }
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const usdc = new ethers.Contract(
+          USDC_ADDRESS,
+          [
+            "function allowance(address owner, address spender) view returns (uint256)",
+          ],
+          provider
+        );
+        const allowance = await usdc.allowance(
+          userAddress,
+          GIFT_CARD_CONTRACT_ADDRESS
+        );
+        // Use a reasonable minimum, e.g. 100 USDC
+        setUsdcApproved(
+          allowance.gte(ethers.utils.parseUnits("100", USDC_DECIMALS))
+        );
+      } catch (e) {
+        setUsdcApproved(false);
+      }
+    };
+    checkAllowance();
+  }, [paymentMethod, activeStep, userAddress]);
 
   return (
     <Dialog
@@ -862,6 +964,22 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
           <Alert
             severity="error"
             sx={{ mb: 2, bgcolor: "rgba(211, 47, 47, 0.1)" }}
+            action={
+              showApprove ? (
+                <Button
+                  color="primary"
+                  onClick={handleApproveUSDC}
+                  disabled={isApproving}
+                  size="small"
+                >
+                  {isApproving ? (
+                    <CircularProgress size={18} />
+                  ) : (
+                    "Approve USDC"
+                  )}
+                </Button>
+              ) : null
+            }
           >
             {error}
           </Alert>
@@ -941,6 +1059,9 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
                 bgcolor: "#6B4CD8",
               },
             }}
+            disabled={
+              paymentMethod === "usdc" && activeStep === 1 && !usdcApproved
+            }
           >
             Next
           </Button>
