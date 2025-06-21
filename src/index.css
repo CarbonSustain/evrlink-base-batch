@@ -1,5 +1,42 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&family=Satoshi:wght@400;500;700;900&family=Gochi+Hand:wght@400&display=swap');
+@import './tailwind.css';
+html, body {
+  font-family: 'Avenir', 'Satoshi', 'Roboto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* Custom font utilities */
+.font-patrick-hand {
+  font-family: 'Patrick Hand', cursive;
+}
+
+.font-satoshi {
+  font-family: 'Satoshi', sans-serif;
+}
+
+.font-gochi-hand {
+  font-family: 'Gochi Hand', cursive;
+}
+
+.font-anke-hand {
+  font-family: 'AnkeHand', cursive;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+button:focus,
+a:focus {
+  outline: 2px solid #06b6d4;
+  outline-offset: 2px;
+}
 
 @tailwind base;
 @tailwind components;
