@@ -214,7 +214,7 @@ console.log("artNfts: ", artNfts);
               <span>My Gallery</span>
             </Link>
             <Link
-                to="/templates"
+                to="/marketplace"
                 className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
             >
               <span className="material-icons">grid_view</span>
@@ -479,15 +479,15 @@ console.log("artNfts: ", artNfts);
               {artNfts.map((nft) => (
                 <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
                   <div className="flex items-center gap-3 p-4">
-                  <Link to={`/meep/${nft.id}`}>
-  <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full cursor-pointer hover:opacity-90 transition">
-    <img
-      src={getImageUrl(nft.imageUri)}
-      alt={`Meep ${nft.id}`}
-      className="w-full h-full object-cover"
-    />
-  </div>
-</Link>
+                  {/* <Link to={`/meep/${nft.id}`}>
+                    <div className="aspect-w-10 aspect-h-4 bg-gray-100 w-full cursor-pointer hover:opacity-90 transition">
+                      <img
+                        src={getImageUrl(nft.imageUri)}
+                        alt={`Meep ${nft.id}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </Link> */}
 
                     <div>
                       <h3 className="font-medium">{nft.giftCardCategoryId}</h3>

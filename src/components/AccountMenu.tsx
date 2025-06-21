@@ -37,28 +37,28 @@ const AccountMenu = ({ address }: AccountMenuProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+        <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors">
           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-purple-600" />
-          <span className="text-white/90">{truncateAddress(address)}</span>
+          <span className="text-black">{truncateAddress(address)}</span>
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-[300px] bg-[#1a1a1a] border-white/10 text-white">
+      <DropdownMenuContent className="w-[300px] bg-[#fafafa] border-gray-200 text-black">
         <div className="flex items-center gap-3 p-4">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-purple-600" />
           <span className="font-medium">Manage account</span>
         </div>
 
-        <div className="px-4 py-3 space-y-4 border-t border-white/10">
+        <div className="px-4 py-3 space-y-4 border-t border-gray-200">
           <div>
-            <p className="text-sm text-gray-400">CONNECTED WALLET</p>
+            <p className="text-sm text-gray-600">CONNECTED WALLET</p>
             <div className="flex items-center justify-between mt-1">
-              <span className="text-white/90">{truncateAddress(address)}</span>
+              <span className="text-black">{truncateAddress(address)}</span>
               <button
-                className="p-1.5 hover:bg-white/5 rounded-md transition-colors"
+                className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
                 onClick={copyAddress}
               >
-                <Copy className="w-4 h-4 text-gray-400" />
+                <Copy className="w-4 h-4 text-gray-600" />
               </button>
             </div>
           </div>
@@ -84,7 +84,7 @@ const AccountMenu = ({ address }: AccountMenuProps) => {
             </div>
           </div>
 
-          <button className="w-full py-2.5 px-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-center">
+          <button className="w-full py-2.5 px-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-center">
             Wrap/Unwrap RON
           </button>
 
@@ -100,14 +100,14 @@ const AccountMenu = ({ address }: AccountMenuProps) => {
         <DropdownMenuSeparator className="bg-white/10" />
 
         <DropdownMenuItem
-          className="px-4 py-2.5 text-white hover:bg-white/5 cursor-pointer"
+          className="px-4 py-2.5 text-black hover:bg-gray-100 cursor-pointer"
           onClick={() => navigate("/profile")}
         >
           <User className="w-4 h-4 mr-2" />
           My Profile
         </DropdownMenuItem>
 
-        <DropdownMenuItem className="px-4 py-2.5 text-white hover:bg-white/5 cursor-pointer">
+        <DropdownMenuItem className="px-4 py-2.5 text-black hover:bg-gray-100 cursor-pointer">
           <Settings className="w-4 h-4 mr-2" />
           Settings
         </DropdownMenuItem>
@@ -115,7 +115,7 @@ const AccountMenu = ({ address }: AccountMenuProps) => {
         <DropdownMenuSeparator className="bg-white/10" />
 
         <DropdownMenuItem
-          className="px-4 py-2.5 text-red-500 hover:bg-white/5 cursor-pointer"
+          className="px-4 py-2.5 text-red-500 hover:bg-gray-100 cursor-pointer"
           onClick={handleLogout}
         >
           <LogOut className="w-4 h-4 mr-2" />

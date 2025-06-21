@@ -53,7 +53,7 @@ interface BackgroundDetailsModalProps {
 
 const steps = ["Select Option", "Details", "Confirm"];
 
-const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
+const BackgroundDetailsModal = ({
   open,
   onClose,
   background,
@@ -429,13 +429,13 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
       case 0:
         return (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom sx={{ color: "white" }}>
+            <Typography variant="h6" gutterBottom sx={{ color: "black" }}>
               Select Transfer Type
             </Typography>
             <Typography
               variant="body1"
               paragraph
-              sx={{ color: "rgba(255,255,255,0.7)", mb: 4 }}
+              sx={{ color: "black", mb: 4 }}
             >
               Choose how you want to transfer this NFT:
             </Typography>
@@ -445,8 +445,10 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
               onClick={() => setTransferType("direct")}
               sx={{
                 mb: 2,
-                bgcolor: "#7F5AF0",
-                "&:hover": { bgcolor: "#6B4CD8" },
+                bgcolor: "#60cedc",
+                color: "black",
+                border: "2px solid #00b2c7",
+                "&:hover": { bgcolor: "#4cbbc9" },
                 display: "flex",
                 gap: 2,
                 alignItems: "center",
@@ -457,15 +459,15 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
               Direct Transfer to Address
             </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               fullWidth
               onClick={() => setTransferType("giftcard")}
               sx={{
-                color: "white",
-                borderColor: "rgba(255,255,255,0.23)",
+                bgcolor: "#60cedc",
+                color: "black",
+                border: "2px solid #00b2c7",
                 "&:hover": {
-                  borderColor: "rgba(255,255,255,0.5)",
-                  bgcolor: "rgba(255,255,255,0.05)",
+                  bgcolor: "#4cbbc9",
                 },
                 display: "flex",
                 gap: 2,
@@ -477,15 +479,15 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
               Create Gift Card with Secret Key
             </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               fullWidth
               onClick={() => setTransferType("baseusername")}
               sx={{
-                color: "white",
-                borderColor: "rgba(255,255,255,0.23)",
+                bgcolor: "#60cedc",
+                color: "black",
+                border: "2px solid #00b2c7",
                 "&:hover": {
-                  borderColor: "rgba(255,255,255,0.5)",
-                  bgcolor: "rgba(255,255,255,0.05)",
+                  bgcolor: "#4cbbc9",
                 },
                 display: "flex",
                 gap: 2,
@@ -502,7 +504,7 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
       case 1:
         return (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom sx={{ color: "white" }}>
+            <Typography variant="h6" gutterBottom sx={{ color: "black" }}>
               {transferType === "direct"
                 ? "Enter Recipient Details"
                 : transferType === "baseusername"
@@ -550,7 +552,7 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
                 />
                 <Typography
                   variant="body2"
-                  sx={{ color: "rgba(255,255,255,0.7)", mb: 3 }}
+                  sx={{ color: "rgba(0,0,0,0.87)", mb: 3 }}
                 >
                   Gift Card Price: {background.price} ETH
                 </Typography>
@@ -582,16 +584,26 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
               </Typography>
               <Box sx={{ display: "flex", gap: 2 }}>
                 <Button
-                  variant={paymentMethod === "eth" ? "contained" : "outlined"}
-                  color="primary"
+                  variant="contained"
                   onClick={() => setPaymentMethod("eth")}
+                  sx={{
+                    bgcolor: paymentMethod === "eth" ? "#60cedc" : "transparent",
+                    color: paymentMethod === "eth" ? "black" : "#00b2c7",
+                    border: "2px solid #00b2c7",
+                    "&:hover": { bgcolor: paymentMethod === "eth" ? "#4cbbc9" : "rgba(0, 178, 199, 0.04)" },
+                  }}
                 >
                   ETH
                 </Button>
                 <Button
-                  variant={paymentMethod === "usdc" ? "contained" : "outlined"}
-                  color="primary"
+                  variant="contained"
                   onClick={() => setPaymentMethod("usdc")}
+                  sx={{
+                    bgcolor: paymentMethod === "usdc" ? "#60cedc" : "transparent",
+                    color: paymentMethod === "usdc" ? "black" : "#00b2c7",
+                    border: "2px solid #00b2c7",
+                    "&:hover": { bgcolor: paymentMethod === "usdc" ? "#4cbbc9" : "rgba(0, 178, 199, 0.04)" },
+                  }}
                 >
                   USDC
                 </Button>
@@ -613,12 +625,12 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
       case 2:
         return (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom sx={{ color: "white" }}>
+            <Typography variant="h6" gutterBottom sx={{ color: "black" }}>
               Confirm Details
             </Typography>
             <Box
               sx={{
-                bgcolor: "rgba(255,255,255,0.05)",
+                bgcolor: "rgba(0,0,0,0.05)",
                 p: 3,
                 borderRadius: 2,
                 mb: 3,
@@ -626,7 +638,7 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             >
               <Typography
                 variant="body1"
-                sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
+                sx={{ color: "rgba(0,0,0,0.87)", mb: 2 }}
               >
                 Transfer Type:{" "}
                 {transferType === "direct" ? "Direct Transfer" : "Gift Card"}
@@ -634,21 +646,21 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
               {transferType === "direct" ? (
                 <Typography
                   variant="body1"
-                  sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
+                  sx={{ color: "rgba(0,0,0,0.87)", mb: 2 }}
                 >
                   Recipient: {recipientAddress}
                 </Typography>
               ) : transferType === "baseusername" ? (
                 <Typography
                   variant="body1"
-                  sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
+                  sx={{ color: "rgba(0,0,0,0.87)", mb: 2 }}
                 >
                   Base Username: {recipientUsername}
                 </Typography>
               ) : (
                 <Typography
                   variant="body1"
-                  sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
+                  sx={{ color: "rgba(0,0,0,0.87)", mb: 2 }}
                 >
                   Secret Key: {secretKey}
                 </Typography>
@@ -656,18 +668,18 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
               {message && (
                 <Typography
                   variant="body1"
-                  sx={{ color: "rgba(255,255,255,0.7)", mb: 3 }}
+                  sx={{ color: "rgba(0,0,0,0.87)", mb: 3 }}
                 >
                   Message: {message}
                 </Typography>
               )}
-              <Typography variant="h6" sx={{ color: "#7F5AF0", mb: 2 }}>
+              <Typography variant="h6" sx={{ color: "#00b2c7", mb: 2 }}>
                 Price Breakdown
               </Typography>
               {loadingPrice && (
                 <Typography
                   variant="body2"
-                  sx={{ color: "rgba(255,255,255,0.7)" }}
+                  sx={{ color: "rgba(0,0,0,0.7)" }}
                 >
                   Loading price breakdown...
                 </Typography>
@@ -678,7 +690,7 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
                 </Typography>
               )}
               {priceBreakdown && (
-                <Box sx={{ color: "rgba(255,255,255,0.85)" }}>
+                <Box sx={{ color: "rgba(0,0,0,0.87)" }}>
                   <Box
                     sx={{
                       display: "flex",
@@ -736,7 +748,7 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
               )}
               <Typography
                 variant="body1"
-                sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
+                sx={{ color: "rgba(0,0,0,0.87)", mb: 2 }}
               >
                 Payment Method: {paymentMethod === "eth" ? "ETH" : "USDC"}
               </Typography>
@@ -828,14 +840,14 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="sm"
-      fullWidth
+      maxWidth={false}
       scroll="paper"
       PaperProps={{
         style: {
-          background: "linear-gradient(to bottom, #1a1a1a, #000000)",
+          background: "white",
           borderRadius: "16px",
-          color: "white",
+          color: "black",
+          width: "576px",
           maxHeight: "90vh",
           margin: "32px",
           position: "fixed",
@@ -852,10 +864,12 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             alt={background.category}
             style={{
               width: "100%",
-              height: "250px",
+              height: "384px",
               objectFit: "cover",
+              objectPosition: "center",
               borderTopLeftRadius: "16px",
               borderTopRightRadius: "16px",
+              display: "block"
             }}
           />
           <Box
@@ -871,13 +885,13 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
           >
             <Typography
               variant="h5"
-              sx={{ color: "white", mb: 1, fontWeight: "bold" }}
+              sx={{ color: "black", mb: 1, fontWeight: "bold" }}
             >
               {background.category} Background
             </Typography>
             <Typography
               variant="subtitle1"
-              sx={{ color: "rgba(255,255,255,0.7)" }}
+              sx={{ color: "rgba(0,0,0,0.7)" }}
             >
               By {background.artistAddress.slice(0, 6)}...
               {background.artistAddress.slice(-4)}
@@ -892,7 +906,8 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
               background: "rgba(0,0,0,0.7)",
               padding: "8px 16px",
               borderRadius: "20px",
-              color: "#7F5AF0",
+              border: "2px solid #00b2c7",
+              color: "#00b2c7",
               fontWeight: "bold",
               backdropFilter: "blur(4px)",
             }}
@@ -903,31 +918,31 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
       </DialogTitle>
       <DialogContent
         sx={{
-          bgcolor: "transparent",
+          bgcolor: "white",
           overflowY: "auto",
           "&::-webkit-scrollbar": {
             width: "8px",
           },
           "&::-webkit-scrollbar-track": {
-            background: "rgba(255, 255, 255, 0.1)",
+            background: "rgba(0, 0, 0, 0.05)",
             borderRadius: "4px",
           },
           "&::-webkit-scrollbar-thumb": {
-            background: "#7F5AF0",
+            background: "#00b2c7",
             borderRadius: "4px",
           },
           "& .MuiTextField-root": {
             "& .MuiOutlinedInput-root": {
-              color: "white",
+              color: "black",
               "& fieldset": {
-                borderColor: "rgba(255, 255, 255, 0.23)",
+                borderColor: "rgba(0, 0, 0, 0.23)",
               },
               "&:hover fieldset": {
-                borderColor: "rgba(255, 255, 255, 0.5)",
+                borderColor: "rgba(0, 0, 0, 0.5)",
               },
             },
             "& .MuiInputLabel-root": {
-              color: "rgba(255, 255, 255, 0.7)",
+              color: "rgba(0, 0, 0, 0.7)",
             },
           },
         }}
@@ -938,18 +953,19 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             pt: 2,
             pb: 4,
             "& .MuiStepLabel-label": {
-              color: "rgba(255, 255, 255, 0.7)",
+              color: "black",
               "&.Mui-active": {
-                color: "white",
+                color: "black",
+                fontWeight: "bold",
               },
             },
             "& .MuiStepIcon-root": {
-              color: "rgba(255, 255, 255, 0.3)",
+              color: "rgba(0, 0, 0, 0.3)",
               "&.Mui-active": {
-                color: "#7F5AF0",
+                color: "#00b2c7",
               },
               "&.Mui-completed": {
-                color: "#7F5AF0",
+                color: "#00b2c7",
               },
             },
           }}
@@ -984,30 +1000,29 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             {error}
           </Alert>
         )}
-        <Box sx={{ color: "white" }}>{getStepContent(activeStep)}</Box>
+        <Box sx={{ color: "black" }}>{getStepContent(activeStep)}</Box>
       </DialogContent>
       <DialogActions
         sx={{
-          borderTop: "1px solid rgba(255,255,255,0.1)",
+          borderTop: "1px solid rgba(0,0,0,0.1)",
           p: 3,
           gap: 1,
           position: "sticky",
           bottom: 0,
-          bgcolor: "rgba(0,0,0,0.8)",
-          backdropFilter: "blur(8px)",
+          bgcolor: "#fafafa",
         }}
       >
         <Button
           onClick={onClose}
           sx={{
-            color: "white",
-            borderColor: "rgba(255,255,255,0.23)",
+            bgcolor: "#60cedc",
+            color: "black",
+            border: "2px solid #00b2c7",
             "&:hover": {
-              borderColor: "rgba(255,255,255,0.5)",
-              bgcolor: "rgba(255,255,255,0.05)",
+              bgcolor: "#4cbbc9",
             },
           }}
-          variant="outlined"
+          variant="contained"
         >
           Cancel
         </Button>
@@ -1015,14 +1030,14 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
           <Button
             onClick={handleBack}
             sx={{
-              color: "white",
-              borderColor: "rgba(255,255,255,0.23)",
+              bgcolor: "#60cedc",
+              color: "black",
+              border: "2px solid #00b2c7",
               "&:hover": {
-                borderColor: "rgba(255,255,255,0.5)",
-                bgcolor: "rgba(255,255,255,0.05)",
+                bgcolor: "#4cbbc9",
               },
             }}
-            variant="outlined"
+            variant="contained"
           >
             Back
           </Button>
@@ -1033,9 +1048,11 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             variant="contained"
             disabled={isLoading}
             sx={{
-              bgcolor: "#7F5AF0",
+              bgcolor: "#60cedc",
+              color: "black",
+              border: "2px solid #00b2c7",
               "&:hover": {
-                bgcolor: "#6B4CD8",
+                bgcolor: "#4cbbc9",
               },
             }}
           >
@@ -1054,9 +1071,11 @@ const BackgroundDetailsModal: React.FC<BackgroundDetailsModalProps> = ({
             }}
             variant="contained"
             sx={{
-              bgcolor: "#7F5AF0",
+              bgcolor: "#60cedc",
+              color: "black",
+              border: "2px solid #00b2c7",
               "&:hover": {
-                bgcolor: "#6B4CD8",
+                bgcolor: "#4cbbc9",
               },
             }}
             disabled={

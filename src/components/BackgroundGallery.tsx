@@ -109,7 +109,7 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
     return (
       <div className="flex justify-center items-center py-20">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
-        <span className="ml-3 text-white">Loading backgrounds...</span>
+        <span className="ml-3 text-black">Loading backgrounds...</span>
       </div>
     );
   }
@@ -117,7 +117,7 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
   if (error) {
     return (
       <div className="text-center py-10">
-        <div className="text-red-400 mb-3">{error}</div>
+        <div className="text-red-500 mb-3">{error}</div>
         <Button onClick={() => window.location.reload()} variant="outline">
           Try Again
         </Button>
@@ -128,7 +128,7 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
   if (backgrounds.length === 0) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-300 text-lg mb-6">{emptyStateMessage}</p>
+        <p className="text-gray-600 text-lg mb-6">{emptyStateMessage}</p>
         <Button
           onClick={() => navigate("/create-background")}
           className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3"
@@ -150,10 +150,9 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="group cursor-pointer"
-            onClick={() => onSelectBackground(background)}
+            className="group"
           >
-            <div className="relative rounded-xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1">
+            <div className="relative rounded-xl overflow-hidden bg-[#fafafa] border-2 border-[#00b2c7] transition-all duration-300 hover:shadow-xl hover:shadow-[#00b2c7]/20 hover:-translate-y-1">
               <div className="relative h-48">
                 <img
                   src={imageUrl}
@@ -167,33 +166,42 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
                     console.error(`Failed to load image: ${currentSrc}`);
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute top-4 right-4 bg-black/30 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-medium">
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-300/40 to-transparent" />
+                <div className="absolute top-4 right-4 bg-[#00b2c7]/90 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-medium">
                   {background.price} ETH
                 </div>
               </div>
 
               <div className="p-6">
-                <h3 className="text-xl font-medium text-white mb-2 group-hover:text-primary transition-colors">
+                <h3 className="text-xl font-medium text-[#00b2c7] mb-2 transition-colors">
                   Category #{background.giftCardCategoryId}
                 </h3>
-                <p className="text-gray-400 text-sm line-clamp-2 mb-4">
+                <p className="text-black text-sm line-clamp-2 mb-4">
                   Beautiful background for creating unique gift cards.
                 </p>
 
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-400">
+                <div className="flex justify-between items-center text-sm mb-4">
+                  <span className="text-black">
                     By{" "}
                     {background.artistAddress &&
                     background.artistAddress.length >= 10
                       ? `${background.artistAddress.slice(
                           0,
                           6
-                        )}...${background.artistAddress.slice(-4)}`
-                      : background.artistAddress || ""}
+                        )}...${background.artistAddress.slice(-4)}` : background.artistAddress || ""}
                   </span>
                   {/* Usage count is not in ArtNFT, so omit or add if you extend ArtNFT */}
                 </div>
+                
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card click event
+                    onSelectBackground(background);
+                  }}
+                  className="w-full py-2.5 px-4 rounded-lg bg-[#00b2c7] hover:bg-[#00a0b3] text-white font-medium transition-colors text-center"
+                >
+                  Generate Meep
+                </button>
               </div>
             </div>
           </motion.div>

@@ -227,7 +227,7 @@ const Marketplace: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0A0B14] relative overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-[#fafafa] relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 grid-pattern opacity-10"></div>
       <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-transparent to-transparent"></div>
@@ -260,18 +260,18 @@ const Marketplace: React.FC = () => {
                   </div>
 
                   <motion.h1
-                    className="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-white mb-6"
+                    className="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-black mb-6"
                     variants={fadeInUpVariants}
                     custom={1}
                   >
                     Explore Our
-                    <span className="block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    <span className="block text-black">
                       Gift Card Collection
                     </span>
                   </motion.h1>
 
                   <motion.p
-                    className="text-xl text-gray-300"
+                    className="text-xl text-black"
                     variants={fadeInUpVariants}
                     custom={2}
                   >
@@ -289,8 +289,8 @@ const Marketplace: React.FC = () => {
 
               {/* Show all artNfts if no category is selected */}
               <div className="mt-12">
-                <h2 className="text-2xl font-display font-medium text-white mb-6">
-                  All Backgrounds
+                <h2 className="text-2xl font-display font-medium text-black mb-6">
+                  All Templates
                 </h2>
                 <BackgroundGallery
                   backgrounds={artNfts}
@@ -307,7 +307,7 @@ const Marketplace: React.FC = () => {
                 <div>
                   <button
                     onClick={() => setSelectedCategory(null)}
-                    className="text-white/60 hover:text-white flex items-center mb-3 transition-colors"
+                    className="bg-[#6fd4df] text-black font-medium px-3 py-1 rounded-md flex items-center mb-3 transition-colors hover:opacity-90"
                   >
                     <svg
                       className="w-5 h-5 mr-1"
@@ -325,7 +325,7 @@ const Marketplace: React.FC = () => {
                     </svg>
                     Back to Categories
                   </button>
-                  <h1 className="text-3xl font-display font-medium text-white">
+                  <h1 className="text-3xl font-display font-medium text-black">
                     Category #{selectedCategory}
                   </h1>
                 </div>

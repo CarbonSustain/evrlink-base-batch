@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Primary Colors */
+    --primary-background: #0078ff;
+    --primary-foreground: #ffffff;
+    --primary-light: #4da6ff;
+    --primary-dark: #0057b8;
+
+    /* Secondary Colors */
+    --secondary-background: #f8fafc;
+    --secondary-foreground: #1e293b;
+    --secondary-light: #f1f5f9;
+    --secondary-dark: #0f172a;
+
+    /* Accent Colors */
+    --accent-cyan: #06b6d4;
+    --accent-pink: #ec4899;
+    --accent-indigo: #6366f1;
+    --accent-slate: #64748b;
+
+    /* Border Colors */
+    --border-primary: #e2e8f0;
+    --border-secondary: #cbd5e1;
+    --border-light: #f1f5f9;
+    --border-dark: #475569;
+  }
+}
+
+@layer utilities {
+  /* Background Color Utilities */
+  .bg-primary-blue {
+    background-color: var(--primary-background);
+  }
+
+  .bg-primary-light {
+    background-color: var(--primary-light);
+  }
+
+  .bg-primary-dark {
+    background-color: var(--primary-dark);
+  }
+
+  .bg-secondary-light {
+    background-color: var(--secondary-light);
+  }
+
+  .bg-secondary-dark {
+    background-color: var(--secondary-dark);
+  }
+
+  .bg-accent-cyan {
+    background-color: var(--accent-cyan);
+  }
+
+  .bg-accent-pink {
+    background-color: var(--accent-pink);
+  }
+
+  .bg-accent-indigo {
+    background-color: var(--accent-indigo);
+  }
+
+  /* Text Color Utilities */
+  .text-primary-white {
+    color: var(--primary-foreground);
+  }
+
+  .text-secondary-slate {
+    color: var(--secondary-foreground);
+  }
+
+  .text-accent-cyan {
+    color: var(--accent-cyan);
+  }
+
+  .text-accent-pink {
+    color: var(--accent-pink);
+  }
+
+  .text-accent-indigo {
+    color: var(--accent-indigo);
+  }
+
+  /* Border Color Utilities */
+  .border-primary {
+    border-color: var(--border-primary);
+  }
+
+  .border-secondary {
+    border-color: var(--border-secondary);
+  }
+
+  .border-light {
+    border-color: var(--border-light);
+  }
+
+  .border-dark {
+    border-color: var(--border-dark);
+  }
+
+  /* Custom gradient utilities */
+  .bg-gradient-hero {
+    background: linear-gradient(180deg, #00ffff44 0%, #ffffffbf 100%);
+  }
+
+  .bg-gradient-categories {
+    background: linear-gradient(174deg, #221d53 0%, #00b2c7 100%);
+  }
+}

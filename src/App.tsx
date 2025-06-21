@@ -24,7 +24,13 @@ import Debug from "./pages/Debug";
 import ProfilePage from "./pages/ProfilePage";
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
-import { User } from "lucide-react";
+// import { User } from "lucide-react";
+import MyGallery from "./pages/MyGallery";
+// import MyGalleryNewUser from "./pages/MyGalleryNewUser";
+import Faq from "./pages/Faq";
+import MeepDetails from "./pages/MeepDetails";
+import HomePage from "./pages/landing-page/src/pages/Home/index";
+
 
 const queryClient = new QueryClient();
 
@@ -66,7 +72,12 @@ const App = () => (
               {/* Auth routes outside of Layout */}
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/gallery" element={<MyGallery />} />
+              <Route path="/meep/:id" element={<MeepDetails />} />
+              <Route path="/faqs" element={<Faq />} />
               <Route path="*" element={<NotFound />} />
+              {/* Landing page route */}
+              <Route path="/landing" element={<HomePage />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>

@@ -26,8 +26,8 @@ const CategoryNav: React.FC<CategoryNavProps> = ({
           className={cn(
             "px-4 py-2 rounded-full transition-all text-sm font-medium",
             selectedCategory === null
-              ? "bg-primary text-white shadow-md shadow-primary/20"
-              : "bg-white/10 backdrop-blur-sm text-white/70 hover:bg-white/20"
+              ? "bg-[#6fd4df] text-black shadow-md shadow-[#6fd4df]/20"
+              : "bg-[#6fd4df] text-black hover:opacity-90"
           )}
         >
           All Categories
@@ -42,8 +42,8 @@ const CategoryNav: React.FC<CategoryNavProps> = ({
                     className={cn(
                         "px-4 py-2 rounded-full transition-all text-sm font-medium",
                         selectedCategory === category
-                            ? "bg-primary text-white shadow-md shadow-primary/20"
-                            : "bg-white/10 backdrop-blur-sm text-white/70 hover:bg-white/20"
+                            ? "bg-[#6fd4df] text-black shadow-md shadow-[#6fd4df]/20"
+                            : "bg-[#6fd4df] text-black hover:opacity-90"
                     )}
                 >
                   {category}
