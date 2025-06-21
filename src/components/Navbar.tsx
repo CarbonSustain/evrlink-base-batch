@@ -14,50 +14,52 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Menu Toggle Button */}
-      <button
-        onClick={toggleMenu}
-        className={cn(
-          "fixed z-50 p-2 rounded-lg bg-[#fafafa] border border-gray-200 transition-all duration-300",
-          isOpen 
-            ? "left-[248px] top-20" 
-            : "left-4 top-20",
-        )}
-      >
-        {isOpen ? (
-          <X className="h-6 w-6 text-black" />
-        ) : (
+      {/* Menu Toggle Button - only shown when navbar is closed */}
+      {!isOpen && (
+        <button
+          onClick={toggleMenu}
+          className="fixed z-50 p-2 rounded-lg bg-white border border-gray-200 transition-all duration-300 left-4 top-20"
+        >
           <Menu className="h-6 w-6 text-black" />
-        )}
-      </button>
+        </button>
+      )}
 
       {/* Navbar */}
       <nav className={cn(
-        "fixed left-0 top-16 bottom-0 w-64 z-40 backdrop-blur-sm border-r border-gray-200 flex flex-col bg-[#fafafa] transition-all duration-300 ease-in-out",
+        "fixed left-0 top-16 bottom-0 w-52 z-40 backdrop-blur-sm border-r border-gray-200 flex flex-col bg-white transition-all duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "-translate-x-full",
-        scrolled && "bg-[#fafafa]"
+        scrolled && "bg-white"
       )}>
-        <div className="py-6 px-4 flex flex-col h-full">
+        <div className="py-6 px-4 flex flex-col h-full relative">
+          {/* Close Button (X) */}
+          <button
+            onClick={toggleMenu}
+            className="absolute top-2 right-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5 text-gray-600" />
+          </button>
+          
           {/* Main Menu */}
           <div className="flex flex-col space-y-2 flex-1 pt-8">
-            <NavLink to="/" active={location.pathname === "/"} onClick={() => setIsOpen(false)}>
-              Home
+            <NavLink to="/dashboard" active={location.pathname === "/dashboard"} onClick={() => setIsOpen(false)}>
+              Dashboard
+            </NavLink>
+            <NavLink to="/gallery" active={location.pathname.startsWith("/gallery")} onClick={() => setIsOpen(false)}>
+              My Gallery
             </NavLink>
             <NavLink to="/marketplace" active={location.pathname.startsWith("/marketplace")} onClick={() => setIsOpen(false)}>
               Templates
             </NavLink>
-            <NavLink to="/about" active={location.pathname === "/about"} onClick={() => setIsOpen(false)}>
-              About Us
+            <NavLink to="/settings" active={location.pathname === "/settings"} onClick={() => setIsOpen(false)}>
+              Settings
             </NavLink>
-            <NavLink to="/create" active={location.pathname === "/create"} onClick={() => setIsOpen(false)}>
-              Create Meep
+            <NavLink to="/faqs" active={location.pathname === "/faqs"} onClick={() => setIsOpen(false)}>
+              FAQs
             </NavLink>
-            <NavLink to="/claim" active={location.pathname === "/claim"} onClick={() => setIsOpen(false)}>
-              Claim Meep
-            </NavLink>
-            <NavLink to="/create-background" active={location.pathname === "/create-background"} onClick={() => setIsOpen(false)}>
+            {/* <NavLink to="/create-background" active={location.pathname === "/create-background"} onClick={() => setIsOpen(false)}>
               Create Background
-            </NavLink>
+            </NavLink> */}
           </div>
         </div>
       </nav>
