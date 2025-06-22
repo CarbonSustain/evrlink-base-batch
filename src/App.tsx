@@ -45,7 +45,7 @@ const App = () => (
             {/* Add AgentButton here so it appears on all pages */}
             <AgentButton />
             <Routes>
-              <Route path="/" element={<Layout />}>
+              <Route path="/l/" element={<Layout />}>
                 <Route index element={<Index />} />
                 <Route path="about" element={<About />} />
                 <Route path="create" element={<CreateGift />} />
@@ -79,7 +79,7 @@ const App = () => (
               <Route path="/faqs" element={<Faq />} />
               <Route path="*" element={<NotFound />} />
               {/* Landing page route */}
-              <Route path="/landing" element={<HomePage />} />
+              <Route path="/" element={<HomePage />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>

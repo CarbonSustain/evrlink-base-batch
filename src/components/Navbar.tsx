@@ -37,7 +37,7 @@ const Navbar = () => {
   const menuItems = [
     { to: '/dashboard', label: 'Home', icon: 'home' },
     { to: '/gallery', label: 'My Gallery', icon: 'collections' },
-    { to: '/marketplace', label: 'Templates', icon: 'grid_view' },
+    { to: '/l/marketplace', label: 'Templates', icon: 'grid_view' },
     { to: '/settings', label: 'Settings', icon: 'settings' },
     { to: '/faqs', label: 'FAQs', icon: 'help' },
   ];
