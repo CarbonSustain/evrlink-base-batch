@@ -101,10 +101,10 @@ const AccountMenu = ({ address }: AccountMenuProps) => {
 
         <DropdownMenuItem
           className="px-4 py-2.5 text-black hover:bg-gray-100 cursor-pointer"
-          onClick={() => navigate("/profile")}
+          onClick={() => navigate("/gallery")}
         >
           <User className="w-4 h-4 mr-2" />
-          My Profile
+          My Gallery
         </DropdownMenuItem>
 
         <DropdownMenuItem className="px-4 py-2.5 text-black hover:bg-gray-100 cursor-pointer">
