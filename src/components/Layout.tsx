@@ -25,7 +25,7 @@ const Layout = () => {
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      navigate(`/l/search?q=${encodeURIComponent(searchQuery)}`);
       setSearchQuery('');
     }
   };
