@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import Button from "@/components/Button";
 import { Input } from "@/components/ui/input";
 import { Gift, Lock, ArrowRight, Hash, Wallet } from "lucide-react";
@@ -162,7 +160,7 @@ const ClaimGift = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0A0B14] relative overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-white relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 grid-pattern opacity-10"></div>
       <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-transparent to-transparent"></div>
@@ -171,10 +169,8 @@ const ClaimGift = () => {
       <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse-slow"></div>
       <div className="absolute top-40 right-20 w-72 h-72 bg-secondary/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse-slow delay-1000"></div>
 
-      <Navbar />
-
-      <div className="flex-1 pt-32 pb-24 relative z-10">
-        <div className="content-container">
+      <div className="flex-1 pt-16 pb-24 relative z-10">
+        <div className="content-container mx-auto bg-white min-h-screen p-4 sm:p-6 md:p-8">
           {!claimed ? (
             <motion.div
               className="max-w-xl mx-auto"
@@ -184,22 +180,22 @@ const ClaimGift = () => {
             >
               <motion.div className="text-center mb-10" variants={itemVariants}>
                 <div className="w-20 h-20 mx-auto mb-6 relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full animate-pulse-slow" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#00b2c7]/30 to-[#00d0a6]/30 rounded-full animate-pulse-slow" />
                   <div className="relative w-full h-full flex items-center justify-center">
-                    <Gift className="w-10 h-10 text-white" />
+                    <Gift className="w-10 h-10 text-[#00b2c7]" />
                   </div>
                 </div>
 
-                <h1 className="text-4xl font-display font-medium mb-3 text-white bg-gradient-to-r from-primary to-secondary bg-clip-text">
+                <h1 className="text-4xl sm:text-5xl font-display font-bold text-gray-900 mb-3">
                   Claim Your Gift
                 </h1>
-                <p className="text-gray-300 text-lg">
+                <p className="text-lg text-gray-600">
                   Enter the gift card ID and secret message to claim your gift
                 </p>
               </motion.div>
 
               <motion.div
-                className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-8 shadow-2xl"
+                className="bg-white backdrop-blur-xl border border-gray-200 rounded-xl p-6 sm:p-8 space-y-6 shadow-lg"
                 variants={itemVariants}
               >
                 <form onSubmit={handleClaim} className="space-y-6">
@@ -207,7 +203,7 @@ const ClaimGift = () => {
                   <div className="space-y-2">
                     <label
                       htmlFor="giftCardId"
-                      className="block text-sm font-medium text-gray-300"
+                      className="block text-sm font-medium text-gray-700"
                     >
                       Gift Card ID
                     </label>
@@ -219,14 +215,14 @@ const ClaimGift = () => {
                         id="giftCardId"
                         type="text"
                         placeholder="Enter gift card ID..."
-                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                        className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
                         value={giftCardIdInput}
                         onChange={(e) => setGiftCardIdInput(e.target.value)}
                         disabled={!!urlGiftCardId}
                       />
                     </div>
                     {urlGiftCardId && (
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
                         Gift card ID provided in URL: {urlGiftCardId}
                       </p>
                     )}
@@ -236,7 +232,7 @@ const ClaimGift = () => {
                   <div className="space-y-2">
                     <label
                       htmlFor="secretMessage"
-                      className="block text-sm font-medium text-gray-300"
+                      className="block text-sm font-medium text-gray-700"
                     >
                       Secret Message
                     </label>
@@ -248,7 +244,7 @@ const ClaimGift = () => {
                         id="secretMessage"
                         type="text"
                         placeholder="Enter secret message..."
-                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                        className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
                         value={secretMessage}
                         onChange={(e) => setSecretMessage(e.target.value)}
                       />
@@ -259,8 +255,9 @@ const ClaimGift = () => {
                     type="submit"
                     fullWidth
                     loading={loading}
+                    variant="secondary"
                     icon={<ArrowRight className="w-4 h-4" />}
-                    className="bg-gradient-to-r from-primary/90 to-secondary/90 hover:from-primary hover:to-secondary text-white font-medium shadow-xl shadow-primary/20"
+                    className="!bg-[#00b2c7] hover:!bg-[#00b2c7]/90 text-white font-medium shadow-md"
                   >
                     {loading ? "Claiming..." : "Claim Gift"}
                   </Button>
@@ -274,7 +271,7 @@ const ClaimGift = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-10 space-y-8 shadow-2xl">
+              <div className="bg-white backdrop-blur-xl border border-gray-200 rounded-xl p-10 space-y-8 shadow-lg">
                 <ClaimCard
                   title="Your Gift Card"
                   message="Congratulations! You've successfully claimed your gift."
@@ -292,7 +289,7 @@ const ClaimGift = () => {
                       setIsFlipped(false);
                       navigate("/");
                     }}
-                    className="border-white/30 bg-white/10 text-white hover:bg-white/20 font-medium shadow-xl"
+                    className="border-gray-300 bg-gray-100 text-gray-800 hover:bg-gray-200 font-medium shadow-md"
                   >
                     Return to Home
                   </Button>
@@ -302,7 +299,7 @@ const ClaimGift = () => {
                       onClick={handleConnectWallet}
                       loading={isWalletConnected}
                       icon={<Wallet className="w-4 h-4" />}
-                      className="bg-gradient-to-r from-primary/90 to-secondary/90 hover:from-primary hover:to-secondary text-white font-medium shadow-xl shadow-primary/20"
+                      className="bg-gradient-to-r from-[#00b2c7]/90 to-[#00d0a6]/90 hover:from-[#00b2c7] hover:to-[#00d0a6] text-white font-medium shadow-md shadow-[#00b2c7]/20"
                     >
                       {isWalletConnected ? "Connecting..." : "Connect Wallet"}
                     </Button>
@@ -311,7 +308,7 @@ const ClaimGift = () => {
                       onClick={handleAddToWallet}
                       loading={isAddingToWallet}
                       icon={<Gift className="w-4 h-4" />}
-                      className="bg-gradient-to-r from-primary/90 to-secondary/90 hover:from-primary hover:to-secondary text-white font-medium shadow-xl shadow-primary/20"
+                      className="bg-gradient-to-r from-[#00b2c7]/90 to-[#00d0a6]/90 hover:from-[#00b2c7] hover:to-[#00d0a6] text-white font-medium shadow-md shadow-[#00b2c7]/20"
                     >
                       {isAddingToWallet
                         ? "Adding to Wallet..."
@@ -324,8 +321,6 @@ const ClaimGift = () => {
           )}
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 };
