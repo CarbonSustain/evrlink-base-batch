@@ -131,10 +131,10 @@ useEffect(() => {
   }
 }, [walletAddress]);
 
-const showEmptyState =
-  !walletAddress || (sentGifts.length === 0 && receivedGifts.length === 0);
+// const showEmptyState =
+//   !walletAddress || (sentGifts.length === 0 && receivedGifts.length === 0);
 
-  if (showEmptyState) return <Navigate to="/gallerynewuser" replace />; 
+  // if (showEmptyState) return <Navigate to="/gallerynewuser" replace />; 
   
   useEffect(() => {
     // Get wallet address from localStorage or context
