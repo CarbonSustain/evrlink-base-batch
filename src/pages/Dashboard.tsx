@@ -1,22 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import evrlinklogo from '../../public/images/g-Logo.png';
-import bell from '../../public/images/Bell.png';
-import wallet from '../../public/images/Frame 14.png';
 import { useWallet } from '@/contexts/WalletContext';
 import { useArtNftsStore } from '@/services/store';
 import { API_BASE_URL } from '@/services/api';
 
-
-
 const Dashboard = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [showWalletAddress, setShowWalletAddress] = useState(false);
   const { address, disconnect } = useWallet();
   const [walletAddress, setWalletAddress] = useState('');
   const navigate = useNavigate();
-  const [isDesktop, setIsDesktop] = useState(false);
-
 
   useEffect(() => {
     // Get wallet address from localStorage or context
@@ -26,63 +17,19 @@ const Dashboard = () => {
     }
   }, [address]);
 
-  useEffect(() => {
-    // Set initial desktop state
-    setIsDesktop(window.innerWidth >= 1024);
-
-    // Handle resize events
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   // Function to abbreviate wallet address for display
   const abbreviateAddress = (address: string) => {
     if (!address) return '';
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const toggleWalletAddressDisplay = () => {
-    setShowWalletAddress(!showWalletAddress);
-  };
-
-  const handleLogout = () => {
-    // Clear localStorage items
-    localStorage.removeItem('token');
-    localStorage.removeItem('walletAddress');
-    localStorage.removeItem('userEmail');
-
-    // Disconnect wallet if connected
-    if (disconnect) {
-      disconnect();
-    } else {
-      // If disconnect function is not available, force redirect
-      window.location.href = '/';
-    }
-  };
-
-  const categories = [
-    'Birthdays',
-    'Congratulations',
-    'The Feels',
-    'Work',
-    'Thank you',
-    'Sorry',
-    'IRL',
-    'Degen',
-  ];
+  // Using numbers for categories instead of names
+  const categories = Array.from({ length: 8 }, (_, i) => (i + 1).toString());
 
   // SVG content shortened for brevity
   const svg1 = `<svg xmlns="http://www.w3.org/2000/svg" width="157" height="153" viewBox="0 0 157 153" fill="none">
   <g filter="url(#filter0_dd_527_2240)">
-    <path d="M-75.7355 158.346C-72.1171 160.017 -66.4276 158.418 -66.4276 158.418C-66.4276 158.418 -68.5739 159.879 -66.8221 168.839C-65.2174 177.046 -61.6555 181.79 -55.6059 187.079C-51.7941 190.412 -45.7795 193.144 -45.7795 193.144C-45.7795 193.144 -51.1955 202.774 -39.379 210.718C-27.5626 218.663 -20.6211 208.216 -20.6211 208.216L-10.244 213.759C-10.244 213.759 -14.0222 225.418 -1.25895 231.081C7.76332 235.083 17.7106 228.692 17.7106 228.692C17.7106 228.692 32.6805 238.929 42.9784 235.915C50.3771 233.749 56.685 225.543 56.685 225.543C56.685 225.543 64.8258 238.33 72.3973 236.386C77.8464 234.986 80.198 226.004 80.9949 220.291C82.7261 207.877 81.1964 192.905 81.1964 192.905C81.1964 192.905 104.936 161.234 115.773 134.63C119.856 124.606 123.656 114.98 120.665 104.578C118.762 97.9613 111.323 92.5106 111.323 92.5106C111.323 92.5106 122.601 82.6092 115.418 72.1049C104.274 55.8076 82.9503 69.188 82.9503 69.188L48.2046 51.1713C48.2046 51.1713 49.5215 40.3579 47.5945 33.9685C44.5362 23.8273 35.1881 17.9323 24.6817 19.2792C14.5581 20.5771 10.5756 36.514 10.5756 36.514C10.5756 36.514 -1.33618 39.65 -7.9097 43.774C-17.0393 49.5013 -19.555 55.3503 -25.5144 64.3297C-31.4743 73.3088 -33.9924 79.3089 -39.0723 89.8818C-44.0232 100.187 -54.8952 125.108 -54.8952 125.108C-54.8952 125.108 -61.6304 129.485 -66.1293 132.718C-69.6983 135.283 -73.8292 138.132 -77.3624 141.689C-85.6654 150.047 -81.2394 155.804 -75.7355 158.346Z" fill="white"/>
+    <path d="M-75.7355 158.346C-72.1171 160.017 -66.4276 158.418 -66.4276 158.418C-66.4276 158.418 -68.5739 159.879 -66.8221 168.839C-65.2174 177.046 -61.6555 181.79 -55.6059 187.079C-51.7941 190.412 -45.7795 193.144 -45.7795 193.144C-45.7795 193.144 -51.1955 202.774 -39.379 210.718C-27.5626 218.663 -20.6211 208.216 -20.6211 208.216L-10.244 213.759C-10.244 213.759 -14.0222 225.418 -1.25895 231.081C7.76332 235.083 17.7106 228.692 17.7106 228.692C17.7106 228.692 32.6805 238.929 42.9784 235.915C50.3771 233.749 56.685 225.543 56.685 225.543C56.685 225.543 64.8258 238.33 72.3973 236.386C77.8464 234.986 80.198 226.004 80.9949 220.291C82.7261 207.877 81.1964 192.905 81.1964 192.905C81.1964 192.905 104.936 161.234 115.773 134.63C119.856 124.606 123.656 114.98 120.665 104.578C118.762 97.9612 111.323 92.5106 111.323 92.5106C111.323 92.5106 122.601 82.6092 115.418 72.1049C104.274 55.8076 82.9502 69.188 82.9502 69.188L48.2046 51.1713C48.2046 51.1713 49.5215 40.3579 47.5945 33.9685C44.5362 23.8273 35.1881 17.9323 24.6817 19.2792C14.5581 20.5771 10.5756 36.514 10.5756 36.514C10.5756 36.514 -1.33618 39.6499 -7.9097 43.774C-17.0393 49.5013 -19.555 55.3503 -25.5144 64.3297C-31.4743 73.3088 -33.9924 79.3089 -39.0723 89.8818C-44.0232 100.187 -54.8952 125.108 -54.8952 125.108C-54.8952 125.108 -61.6304 129.485 -66.1293 132.718C-69.6983 135.283 -73.8292 138.132 -77.3624 141.689C-85.6654 150.047 -81.2394 155.804 -75.7355 158.346Z" fill="white"/>
     <path d="M-75.7355 158.346C-72.1171 160.017 -66.4276 158.418 -66.4276 158.418C-66.4276 158.418 -68.5739 159.879 -66.8221 168.839C-65.2174 177.046 -61.6555 181.79 -55.6059 187.079C-51.7941 190.412 -45.7795 193.144 -45.7795 193.144C-45.7795 193.144 -51.1955 202.774 -39.379 210.718C-27.5626 218.663 -20.6211 208.216 -20.6211 208.216L-10.244 213.759C-10.244 213.759 -14.0222 225.418 -1.25895 231.081C7.76332 235.083 17.7106 228.692 17.7106 228.692C17.7106 228.692 32.6805 238.929 42.9784 235.915C50.3771 233.749 56.685 225.543 56.685 225.543C56.685 225.543 64.8258 238.33 72.3973 236.386C77.8464 234.986 80.198 226.004 80.9949 220.291C82.7261 207.877 81.1964 192.905 81.1964 192.905C81.1964 192.905 104.936 161.234 115.773 134.63C119.856 124.606 123.656 114.98 120.665 104.578C118.762 97.9612 111.323 92.5106 111.323 92.5106C111.323 92.5106 122.601 82.6092 115.418 72.1049C104.274 55.8076 82.9502 69.188 82.9502 69.188L48.2046 51.1713C48.2046 51.1713 49.5215 40.3579 47.5945 33.9685C44.5362 23.8273 35.1881 17.9323 24.6817 19.2792C14.5581 20.5771 10.5756 36.514 10.5756 36.514C10.5756 36.514 -1.33618 39.6499 -7.9097 43.774C-17.0393 49.5013 -19.555 55.3503 -25.5144 64.3297C-31.4743 73.3088 -33.9924 79.3089 -39.0723 89.8818C-44.0232 100.187 -54.8952 125.108 -54.8952 125.108C-54.8952 125.108 -61.6304 129.485 -66.1293 132.718C-69.6983 135.283 -73.8292 138.132 -77.3624 141.689C-85.6654 150.047 -81.2394 155.804 -75.7355 158.346Z" stroke="white"/>
   </g>
   <path d="M27.9051 26.1566C11.7034 26.3593 12.5834 44.6468 12.5834 44.6468C12.5834 44.6468 21.4024 46.4252 27.1983 48.3728C33.6869 50.5531 43.4592 55.6407 43.4592 55.6407C43.4592 55.6407 48.8152 25.8951 27.9051 26.1566Z" fill="#00B2C7"/>
@@ -91,8 +38,7 @@ const Dashboard = () => {
   <path d="M22.8909 112.491C22.8909 112.491 22.5199 118.282 25.4848 119.865C27.7602 121.081 32.0092 120.901 32.0092 120.901M32.0092 120.901C32.0092 120.901 33.885 125.516 36.4683 126.821C39.984 128.598 46.3983 125.048 46.3983 125.048M32.0092 120.901L33.9179 117.837" stroke="black" stroke-width="3" stroke-linecap="round"/>
   <path d="M-11.0694 101.253C-9.62889 99.4189 -4.56626 99.6907 -1.49775 102.037C1.05844 103.99 3.96258 106.679 2.79647 109.818C1.99819 111.968 -2.86445 111.569 -5.9443 110.361C-9.89381 108.811 -13.1515 103.906 -11.0694 101.253Z" fill="#F58D88"/>
   <path d="M58.1679 138.783C59.6084 136.948 64.671 137.22 67.7396 139.566C70.2957 141.519 73.1999 144.208 72.0338 147.347C71.2355 149.497 66.3729 149.099 63.293 147.89C59.3435 146.34 56.0858 141.435 58.1679 138.783Z" fill="#F58D88"/>
-  <path d="M10.3136 144.7C-7.64578 140.673 -17.8535 129.815 -32.2394 141.296C-38.9964 146.688 -42.2251 153.643 -43.9164 160.101C-46.3588 169.428 -36.5813 174.906 -32.5875 178.13C-31.9355 178.656 -21.1511 184.239 -19.6687 185.031C-8.02088 191.253 -15.7615 189.004 -5.12769 195.519C1.53894 199.603 3.90965 198.987 8.35571 201.362C9.7615 202.113 14.464 204.402 15.7667 205.32C17.3497 206.437 18.5183 208.326 20.0739 208.981C31.2597 213.693 40.9968 212.328 47.861 202.318C56.861 189.192 49.6212 167.053 35.6974 159.346C32.3793 157.51 30.3494 157.884 27.4229 155.472C25.0605 153.525 23.2069 150.954 20.7201 149.169C17.9678 147.192 13.6202 145.441 10.3136 144.7Z" fill="#FAFAFA"/>
-  <path d="M16.1505 31.8561C20.7019 25.849 27.3682 26.1435 27.3682 26.1435C27.3682 26.1435 20.8858 30.468 18.6629 34.287C17.2352 36.7396 15.9452 43.4514 15.9452 43.4514L12.6264 43.0396C12.6264 43.0396 2.63659 44.9247 -0.788842 48.1228C-10.8339 57.5014 -13.7519 63.7273 -20.2267 75.8486C-30.5212 95.1204 -39.8165 111.659 -48.5734 133.658C-51.7562 141.654 -53.4167 146.285 -54.9427 154.754C-55.8008 159.518 -57.2088 162.306 -56.349 167.069C-55.0377 174.333 -51.6696 178.824 -45.1591 182.301C-22.2871 194.519 -10.9709 200.292 10.8634 211.955C22.7229 218.29 27.2823 221.985 37.4922 224.274C41.0802 225.078 46.7986 225.707 46.7986 225.707C46.7986 225.707 39.8878 229.471 31.3045 226.685C27.0003 225.288 20.5735 222.314 20.5735 222.314L-5.29231 209.586L-19.8063 202.105L-41.4077 190.566C-41.4077 190.566 -49.6442 186.648 -53.6474 182.395C-58.1037 177.66 -60.5347 174.905 -62.0552 167.56C-62.779 164.064 -62.0762 156.388 -62.0762 156.388C-62.0762 156.388 -59.9752 148.44 -58.1838 143.496C-56.118 137.794 -52.1492 129.57 -52.1492 129.57C-52.1492 129.57 -43.9508 105.64 -27.9592 78.2511C-21.6241 66.3915 -13.2838 51.8298 0.323475 45.1783C7.50798 41.6665 12.6264 43.0396 12.6264 43.0396C12.6264 43.0396 12.92 36.1191 16.1505 31.8561Z" fill="black" fill-opacity="0.15"/>
+  <path d="M10.3136 144.7C-7.64578 140.673 -17.8535 129.815 -32.2394 141.296C-38.9964 146.688 -42.2251 153.643 -43.9164 160.101C-46.3588 169.428 -36.5813 174.906 -32.5875 178.13C-31.9355 178.656 -21.1511 184.239 -19.6687 185.031C-8.02088 191.253 -15.7615 189.004 -5.12769 195.519C1.53894 199.603 3.90965 198.987 8.35571 201.362C9.7615 202.113 14.464 204.402 15.7667 205.32C17.3497 206.437 18.5183 208.326 20.0739 208.981C31.2597 213.693 40.9968 212.328 47.861 202.318C56.861 189.192 49.6212 167.053 35.6974 159.346C32.3793 157.51 30.3494 157.884 27.4229 155.472C25.0605 153.525 23.2069 150.954 20.7201 149.169C17.9678 147.192 13.6202 145.441 10.3136 144.7Z" fill="black" fill-opacity="0.15"/>
   <path d="M82.925 77.0528L79.1939 75.0597C79.1939 75.0597 82.5733 72.9984 85.7531 71.7583C91.9552 68.8106 97.3365 68.4186 97.3365 68.4186C97.3365 68.4186 91.8952 71.2946 88.5062 73.2289C86.0619 74.6241 82.925 77.0528 82.925 77.0528Z" fill="black" fill-opacity="0.15"/>
   <path d="M1.81166 101.503C-2.14141 99.6079 -3.43678 95.0658 -1.67032 91.2055C0.153259 87.2189 4.8932 85.4206 8.85445 87.2998C12.6399 89.0954 14.2868 93.3799 12.7742 97.2876C11.1181 101.565 5.94778 103.486 1.81166 101.503Z" fill="black"/>
   <path d="M11.1307 96.6727C9.14833 99.8815 3.38515 99.0916 3.38515 99.0916C3.38515 99.0916 0.806574 96.4229 0.00577473 93.9187C-0.623071 91.9528 0.638848 89.674 2.70793 89.3768C6.22368 88.8725 6.59847 92.747 6.59847 92.747C6.59847 92.747 9.07984 91.5801 10.2387 92.35C11.5782 93.2402 11.976 95.3043 11.1307 96.6727Z" fill="#EA173A" stroke="black" stroke-width="0.684195"/>
@@ -125,7 +71,7 @@ const Dashboard = () => {
 
   const svg2 = `<svg xmlns="http://www.w3.org/2000/svg" width="157" height="153" viewBox="0 0 157 153" fill="none">
   <g filter="url(#filter0_dd_527_2271)">
-    <path d="M91.0692 233.544C94.4699 231.465 96.3043 225.847 96.3043 225.847C96.3043 225.847 96.3252 228.443 104.747 231.969C112.46 235.198 118.384 234.875 126.144 232.787C131.034 231.472 136.648 227.992 136.648 227.992C136.648 227.992 141.641 237.847 154.814 232.442C167.987 227.038 163.163 215.46 163.163 215.46L173.54 209.916C173.54 209.916 181.131 219.539 192.933 212.078C201.277 206.805 201.495 194.983 201.495 194.983C201.495 194.983 218.327 188.232 221.547 177.996C223.86 170.642 220.546 160.837 220.546 160.837C220.546 160.837 235.701 161.18 238.295 153.805C240.161 148.498 234.003 141.549 229.697 137.711C220.341 129.37 207.046 122.317 207.046 122.317C207.046 122.317 193.92 84.9763 177.832 61.1775C171.77 52.2107 165.882 43.7 155.573 40.403C149.015 38.3054 140.349 41.4584 140.349 41.4584C140.349 41.4584 138.389 26.5791 125.664 26.7095C105.922 26.9115 105.188 52.0747 105.188 52.0747L70.8951 70.9381C70.8951 70.9381 62.6392 63.8314 56.2569 61.8807C46.1273 58.7844 36.0301 63.2769 31.3082 72.7587C26.7584 81.8949 37.7909 94.0658 37.7909 94.0658C37.7909 94.0658 33.7747 105.71 33.5478 113.467C33.2324 124.24 36.6958 129.583 40.8456 139.529C44.9954 149.475 48.5827 154.904 54.5464 165.004C60.3591 174.849 75.0293 197.742 75.0293 197.742C75.0293 197.742 74.9226 205.773 75.1082 211.31C75.2558 215.703 75.3275 220.72 76.3195 225.635C78.6506 237.183 85.8961 236.705 91.0692 233.544Z" fill="white"/>
+    <path d="M91.0692 233.544C94.4699 231.465 96.3043 225.847 96.3043 225.847C96.3043 225.847 96.3252 228.443 104.747 231.969C112.46 235.198 118.384 234.875 126.144 232.787C131.034 231.472 136.648 227.992 136.648 227.992C136.648 227.992 141.641 237.847 154.814 232.442C167.987 227.038 163.163 215.46 163.163 215.46L173.54 209.916C173.54 209.916 181.131 219.539 192.933 212.078C201.277 206.805 201.495 194.983 201.495 194.983C201.495 194.983 218.327 188.232 221.547 177.996C223.86 170.642 220.546 160.837 220.546 160.837C220.546 160.837 235.701 161.18 238.295 153.805C240.161 148.498 234.003 141.549 229.697 137.711C220.341 129.37 207.046 122.317 207.046 122.317C207.046 122.317 193.92 84.9763 177.832 61.1775C171.77 52.2107 165.882 43.7 155.573 40.403C149.015 38.3054 140.349 41.4584 140.349 41.4584C140.349 41.4584 138.389 26.5791 125.664 26.7095C105.922 26.9115 105.188 52.0747 105.188 52.0747L70.895 70.9381C70.895 70.9381 62.6392 63.8314 56.2569 61.8807C46.1273 58.7844 36.0301 63.2769 31.3082 72.7587C26.7584 81.8949 37.7909 94.0658 37.7909 94.0658C37.7909 94.0658 33.7747 105.71 33.5478 113.467C33.2324 124.24 36.6958 129.583 40.8456 139.529C44.9954 149.475 48.5827 154.904 54.5464 165.004C60.3591 174.849 75.0293 197.742 75.0293 197.742C75.0293 197.742 74.9226 205.773 75.1082 211.31C75.2558 215.703 75.3275 220.72 76.3195 225.635C78.6506 237.183 85.8961 236.705 91.0692 233.544Z" fill="white"/>
     <path d="M91.0692 233.544C94.4699 231.465 96.3043 225.847 96.3043 225.847C96.3043 225.847 96.3252 228.443 104.746 231.969C112.46 235.198 118.384 234.875 126.144 232.787C131.034 231.472 136.648 227.992 136.648 227.992C136.648 227.992 141.641 237.847 154.814 232.442C167.987 227.038 163.163 215.46 163.163 215.46L173.54 209.916C173.54 209.916 181.131 219.539 192.933 212.078C201.277 206.805 201.495 194.983 201.495 194.983C201.495 194.983 218.327 188.232 221.547 177.996C223.86 170.642 220.546 160.837 220.546 160.837C220.546 160.837 235.701 161.18 238.295 153.805C240.161 148.498 234.003 141.549 229.697 137.711C220.341 129.37 207.046 122.317 207.046 122.317C207.046 122.317 193.92 84.9763 177.832 61.1775C171.77 52.2107 165.882 43.7 155.573 40.403C149.015 38.3054 140.349 41.4584 140.349 41.4584C140.349 41.4584 138.389 26.5791 125.664 26.7095C105.922 26.9115 105.188 52.0747 105.188 52.0747L70.895 70.9381C70.895 70.9381 62.6392 63.8314 56.2569 61.8807C46.1273 58.7844 36.0301 63.2769 31.3082 72.7587C26.7584 81.8949 37.7909 94.0658 37.7909 94.0658C37.7909 94.0658 33.7747 105.71 33.5478 113.467C33.2324 124.24 36.6958 129.583 40.8456 139.529C44.9954 149.475 48.5827 154.904 54.5464 165.004C60.3591 174.849 75.0293 197.742 75.0293 197.742C75.0293 197.742 74.9226 205.773 75.1082 211.31C75.2558 215.703 75.3275 220.72 76.3195 225.635C78.6506 237.183 85.8961 236.705 91.0692 233.544Z" stroke="white"/>
   </g>
   <path d="M38.6564 74.5333C29.817 88.1127 45.5067 97.5487 45.5067 97.5487C45.5067 97.5487 51.8881 91.2073 56.7293 87.4726C62.1492 83.2915 71.8112 77.9975 71.8112 77.9975C71.8112 77.9975 50.0647 57.0075 38.6564 74.5333Z" fill="#00B2C7"/>
@@ -169,411 +115,161 @@ const Dashboard = () => {
   </defs>
 </svg>`;
 
-const getImageUrl = (imageURI: string): string => {
-  if (imageURI.startsWith("http")) return imageURI;
-  const normalizedPath = imageURI.replace(/\\\\/g, "/").replace(/\\/g, "/");
-  const cleanPath = normalizedPath.replace(/^\/+/, "");
-  return `${API_BASE_URL}/${cleanPath}`;
-};
+  const getImageUrl = (imageURI: string): string => {
+    if (imageURI.startsWith("http")) return imageURI;
+    const normalizedPath = imageURI.replace(/\\\\/g, "/").replace(/\\/g, "/");
+    const cleanPath = normalizedPath.replace(/^\/+/, "");
+    return `${API_BASE_URL}/${cleanPath}`;
+  };
 
-const {
-  artNftsByCategory,
-  fetchAllArtNfts,
-  isLoading,
-  error,
-} = useArtNftsStore();
+  const {
+    artNftsByCategory,
+    fetchAllArtNfts,
+    isLoading,
+    error,
+  } = useArtNftsStore();
 
-const artNfts = Object.values(artNftsByCategory).flat();
+  const artNfts = Object.values(artNftsByCategory).flat();
 
-useEffect(() => {
-  fetchAllArtNfts();
-}, []);
+  useEffect(() => {
+    fetchAllArtNfts();
+  }, []);
 
-console.log("artNfts: ", artNfts);
+  console.log("artNfts: ", artNfts);
 
   return (
-      <div className="min-h-screen bg-white flex">
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:block w-64 bg-white border-r border-gray-200 sticky top-0 h-screen overflow-y-auto">
-        <div className="p-4 pb-0">
-          <Link to="/">
-            <img src={evrlinklogo} alt="Evrlink" className="h-12 mb-4" />
-          </Link>
+    <div className="py-4">
+      {/* Welcome Message */}
+      <div className="bg-[#00B2C71A] rounded-xl p-4 lg:p-8 mb-8 relative">
+        <div className="max-w-2xl mx-auto text-center">
+          <h1 className="text-xl lg:text-2xl font-semibold mb-4">A Meep Welcome ❤️</h1>
+          <p className="text-gray-600 mb-2 text-sm lg:text-base">
+            We've been thinking of ways to create lasting, meaningful moments for you-and we realized greeting
+            cards could be something truly special.
+          </p>
+          <p className="text-gray-600 mb-2 text-sm lg:text-base">
+            This Meep isn't just a card, it's a warm, everlasting welcome, etched into time.
+          </p>
+          <p className="text-gray-600 mb-2 text-sm lg:text-base">
+            We're so thrilled you're here, and we can't wait to share many unforgettable moments together.
+            Here's to new beginnings and the people who make life special.
+          </p>
+          <p className="text-gray-600 text-sm lg:text-base">XOXO, Evrlink</p>
         </div>
-          <nav className="p-4 space-y-2">
-            <Link
-                to="/dashboard"
-                className="flex items-center gap-3 px-4 py-2 text-gray-900 bg-blue-50 rounded-lg"
-            >
-              <span className="material-icons">home</span>
-              <span>Home</span>
-            </Link>
-            <Link
-                to="/gallery"
-                className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-            >
-              <span className="material-icons">collections</span>
-              <span>My Gallery</span>
-            </Link>
-            <Link
-                to="/l/marketplace"
-                className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-            >
-              <span className="material-icons">grid_view</span>
-              <span>Templates</span>
-            </Link>
-            <Link
-                to="/settings"
-                className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-            >
-              <span className="material-icons">settings</span>
-              <span>Settings</span>
-            </Link>
-            <Link
-                to="/faqs"
-                className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-            >
-              <span className="material-icons">help</span>
-              <span>FAQs</span>
-            </Link>
-          </nav>
-          <div className="absolute bottom-4 left-4 right-4">
-            <button className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg w-full">
-              <span className="material-icons">logout</span>
-              <span>LogOut</span>
-            </button>
-          </div>
-        </aside>
-
-        {/* Main Content Container */}
-        <div className="flex-1 w-full max-w-full overflow-x-hidden">
-          {/* Mobile Header */}
-          <header className="bg-white border-b border-gray-200 fixed top-0 w-full lg:w-[calc(100%-16rem)] z-10">
-            <div className="px-4 h-16 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {/* Mobile Menu Button */}
-                <button
-                    onClick={toggleSidebar}
-                    className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  <span className="material-icons">{isSidebarOpen ? 'close' : 'menu'}</span>
-                </button>
-                {/* Logo - Mobile Only */}
-                <img src={evrlinklogo} alt="Evrlink" className="h-8 lg:hidden" />
-              </div>
-              <div className="hidden lg:block relative mb-8 mt-6 w-full max-w-2xl">
-            <span className="absolute inset-y-0 left-3 flex items-center">
-              <span className="material-icons text-gray-400">search</span>
-            </span>
-                <input
-                    type="text"
-                    placeholder="Search for a meep or template..."
-                    className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00B2C7]"
-                />
-              </div>
-              {/* Mobile Search - Hidden on Desktop */}
-              <div className="lg:hidden relative mb-6">
-              <span className="absolute inset-y-0 left-3 flex items-center">
-                <span className="material-icons text-gray-400">search</span>
-              </span>
-                <input
-                    type="text"
-                    placeholder="Search for a meep or template..."
-                    className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00B2C7]"
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <button
-                      className="p-2 hover:bg-gray-100 rounded-full relative"
-                      onClick={toggleWalletAddressDisplay}
-                      title={abbreviateAddress(walletAddress)}
-                  >
-                    <img src={wallet} alt="wallet" className="w-6 h-6" />
-                  </button>
-
-                  {showWalletAddress && (
-                      <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-3">
-                        <div className="text-sm font-medium text-gray-700 mb-1">Your Wallet</div>
-                        <div className="text-xs bg-gray-50 p-2 rounded break-all font-mono">
-                          {walletAddress || 'No wallet connected'}
-                        </div>
-                        <div className="mt-2 flex justify-end">
-                          <button
-                              className="text-xs text-blue-600 hover:text-blue-800"
-                              onClick={() => {
-                                navigator.clipboard.writeText(walletAddress);
-                                // Could add toast notification here
-                              }}
-                          >
-                            Copy Address
-                          </button>
-                        </div>
-                      </div>
-                  )}
-                </div>
-
-                <button className="p-2 hover:bg-gray-100 rounded-full">
-                  <img src={bell} alt="bell" className="w-6 h-6" />
-                </button>
-
-                <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center relative group">
-                  <img src="/avatar.jpg" alt="Profile" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center transition-all duration-300">
-                  <span className="text-white opacity-0 group-hover:opacity-100 text-xs">
-                    {abbreviateAddress(walletAddress)}
-                  </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </header>
-
-          {/* Mobile Sidebar */}
-          <aside
-              className={`fixed left-0 top-16 w-64 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 p-4 z-30 transition-transform duration-300 lg:hidden ${
-                  isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-              }`}
-          >
-            <nav className="space-y-2">
-              <Link
-                  to="/dashboard"
-                  className="flex items-center gap-3 px-4 py-2 text-gray-900 bg-blue-50 rounded-lg"
-                  onClick={() => setIsSidebarOpen(false)}
-              >
-                <span className="material-icons">home</span>
-                <span>Home</span>
-              </Link>
-              <Link
-                  to="/gallery"
-                  className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-                  onClick={() => setIsSidebarOpen(false)}
-              >
-                <span className="material-icons">collections</span>
-                <span>My Gallery</span>
-              </Link>
-              <Link
-                  to="/templates"
-                  className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-                  onClick={() => setIsSidebarOpen(false)}
-              >
-                <span className="material-icons">grid_view</span>
-                <span>Templates</span>
-              </Link>
-              <Link
-                  to="/settings"
-                  className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-                  onClick={() => setIsSidebarOpen(false)}
-              >
-                <span className="material-icons">settings</span>
-                <span>Settings</span>
-              </Link>
-              <Link
-                  to="/faqs"
-                  className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-                  onClick={() => setIsSidebarOpen(false)}
-              >
-                <span className="material-icons">help</span>
-                <span>FAQs</span>
-              </Link>
-            </nav>
-            <div className="absolute bottom-4 left-4 right-4">
-              <button
-                  className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg w-full"
-                  onClick={handleLogout}
-              >
-                <span className="material-icons">logout</span>
-                <span>LogOut</span>
-              </button>
-            </div>
-          </aside>
-
-          {/* Overlay for mobile sidebar */}
-          {isSidebarOpen && (
-              <div
-                  className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
-                  onClick={() => setIsSidebarOpen(false)}
-              />
-          )}
-
-          {/* Main Content */}
-          <main className="pt-16 px-4 lg:px-8 bg-white">
-            {/* Mobile Header Section */}
-            <div className="flex flex-col lg:hidden">
-              <div className="flex justify-between items-center mt-6 mb-4">
-                <h1 className="text-2xl font-bold">Home</h1>
-                <button className="px-3 py-2 rounded-lg bg-[#00B2C7] text-white flex items-center gap-1">
-                  <span className="material-icons text-sm">add</span>
-                  <span>Create Meep</span>
-                </button>
-              </div>
-
-
-            </div>
-
-
-
-            {/* Welcome Message */}
-            <div className="bg-[#00B2C71A] rounded-xl p-4 lg:p-8 mb-8 relative">
-              <div className="max-w-2xl mx-auto text-center">
-                <h1 className="text-xl lg:text-2xl font-semibold mb-4">A Meep Welcome ❤️</h1>
-                <p className="text-gray-600 mb-2 text-sm lg:text-base">
-                  We've been thinking of ways to create lasting, meaningful moments for you-and we realized greeting
-                  cards could be something truly special.
-                </p>
-                <p className="text-gray-600 mb-2 text-sm lg:text-base">
-                  This Meep isn't just a card, it's a warm, everlasting welcome, etched into time.
-                </p>
-                <p className="text-gray-600 mb-2 text-sm lg:text-base">
-                  We're so thrilled you're here, and we can't wait to share many unforgettable moments together.
-                  Here's to new beginnings and the people who make life special.
-                </p>
-                <p className="text-gray-600 text-sm lg:text-base">XOXO, Evrlink</p>
-              </div>
-              <div className="absolute bottom-0 left-0 hidden md:block">
-                <div dangerouslySetInnerHTML={{ __html: svg1 }} />
-              </div>
-              <div className="absolute bottom-0 right-0 hidden md:block">
-                <div dangerouslySetInnerHTML={{ __html: svg2 }} />
-              </div>
-            </div>
-
-            {/* Categories Section */}
-            {/* Categories Section */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg lg:text-xl font-semibold">Welcome to Evrlink!</h2>
-                <Link to="/categories" className="text-sm lg:text-base text-[#00B2C7] hover:text-[#008a9a]">
-                  See All
-                </Link>
-              </div>
-              <p className="text-gray-600 mb-4 text-sm">See some of our categories, and create a Meep.</p>
-
-              <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 mb-8 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 lg:mx-0 px-4 lg:px-0">
-                {(isDesktop
-                  ? Object.keys(artNftsByCategory)
-                  : Object.keys(artNftsByCategory).slice(0, 4)
-                ).map((category) => (
-                  <button
-                    key={category}
-                    className="px-4 py-2 rounded-full border border-gray-200 hover:border-[#00B2C7] text-gray-600 hover:text-[#00B2C7] whitespace-nowrap text-sm flex-shrink-0"
-                  >
-                    Category #{category}
-                  </button>
-                ))}
-                
-                <button className="p-2 bg-gray-100 rounded-full flex-shrink-0 lg:hidden">
-                  <span className="material-icons text-gray-500">chevron_right</span>
-                </button>
-              </div>
-            </div>
-
-
-            {/* Templates Card - Mobile Style */}
-            {/* Templates Card - Mobile Style */}
-            <div className="block lg:hidden mt-6">
-              {isLoading && <p className="text-center text-gray-500">Loading...</p>}
-              {error && <p className="text-center text-red-500">Failed to load templates</p>}
-              {!isLoading && artNfts.length === 0 && (
-                <p className="text-center text-gray-400">No templates available.</p>
-              )}
-
-              {artNfts.map((nft) => (
-                <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
-                  <div className="flex items-center gap-3 p-4">
-                  {/* <Link to={`/meep/${nft.id}`}>
-                    <div className="aspect-w-10 aspect-h-4 bg-gray-100 w-full cursor-pointer hover:opacity-90 transition">
-                      <img
-                        src={getImageUrl(nft.imageUri)}
-                        alt={`Meep ${nft.id}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </Link> */}
-
-                    <div>
-                      <h3 className="font-medium">{nft.giftCardCategoryId}</h3>
-                      <p className="text-sm text-gray-500">by {nft.artistAddress}</p>
-                      <div className="text-sm text-gray-400 mt-1">
-                        <span>#{nft.giftCardCategoryId?.toString().toLowerCase()}</span>{" "}
-                        <span>#celebration</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Link to={`/meep/${nft.id}`}>
-                    <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full cursor-pointer hover:opacity-90 transition">
-                      <img
-                        src={getImageUrl(nft.imageUri)}
-                        alt={`Meep ${nft.id}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </Link>
-
-                  <div className="p-4 flex items-center justify-between">
-                    <button className="flex items-center gap-2 text-gray-600">
-                      <span className="material-icons">favorite_border</span>
-                      <span>74</span>
-                    </button>
-                    <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
-                      Generate Meep
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Templates Grid - Desktop Style */}
-            {/* Templates Grid - Desktop Style */}
-            <div className="hidden lg:grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {isLoading && (
-                <div className="col-span-3 text-center text-gray-500">Loading...</div>
-              )}
-              {error && (
-                <div className="col-span-3 text-center text-red-500">Failed to load templates</div>
-              )}
-              {!isLoading && artNfts.length === 0 && (
-                <div className="col-span-3 text-center text-gray-400">No templates available.</div>
-              )}
-
-              {artNfts.map((nft) => (
-                <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                  <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full">
-                    <Link to={`/meep/${nft.id}`}>
-                      <img
-                        src={getImageUrl(nft.imageUri)}
-                        alt={nft.giftCardCategoryId.toString()}
-                        className="w-full h-full object-cover"
-                      />
-                    </Link>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center gap-3 mb-4">
-                    <Link to={`/meep/${nft.id}`}>
-                      <div>
-                        <h3 className="font-medium">{nft.giftCardCategoryId}</h3>
-                        <p className="text-sm text-gray-500">by {nft.artistAddress}</p>
-                      </div>
-                    </Link>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <button className="flex items-center gap-2 text-gray-600">
-                        <span className="material-icons">favorite_border</span>
-                        <span>74</span>
-                      </button>
-                      <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
-                        Generate Meep
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-          </main>
+        <div className="absolute bottom-0 left-0 hidden md:block">
+          <div dangerouslySetInnerHTML={{ __html: svg1 }} />
+        </div>
+        <div className="absolute bottom-0 right-0 hidden md:block">
+          <div dangerouslySetInnerHTML={{ __html: svg2 }} />
         </div>
       </div>
+
+      {/* Categories Section */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg lg:text-xl font-semibold">Welcome to Evrlink!</h2>
+          <Link to="/categories" className="text-sm lg:text-base text-[#00B2C7] hover:text-[#008a9a]">
+            See All
+          </Link>
+        </div>
+        <p className="text-gray-600 mb-4 text-sm">See some of our categories, and create a Meep.</p>
+
+        <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 mb-8 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 lg:mx-0 px-4 lg:px-0">
+          {(categories).map((category) => (
+            <button
+              key={category}
+              className="px-4 py-2 rounded-full border border-gray-200 hover:border-[#00B2C7] text-gray-600 hover:text-[#00B2C7] whitespace-nowrap text-sm flex-shrink-0"
+            >
+              Category #{category}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Templates Card - Mobile Style */}
+      <div className="block lg:hidden mt-6">
+        {isLoading && <p className="text-center text-gray-500">Loading...</p>}
+        {error && <p className="text-center text-red-500">Failed to load templates</p>}
+        {!isLoading && artNfts.length === 0 && (
+          <p className="text-center text-gray-400">No templates available.</p>
+        )}
+
+        {artNfts.map((nft) => (
+          <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
+            <div className="flex items-center gap-3 p-4">
+              <div>
+                <h3 className="font-medium">{nft.giftCardCategoryId}</h3>
+                <p className="text-sm text-gray-500">by {nft.artistAddress}</p>
+                <div className="text-sm text-gray-400 mt-1">
+                  <span>#{nft.giftCardCategoryId?.toString().toLowerCase()}</span>{" "}
+                  <span>#celebration</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full">
+              <img
+                src={getImageUrl(nft.imageUri)}
+                alt={`Meep ${nft.id}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="p-4 flex items-center justify-between">
+              <button className="flex items-center gap-2 text-gray-600">
+                <span className="material-icons">favorite_border</span>
+                <span>74</span>
+              </button>
+              <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
+                Generate Meep
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Templates Grid - Desktop Style */}
+      <div className="hidden lg:grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {isLoading && (
+          <div className="col-span-3 text-center text-gray-500">Loading...</div>
+        )}
+        {error && (
+          <div className="col-span-3 text-center text-red-500">Failed to load templates</div>
+        )}
+        {!isLoading && artNfts.length === 0 && (
+          <div className="col-span-3 text-center text-gray-400">No templates available.</div>
+        )}
+
+        {artNfts.map((nft) => (
+          <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full">
+              <img
+                src={getImageUrl(nft.imageUri)}
+                alt={nft.giftCardCategoryId.toString()}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div>
+                  <h3 className="font-medium">{nft.giftCardCategoryId}</h3>
+                  <p className="text-sm text-gray-500">by {nft.artistAddress}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <button className="flex items-center gap-2 text-gray-600">
+                  <span className="material-icons">favorite_border</span>
+                  <span>74</span>
+                </button>
+                <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
+                  Generate Meep
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 

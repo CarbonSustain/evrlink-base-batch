@@ -239,47 +239,19 @@ const Marketplace: React.FC = () => {
       {/* Navbar */}
       <Navbar />
 
-      <main className="flex-1 pt-32 pb-20">
+      <main className="flex-1 pt-20 pb-20">
         <div className="content-container relative z-10">
           {selectedCategory === null ? (
             <>
-              <div className="max-w-3xl mx-auto text-center mb-16">
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeInUpVariants}
-                  custom={0}
-                >
-                  <div className="inline-block animate-float">
-                    <div className="w-20 h-20 mx-auto mb-6 relative">
-                      <div className="absolute inset-0 bg-secondary/30 rounded-full animate-pulse-slow" />
-                      <div className="relative w-full h-full flex items-center justify-center">
-                        <Gift className="w-10 h-10 text-white" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <motion.h1
-                    className="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-black mb-6"
-                    variants={fadeInUpVariants}
-                    custom={1}
-                  >
-                    Explore Our
-                    <span className="block text-black">
-                      Gift Card Collection
-                    </span>
-                  </motion.h1>
-
-                  <motion.p
-                    className="text-xl text-black"
-                    variants={fadeInUpVariants}
-                    custom={2}
-                  >
-                    Choose a category to find the perfect background for your
-                    gift card
-                  </motion.p>
-                </motion.div>
-              </div>
+              {/* Templates heading */}
+              <h2 className="text-3xl font-display font-medium text-black mb-4">
+                Templates
+              </h2>
+              
+              {/* Description text about celebrating with meeps */}
+              <p className="text-lg text-gray-700 mb-6">
+                Celebrate someone's special day with a meep that brings onchain joy, confetti, and vibes.
+              </p>
 
               <CategoryNav
                 categories={Object.keys(artNftsByCategory)}
@@ -289,9 +261,6 @@ const Marketplace: React.FC = () => {
 
               {/* Show all artNfts if no category is selected */}
               <div className="mt-12">
-                <h2 className="text-2xl font-display font-medium text-black mb-6">
-                  All Templates
-                </h2>
                 <BackgroundGallery
                   backgrounds={artNfts}
                   isLoading={isLoading}

@@ -2,16 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import evrlinklogo from '/public/images/g-Logo.png';
-import bell from '/public/images/Bell.png';
-import wallet from '/public/images/Frame 14.png';
-import { useWallet } from '@/contexts/WalletContext';
+import { Menu, X, Home, Settings, HelpCircle as QuestionCircle, LayoutGrid, Image, LogOut, Gift, ImagePlus } from 'lucide-react';
 import { useArtNftsStore } from '@/services/store';
-import { API_BASE_URL } from '@/services/api';
-import { Menu, X } from 'lucide-react';
+import { useWallet } from '@/contexts/WalletContext';
 
 const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
+  const { disconnect } = useWallet();
 
   // Reset sidebar state when route changes
   useEffect(() => {
@@ -20,6 +18,14 @@ const Navbar = () => {
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleLogout = () => {
+    // First disconnect the wallet using the context function
+    disconnect();
+    
+    // Then redirect to specified URL
+    window.location.href = 'http://localhost:8001/';
   };
 
   // Ensure toggle button stays hidden when navbar is open
@@ -35,89 +41,67 @@ const Navbar = () => {
   }, [isSidebarOpen]);
 
   const menuItems = [
-    { to: '/dashboard', label: 'Home', icon: 'home' },
-    { to: '/gallery', label: 'My Gallery', icon: 'collections' },
-    { to: '/l/marketplace', label: 'Templates', icon: 'grid_view' },
-    { to: '/settings', label: 'Settings', icon: 'settings' },
-    { to: '/faqs', label: 'FAQs', icon: 'help' },
+    { to: '/dashboard', label: 'Home', icon: <Home className="w-5 h-5" /> },
+    { to: '/gallery', label: 'My Gallery', icon: <Image className="w-5 h-5" /> },
+    { to: '/l/marketplace', label: 'Templates', icon: <LayoutGrid className="w-5 h-5" /> },
+    { to: '/l/claim', label: 'Claim Meep', icon: <Gift className="w-5 h-5" /> },
+    { to: '/l/create-background', label: 'Create Background', icon: <ImagePlus className="w-5 h-5" /> },
+    { to: '/settings', label: 'Settings', icon: <Settings className="w-5 h-5" /> },
+    { to: '/faqs', label: 'FAQs', icon: <QuestionCircle className="w-5 h-5" /> },
   ];
 
   return (
     <>
-      {/* Menu Toggle Button - only shown when navbar is closed on mobile */}
-      <button
-        id="navbar-toggle-button"
-        onClick={toggleSidebar}
-        className={cn(
-          "fixed z-50 p-2 rounded-lg bg-white border border-gray-200 transition-all duration-300 left-4 top-20 lg:hidden",
-          isSidebarOpen && "opacity-0 pointer-events-none hidden"
-        )}
-      >
-        <Menu className="h-6 w-6 text-black" />
-      </button>
+      {/* No menu toggle button */}
 
-      {/* Mobile Sidebar */}
-      <div
-        className={cn(
-          'fixed inset-0 bg-white w-64 z-40 transform transition-transform duration-300 ease-in-out',
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
-          'lg:hidden'
-        )}
-      >
-        <div className="p-4 pb-0">
-          <img src={evrlinklogo} alt="Evrlink" className="h-12 mb-4" />
-          <button
-            onClick={toggleSidebar}
-            className="absolute top-2 right-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            aria-label="Close menu"
-          >
-            <X className="h-5 w-5 text-gray-600" />
-          </button>
-        </div>
-        <nav className="p-4 space-y-2">
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              active={item.to === '/marketplace' 
-                ? location.pathname.startsWith("/marketplace") 
-                : location.pathname === item.to}
-              onClick={toggleSidebar}
+      {/* Single sidebar for all screen sizes */}
+      <div className="min-h-screen bg-white border-r border-gray-200 w-[240px] fixed top-0 left-0 bottom-0 z-10 shadow-sm">
+        <aside className="w-full flex flex-col h-full justify-between">
+          {/* Logo */}
+          <div className="pl-4 pr-6 pt-6 pb-8">
+            <Link to="/" className="flex justify-start items-center">
+              <div className="flex items-center">
+                <img src="/evrlink_logo.svg" alt="Evrlink" className="h-14 mr-1.5" style={{marginTop: '-2px'}} />
+                <span className="text-[#00b2c7] text-xl font-medium">evrlink</span>
+              </div>
+            </Link>
+          </div>
+          
+          <div className="flex flex-col flex-grow">
+            {/* Navigation Menu */}
+            <nav>
+              <ul className="flex flex-col gap-2 px-3 py-4">
+                {menuItems.map((item) => {
+                  const isActive = location.pathname.startsWith(item.to);
+                  return (
+                    <li key={item.to}>
+                      <Link
+                        to={item.to}
+                        className={cn(
+                          "flex items-center px-4 py-2.5 rounded-md transition-all",
+                          isActive
+                            ? "text-[#00b2c7] bg-[#e6f7f9] border-l-4 border-[#00b2c7] pl-3"
+                            : "text-gray-600 hover:text-[#00b2c7] hover:bg-gray-50"
+                        )}
+                      >
+                        <span className={cn("mr-4 opacity-80")}>{item.icon}</span>
+                        <span className="font-medium">{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </div>
+          
+          {/* Logout at bottom */}
+          <div className="p-3 pb-6">
+            <button 
+              onClick={handleLogout}
+              className="flex items-center px-4 py-2.5 text-gray-600 hover:text-[#00b2c7] hover:bg-gray-50 rounded-md w-full transition-all"
             >
-              <span className="material-icons">{item.icon}</span>
-              <span className="ml-3">{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
-        <div className="absolute bottom-4 left-4 right-4">
-          <button className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg w-full">
-            <span className="material-icons">logout</span>
-            <span>LogOut</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:flex min-h-screen bg-white border-r w-64 fixed top-0 left-0 pt-16">
-        <aside className="w-full p-4 pt-6">
-          <nav className="space-y-2">
-            {menuItems.map((item) => (
-              <NavLink 
-                key={item.to} 
-                to={item.to} 
-                active={item.to === '/marketplace' 
-                  ? location.pathname.startsWith("/marketplace") 
-                  : location.pathname === item.to}
-              >
-                <span className="material-icons">{item.icon}</span>
-                <span className="ml-3">{item.label}</span>
-              </NavLink>
-            ))}
-          </nav>
-          <div className="absolute bottom-4 left-4 right-4">
-            <button className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg w-full">
-              <span className="material-icons">logout</span>
-              <span>LogOut</span>
+              <LogOut className="w-5 h-5 mr-4 opacity-80" />
+              <span className="font-medium">LogOut</span>
             </button>
           </div>
         </aside>
@@ -151,13 +135,13 @@ const NavLink = ({ to, active, children, onClick }: NavLinkProps) => {
       to={to}
       onClick={handleClick}
       className={cn(
-        'relative px-4 py-2 transition-colors rounded-lg flex items-center',
-        active ? 'text-black bg-[#e6f7f9]' : 'text-gray-600 hover:text-black hover:bg-gray-100'
+        'relative px-4 py-2.5 transition-colors rounded-lg flex items-center',
+        active ? 'text-[#00b2c7] bg-[#e6f7f9] font-medium' : 'text-gray-600 hover:text-black hover:bg-gray-100'
       )}
     >
       {children}
       {active && (
-        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary to-secondary" />
+        <div className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#00b2c7] rounded-r" />
       )}
     </Link>
   );
