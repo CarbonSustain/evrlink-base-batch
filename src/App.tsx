@@ -26,7 +26,7 @@ import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
 import { User } from "lucide-react";
 import MyGallery from "./pages/MyGallery";
-// import MyGalleryNewUser from "./pages/MyGalleryNewUser";
+import MyGalleryNewUser from "./pages/MyGalleryNewUser";
 import Faq from "./pages/Faq";
 import MeepDetails from "./pages/MeepDetails";
 import HomePage from "./pages/landing-page/src/pages/Home/index";
@@ -73,6 +73,7 @@ const App = () => (
               {/* Auth routes outside of Layout */}
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/gallerynewuser" element={<MyGalleryNewUser />} />
               <Route path="/gallery" element={<MyGallery />} />
               <Route path="/meep/:id" element={<MeepDetails />} />
               <Route path="/faqs" element={<Faq />} />

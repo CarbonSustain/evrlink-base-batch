@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import evrlinklogo from '../../public/images/g-Logo.png';
 import bell from '../../public/images/Bell.png';
 import wallet from '../../public/images/Frame 14.png';
@@ -131,8 +131,11 @@ useEffect(() => {
   }
 }, [walletAddress]);
 
+const showEmptyState =
+  !walletAddress || (sentGifts.length === 0 && receivedGifts.length === 0);
 
-
+  if (showEmptyState) return <Navigate to="/gallerynewuser" replace />; 
+  
   useEffect(() => {
     // Get wallet address from localStorage or context
     const storedAddress = address || localStorage.getItem('walletAddress');
@@ -469,10 +472,10 @@ useEffect(() => {
   </TabsList>
 
   {/* Create Meep Button */}
-  <button className="px-5 py-2 rounded-lg bg-[#00B2C7] text-white flex items-center gap-2 font-medium text-sm shadow hover:bg-[#009bb0] transition-colors">
+  <Link to="/marketplace" className="px-5 py-2 rounded-lg bg-[#00B2C7] text-white flex items-center gap-2 font-medium text-sm shadow hover:bg-[#009bb0] transition-colors">
     <span className="material-icons text-base">add</span>
     Create Meep
-  </button>
+  </Link>
 </div>
 </div>
           {/* Templates Card - Mobile Style */}

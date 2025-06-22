@@ -8,6 +8,7 @@ import Button from './Button';
 import { useWallet } from '@/contexts/WalletContext';
 import { toast } from 'react-hot-toast';
 import bell from '../../public/images/Bell.png';
+import evrlinklogo from '../../public/images/g-Logo.png';
 
 const Layout = () => {
   const [walletDialogOpen, setWalletDialogOpen] = useState(false);
