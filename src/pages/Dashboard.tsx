@@ -195,9 +195,11 @@ console.log("artNfts: ", artNfts);
       <div className="min-h-screen bg-white flex">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:block w-64 bg-white border-r border-gray-200 sticky top-0 h-screen overflow-y-auto">
-          <div className="p-4 pb-0">
+        <div className="p-4 pb-0">
+          <Link to="/">
             <img src={evrlinklogo} alt="Evrlink" className="h-12 mb-4" />
-          </div>
+          </Link>
+        </div>
           <nav className="p-4 space-y-2">
             <Link
                 to="/dashboard"

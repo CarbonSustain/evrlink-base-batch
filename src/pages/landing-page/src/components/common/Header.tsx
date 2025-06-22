@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
             </Button>
           </Link>
 
-          <Link to="/marketplace">
+          <Link to="/l/marketplace">
           <Button
             variant="primary"
             onClick={handleCreateMeep}
