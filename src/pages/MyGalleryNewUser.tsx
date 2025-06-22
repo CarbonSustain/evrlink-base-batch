@@ -176,7 +176,7 @@ const MyGalleryNewUser = () => {
             <span>My Gallery</span>
           </Link>
           <Link
-            to="/templates"
+            to="/marketplace"
             className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
           >
             <span className="material-icons">grid_view</span>
@@ -367,10 +367,10 @@ const MyGalleryNewUser = () => {
                 <button className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg focus:outline-none">Created by Me</button>
                 <button className="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 focus:outline-none">Gifted to Me</button>
               </div>
-              <button className="px-5 py-2 rounded-lg bg-[#00B2C7] text-white flex items-center gap-2 font-medium text-sm shadow hover:bg-[#009bb0] transition-colors">
+              <Link to="/marketplace" className="px-5 py-2 rounded-lg bg-[#00B2C7] text-white flex items-center gap-2 font-medium text-sm shadow hover:bg-[#009bb0] transition-colors">
                 <span className="material-icons text-base">add</span>
                 Create Meep
-              </button>
+              </Link>
             </div>
           </div>
           

@@ -40,7 +40,7 @@ const Layout = () => {
       <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 w-full z-50">
         <div className="px-4 h-16 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/dashboard" className="flex items-center space-x-2">
           <div className="p-4 pb-0">
             <img src={evrlinklogo} alt="Evrlink" className="h-12 mb-4" />
           </div>

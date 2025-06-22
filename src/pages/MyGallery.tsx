@@ -472,10 +472,10 @@ const showEmptyState =
   </TabsList>
 
   {/* Create Meep Button */}
-  <button className="px-5 py-2 rounded-lg bg-[#00B2C7] text-white flex items-center gap-2 font-medium text-sm shadow hover:bg-[#009bb0] transition-colors">
+  <Link to="/marketplace" className="px-5 py-2 rounded-lg bg-[#00B2C7] text-white flex items-center gap-2 font-medium text-sm shadow hover:bg-[#009bb0] transition-colors">
     <span className="material-icons text-base">add</span>
     Create Meep
-  </button>
+  </Link>
 </div>
 </div>
           {/* Templates Card - Mobile Style */}
