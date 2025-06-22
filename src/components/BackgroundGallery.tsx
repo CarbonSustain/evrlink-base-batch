@@ -179,7 +179,7 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
                 <p className="text-black text-sm line-clamp-2 mb-4">
                   Beautiful background for creating unique gift cards.
                 </p>
-
+                
                 <div className="flex justify-between items-center text-sm mb-4">
                   <span className="text-black">
                     By{" "}
@@ -192,6 +192,8 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
                   </span>
                   {/* Usage count is not in ArtNFT, so omit or add if you extend ArtNFT */}
                 </div>
+
+
                 
                 <button
                   onClick={(e) => {

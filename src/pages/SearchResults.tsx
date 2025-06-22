@@ -58,7 +58,7 @@ interface FormattedArtNFT {
 const SearchResults: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const query = searchParams.get('q') || '';
+  const query = searchParams.get('query') || '';
   const [activeCategory, setActiveCategory] = useState<SearchCategory>('all');
   const [results, setResults] = useState<FormattedArtNFT[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);

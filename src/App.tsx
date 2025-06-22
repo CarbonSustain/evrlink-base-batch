@@ -45,41 +45,38 @@ const App = () => (
             {/* Add AgentButton here so it appears on all pages */}
             <AgentButton />
             <Routes>
-              <Route path="/l/" element={<Layout />}>
-                <Route index element={<Index />} />
-                <Route path="about" element={<About />} />
-                <Route path="create" element={<CreateGift />} />
-                <Route path="claim" element={<ClaimGift />} />
-                <Route path="privacy" element={<Privacy />} />
-                <Route path="terms" element={<Terms />} />
-                <Route path="my-gift-cards" element={<MyGiftCards />} />
-                <Route path="profile" element={<ProfilePage />} />
-                <Route path="marketplace" element={<Marketplace />} />
-                <Route
-                  path="marketplace/:categoryId"
-                  element={<CategoryCards />}
-                />
-                <Route
-                  path="marketplace/:categoryId/:cardId"
-                  element={<CardDetail />}
-                />
-                <Route
-                  path="create-background"
-                  element={<CreateBackground />}
-                />
-                <Route path="debug" element={<Debug />} />
-                <Route path="search" element={<SearchResults />} />
-              </Route>
-              {/* Auth routes outside of Layout */}
-              <Route path="/sign-in" element={<SignIn />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/gallerynewuser" element={<MyGalleryNewUser />} />
-              <Route path="/gallery" element={<MyGallery />} />
-              <Route path="/meep/:id" element={<MeepDetails />} />
-              <Route path="/faqs" element={<Faq />} />
-              <Route path="*" element={<NotFound />} />
-              {/* Landing page route */}
+              {/* Only landing page and sign-in are outside Layout */}
               <Route path="/" element={<HomePage />} />
+              <Route path="/sign-in" element={<SignIn />} />
+              
+              {/* All other routes use the Layout with navbar */}
+              <Route element={<Layout />}>
+                {/* /l/ routes */}
+                <Route path="/l">
+                  <Route index element={<Index />} />
+                  <Route path="about" element={<About />} />
+                  <Route path="create" element={<CreateGift />} />
+                  <Route path="claim" element={<ClaimGift />} />
+                  <Route path="privacy" element={<Privacy />} />
+                  <Route path="terms" element={<Terms />} />
+                  <Route path="my-gift-cards" element={<MyGiftCards />} />
+                  <Route path="profile" element={<ProfilePage />} />
+                  <Route path="marketplace" element={<Marketplace />} />
+                  <Route path="marketplace/:categoryId" element={<CategoryCards />} />
+                  <Route path="marketplace/:categoryId/:cardId" element={<CardDetail />} />
+                  <Route path="create-background" element={<CreateBackground />} />
+                  <Route path="debug" element={<Debug />} />
+                  <Route path="search" element={<SearchResults />} />
+                </Route>
+                
+                {/* Root level routes with Layout */}
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/gallery" element={<MyGallery />} />
+                <Route path="/gallerynewuser" element={<MyGalleryNewUser />} />
+                <Route path="/meep/:id" element={<MeepDetails />} />
+                <Route path="/faqs" element={<Faq />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
