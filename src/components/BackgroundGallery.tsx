@@ -168,7 +168,7 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-300/40 to-transparent" />
                 <div className="absolute top-4 right-4 bg-[#00b2c7]/90 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-medium">
-                  {background.price} ETH
+                  {Number(background.price).toFixed(2)} USDC
                 </div>
               </div>
 
