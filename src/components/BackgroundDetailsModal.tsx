@@ -798,7 +798,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
         signer
       );
       // Default approve 3,000,000 USDC (or you can use a dynamic value)
-      const amount = ethers.utils.parseUnits("3000000", USDC_DECIMALS);
+      const amount = ethers.utils.parseUnits("3", USDC_DECIMALS);
       const tx = await usdc.approve(GIFT_CARD_CONTRACT_ADDRESS, amount);
       await tx.wait();
       // Re-check allowance after approval
