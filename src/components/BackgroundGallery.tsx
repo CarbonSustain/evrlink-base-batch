@@ -139,6 +139,15 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
     );
   }
 
+  const categoryNameMap: { [key: string]: string } = {
+    "1": "Birthday Cards",
+    "2": "Wedding Cards",
+    "3": "New Year Cards",
+    "4": "Love & Romance Cards",
+    "5": "Appreciation Cards",
+    "6": "Trading Sentiment Cards",
+  };
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {backgrounds.map((background, index) => {
@@ -174,7 +183,7 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
 
               <div className="p-6">
                 <h3 className="text-xl font-medium text-[#00b2c7] mb-2 transition-colors">
-                  Category #{background.giftCardCategoryId}
+                  {categoryNameMap[background.giftCardCategoryId?.toString()] || "Unknown Category"}
                 </h3>
                 <p className="text-black text-sm line-clamp-2 mb-4">
                   Beautiful background for creating unique gift cards.

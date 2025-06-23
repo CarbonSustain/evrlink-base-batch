@@ -92,7 +92,7 @@ const BackgroundModal: React.FC<BackgroundModalProps> = ({
                   </div>
                   <div className="bg-indigo-600/20 px-6 py-3 rounded-full">
                     <span className="text-indigo-400 font-medium text-lg">
-                      {price} ETH
+                      {price} USDC
                     </span>
                   </div>
                 </div>
@@ -120,7 +120,7 @@ const BackgroundModal: React.FC<BackgroundModalProps> = ({
                     <li className="flex justify-between items-center">
                       <span>Price</span>
                       <span className="text-indigo-400 font-medium">
-                        {price} ETH
+                        {price} USDC
                       </span>
                     </li>
                     {/* Blockchain ID field removed because it does not exist on ApiBackground */}

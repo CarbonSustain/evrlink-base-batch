@@ -13,6 +13,16 @@ const CategoryNav: React.FC<CategoryNavProps> = ({
   selectedCategory,
   onSelectCategory,
 }) => {
+
+const categoryNameMap: { [key: string]: string } = {
+    "1": "Birthday Cards",
+    "2": "Wedding Cards",
+    "3": "New Year Cards",
+    "4": "Love & Romance Cards",
+    "5": "Appreciation Cards",
+    "6": "Trading Sentiment Cards",
+  };
+  
   return (
     <div className="w-full overflow-x-auto pb-2 mb-6">
       <motion.div 
@@ -34,21 +44,22 @@ const CategoryNav: React.FC<CategoryNavProps> = ({
         </button>
 
         {categories
-            .filter((category) => category)
-            .map((category) => (
-                <button
-                    key={category}
-                    onClick={() => onSelectCategory(category)}
-                    className={cn(
-                        "px-4 py-2 rounded-full transition-all text-sm font-medium",
-                        selectedCategory === category
-                            ? "bg-[#6fd4df] text-black shadow-md shadow-[#6fd4df]/20"
-                            : "bg-[#6fd4df] text-black hover:opacity-90"
-                    )}
-                >
-                  {category}
-                </button>
-            ))}
+  .filter((category) => category)
+  .map((category) => (
+    <button
+      key={category}
+      onClick={() => onSelectCategory(category)}
+      className={cn(
+        "px-4 py-2 rounded-full transition-all text-sm font-medium",
+        selectedCategory === category
+          ? "bg-[#6fd4df] text-black shadow-md shadow-[#6fd4df]/20"
+          : "bg-[#6fd4df] text-black hover:opacity-90"
+      )}
+    >
+      {categoryNameMap[category] || `Category #${category}`}
+    </button>
+))}
+
       </motion.div>
     </div>
   );

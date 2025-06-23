@@ -37,7 +37,7 @@ const BackgroundsGrid: React.FC<BackgroundsGridProps> = ({
 
   // Helper to format price in ETH
   const formatPrice = (price: number) => {
-    return `${price} ETH`;
+    return `${price} USDC`;
   };
 
   if (isLoading) {
