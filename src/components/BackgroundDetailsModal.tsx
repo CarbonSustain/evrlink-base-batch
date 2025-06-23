@@ -927,7 +927,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
               backdropFilter: "blur(4px)",
             }}
           >
-            {background.price} ETH
+            {Number(background.price).toFixed(2)} USD
           </Typography>
         </Box>
       </DialogTitle>
