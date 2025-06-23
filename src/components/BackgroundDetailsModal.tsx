@@ -713,7 +713,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     }}
                   >
                     <span>Background Price:</span>
-                    <span>${priceBreakdown.backgroundPrice.toFixed(3)}</span>
+                    <span>${priceBreakdown.backgroundPrice.toFixed(2)}</span>
                   </Box>
                   <Box
                     sx={{
@@ -723,7 +723,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     }}
                   >
                     <span>Tax Fee:</span>
-                    <span>${priceBreakdown.taxFee.toFixed(3)}</span>
+                    <span>${priceBreakdown.taxFee.toFixed(2)}</span>
                   </Box>
                   <Box
                     sx={{
@@ -733,7 +733,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     }}
                   >
                     <span>Climate Fee:</span>
-                    <span>${priceBreakdown.climateFee.toFixed(3)}</span>
+                    <span>${priceBreakdown.climateFee.toFixed(2)}</span>
                   </Box>
                   <Box
                     sx={{
@@ -743,7 +743,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     }}
                   >
                     <span>Platform Fee:</span>
-                    <span>${priceBreakdown.platformFee.toFixed(3)}</span>
+                    <span>${priceBreakdown.platformFee.toFixed(2)}</span>
                   </Box>
                   <Box
                     sx={{
@@ -921,7 +921,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
               {background.artistAddress.slice(-4)}
             </Typography>
           </Box>
-          <Typography
+          {/* <Typography
             variant="h6"
             sx={{
               position: "absolute",
@@ -937,7 +937,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             }}
           >
             {Number(background.price).toFixed(2)} USDC
-          </Typography>
+          </Typography> */}
         </Box>
       </DialogTitle>
       <DialogContent

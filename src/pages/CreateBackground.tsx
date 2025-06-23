@@ -381,6 +381,9 @@ const CreateBackground = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-12"
           >
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-[#00b2c7] via-[#6fd4df] to-[#00b2c7] mb-6 animate-pulse drop-shadow-lg">
+              🚀 Coming Soon
+            </h1>
             <h1 className="text-4xl font-bold mb-10 text-center text-gray-800">Create Background</h1>
           </motion.div>
 
