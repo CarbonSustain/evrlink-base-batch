@@ -242,6 +242,7 @@ const Dashboard = () => {
 
         {artNfts.map((nft) => (
           <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <Link to={`/meep/${nft.id}`}>
             <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full">
               <img
                 src={getImageUrl(nft.imageUri)}
@@ -249,6 +250,7 @@ const Dashboard = () => {
                 className="w-full h-full object-cover"
               />
             </div>
+            </Link>
             <div className="p-4">
               <div className="flex items-center gap-3 mb-4">
                 <div>
