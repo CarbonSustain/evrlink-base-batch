@@ -176,9 +176,9 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
                   }}
                 />
                 {/* Removed semi-transparent overlay for clearer images */}
-                <div className="absolute top-4 right-4 bg-[#00b2c7]/90 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-medium">
+                {/* <div className="absolute top-4 right-4 bg-[#00b2c7]/90 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-medium">
                   {Number(background.price).toFixed(2)} USDC
-                </div>
+                </div> */}
               </div>
 
               <div className="p-6">

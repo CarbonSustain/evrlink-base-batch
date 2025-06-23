@@ -188,7 +188,7 @@ const Dashboard = () => {
               key={category}
               className="px-4 py-2 rounded-full border border-gray-200 hover:border-[#00B2C7] text-gray-600 hover:text-[#00B2C7] whitespace-nowrap text-sm flex-shrink-0"
             >
-              Category #{category}
+              {categoryMap[category]}
             </button>
           ))}
         </div>
