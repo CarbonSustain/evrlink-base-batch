@@ -469,24 +469,18 @@ const CreateBackground = () => {
 
               {/* Price Input */}
               <div className="bg-[#e6f7f9] border border-gray-200 rounded-xl p-8 shadow-sm">
-                <label className="block text-lg text-gray-800 mb-4">
-                  Price (in ETH)
-                </label>
-                <input
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={price}
-                  onChange={(e) => {
-                    const value = parseFloat(e.target.value);
-                    if (e.target.value === '' || (value > 0)) {
-                      setPrice(e.target.value);
-                    }
-                  }}
-                  placeholder="Enter price in ETH"
-                  className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-800 focus:border-[#00b2c7] focus:ring-[#00b2c7]"
-                />
-              </div>
+  <label className="block text-lg text-gray-800 mb-4">
+    Price (in USD)
+  </label>
+  <input
+    type="number"
+    value={1.2}
+    readOnly
+    placeholder="Enter price in ETH"
+    className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-800 focus:border-[#00b2c7] focus:ring-[#00b2c7] cursor-not-allowed"
+  />
+</div>
+
 
               <div className="flex justify-end">
                 <Button
