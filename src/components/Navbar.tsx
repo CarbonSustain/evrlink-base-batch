@@ -24,8 +24,12 @@ const Navbar = () => {
     // First disconnect the wallet using the context function
     disconnect();
     
-    // Then redirect to specified URL
-    window.location.href = 'http://localhost:8001/';
+    // Determine if we're in production or development
+    const isProd = window.location.hostname !== 'localhost' && 
+                  !window.location.hostname.includes('127.0.0.1');
+    
+    // Redirect to production URL or localhost based on environment
+    window.location.href = isProd ? 'https://evrlink.com/' : 'http://localhost:8001/';
   };
 
   // Ensure toggle button stays hidden when navbar is open
