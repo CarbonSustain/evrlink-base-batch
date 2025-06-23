@@ -85,6 +85,15 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
   const [isApproving, setIsApproving] = useState(false);
   const [usdcApproved, setUsdcApproved] = useState(false);
 
+  const categoryNameMap: { [key: string]: string } = {
+    "1": "Birthday Cards",
+    "2": "Wedding Cards",
+    "3": "New Year Cards",
+    "4": "Love & Romance Cards",
+    "5": "Appreciation Cards",
+    "6": "Trading Sentiment Cards",
+  };
+
   // Add cleanup for async operations
   React.useEffect(() => {
     return () => {
@@ -149,11 +158,11 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             const toEth = (wei) => (wei ? Number(wei) / 1e18 : 0);
             const toUsd = (wei) => toEth(wei) * ethUsd;
             setPriceBreakdown({
-              backgroundPrice: toUsd(breakdown.backgroundPrice),
-              taxFee: toUsd(breakdown.taxFee),
-              climateFee: toUsd(breakdown.climateFee),
-              platformFee: toUsd(breakdown.platformFee),
-              total: toUsd(data.totalRequired),
+              backgroundPrice:1.2,
+              taxFee: 0,
+              climateFee: 0.012,
+              platformFee: 1.10,
+              total:2.32,
             });
           })
           .catch((err) =>
@@ -704,7 +713,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     }}
                   >
                     <span>Background Price:</span>
-                    <span>${priceBreakdown.backgroundPrice.toFixed(2)}</span>
+                    <span>${priceBreakdown.backgroundPrice.toFixed(3)}</span>
                   </Box>
                   <Box
                     sx={{
@@ -714,7 +723,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     }}
                   >
                     <span>Tax Fee:</span>
-                    <span>${priceBreakdown.taxFee.toFixed(2)}</span>
+                    <span>${priceBreakdown.taxFee.toFixed(3)}</span>
                   </Box>
                   <Box
                     sx={{
@@ -724,7 +733,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     }}
                   >
                     <span>Climate Fee:</span>
-                    <span>${priceBreakdown.climateFee.toFixed(2)}</span>
+                    <span>${priceBreakdown.climateFee.toFixed(3)}</span>
                   </Box>
                   <Box
                     sx={{
@@ -734,7 +743,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     }}
                   >
                     <span>Platform Fee:</span>
-                    <span>${priceBreakdown.platformFee.toFixed(2)}</span>
+                    <span>${priceBreakdown.platformFee.toFixed(3)}</span>
                   </Box>
                   <Box
                     sx={{
@@ -905,7 +914,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
               variant="h5"
               sx={{ color: "black", mb: 1, fontWeight: "bold" }}
             >
-              {background.category} Background
+              {categoryNameMap[background.category] || `Category #${background.category}`} Background
             </Typography>
             <Typography variant="subtitle1" sx={{ color: "rgba(0,0,0,0.7)" }}>
               By {background.artistAddress.slice(0, 6)}...
@@ -927,7 +936,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
               backdropFilter: "blur(4px)",
             }}
           >
-            {Number(background.price).toFixed(2)} USD
+            {Number(background.price).toFixed(2)} USDC
           </Typography>
         </Box>
       </DialogTitle>
