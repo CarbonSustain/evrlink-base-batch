@@ -38,7 +38,7 @@ const CreateBackground = () => {
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [category, setCategory] = useState("");
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState("1.2");
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdBackground, setCreatedBackground] = useState<any>(null);
@@ -476,7 +476,7 @@ const CreateBackground = () => {
     type="number"
     value={1.2}
     readOnly
-    placeholder="Enter price in ETH"
+    placeholder="Enter price in USD"
     className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-800 focus:border-[#00b2c7] focus:ring-[#00b2c7] cursor-not-allowed"
   />
 </div>
