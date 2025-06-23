@@ -189,15 +189,10 @@ const BackgroundGallery: React.FC<BackgroundGalleryProps> = ({
                   Beautiful background for creating unique gift cards.
                 </p>
                 
-                <div className="flex justify-between items-center text-sm mb-4">
-                  <span className="text-black">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-black" style={{ fontSize: '0.8125rem' }}>
                     By{" "}
-                    {background.artistAddress &&
-                    background.artistAddress.length >= 10
-                      ? `${background.artistAddress.slice(
-                          0,
-                          6
-                        )}...${background.artistAddress.slice(-4)}` : background.artistAddress || ""}
+                    {background.artistAddress || "Unknown Artist"}
                   </span>
                   {/* Usage count is not in ArtNFT, so omit or add if you extend ArtNFT */}
                 </div>

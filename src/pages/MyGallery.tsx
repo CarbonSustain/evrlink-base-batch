@@ -30,6 +30,8 @@ interface UserProfileData {
 interface MappedGiftCard {
   id: string;
   imageUrl: string;
+  senderAddress: string;
+  recipientAddress: string;
   senderName: string;
   recipientName: string;
   message: string;
@@ -100,8 +102,10 @@ useEffect(() => {
         const mapCard = (card: GiftCard, status: "Sent" | "Received") => ({
           id: card.id,
           imageUrl: getImageUrl(card.Background?.imageURI || card.backgroundUrl),
-          senderName: `${card.creatorAddress?.slice(0, 6)}...${card.creatorAddress?.slice(-4)}`,
-          recipientName: `${card.currentOwner?.slice(0, 6)}...${card.currentOwner?.slice(-4)}`,
+          senderAddress: card.creatorAddress || "",
+          recipientAddress: card.currentOwner || "",
+          senderName: card.creatorAddress || "",
+          recipientName: card.currentOwner || "",
           message: card.message || "",
           amount: `${card.price} USDC`,
           date: card.createdAt ? new Date(card.createdAt).toISOString().split("T")[0] : "",
@@ -194,33 +198,49 @@ useEffect(() => {
       exit={{ opacity: 0, y: -20 }}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="bg-white rounded-xl shadow-sm overflow-hidden mb-4"
+      className="bg-white rounded-xl shadow-sm overflow-hidden mb-4 max-w-full w-full min-w-[460px]"
     >
       {/* Top Info Row */}
-      <div className="flex items-center gap-3 p-4">
+      <div className="flex items-start gap-3 p-4">
         <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0" />
-        <div>
-          <h3 className="font-medium">
-            {gift.status === "Sent"
-              ? `To: ${gift.recipientName}`
-              : `From: ${gift.senderName}`}
-          </h3>
-          <p className="text-sm text-gray-500">{gift.date}</p>
+        <div className="w-full overflow-hidden">
+          <div className="flex flex-col">
+            <div className="font-medium mb-1">
+              {gift.status === "Sent" ? "To:" : "From:"}
+            </div>
+            <div className="flex items-center gap-2 w-full">
+              <div className="font-normal text-sm break-all pr-2">
+                {gift.status === "Sent" ? gift.recipientAddress : gift.senderAddress}
+              </div>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const address = gift.status === "Sent" ? gift.recipientAddress : gift.senderAddress;
+                  navigator.clipboard.writeText(address);
+                  toast.success('Address copied to clipboard!');
+                }}
+                className="ml-auto flex-shrink-0 text-[#00B2C7] hover:text-[#008fa0]"
+              >
+                <span className="material-icons text-sm">content_copy</span>
+              </button>
+            </div>
+          </div>
+          <p className="text-sm text-black">{gift.date}</p>
           {gift.message && (
-            <div className="text-sm text-gray-400 mt-1 italic">
-              "{gift.message}"
+            <div className="text-lg font-bold text-[#00B2C7] mt-2 text-center py-1">
+              {gift.message}
             </div>
           )}
         </div>
       </div>
   
       {/* Image Preview */}
-      <div className="aspect-w-16 aspect-h-9 bg-gray-100">
+      <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full">
         {gift.imageUrl ? (
           <img
             src={gift.imageUrl}
             alt="Gift"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         ) : (
           <div className="flex items-center justify-center w-full h-full bg-gray-200">
