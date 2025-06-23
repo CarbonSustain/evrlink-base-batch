@@ -236,7 +236,7 @@ useEffect(() => {
           <span>74</span>
         </button>
         <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
-          Generate Meep
+          Share Meep
         </button>
       </div>
     </motion.div>

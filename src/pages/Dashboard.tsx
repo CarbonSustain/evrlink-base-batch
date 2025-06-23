@@ -8,6 +8,14 @@ const Dashboard = () => {
   const { address, disconnect } = useWallet();
   const [walletAddress, setWalletAddress] = useState('');
   const navigate = useNavigate();
+  const categoryMap: { [key: string]: string } = {
+    "1": "Birthday Cards",
+    "2": "Wedding Cards",
+    "3": "New Year Cards",
+    "4": "Love & Romance Cards",
+    "5": "Appreciation Cards",
+    "6": "Trading Sentiment Cards",
+  };
 
   useEffect(() => {
     // Get wallet address from localStorage or context
@@ -198,7 +206,7 @@ const Dashboard = () => {
           <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
             <div className="flex items-center gap-3 p-4">
               <div>
-                <h3 className="font-medium">{nft.giftCardCategoryId}</h3>
+                <h3 className="font-medium">{categoryMap[nft.giftCardCategoryId]}</h3>
                 <p className="text-sm text-gray-500">by {nft.artistAddress}</p>
                 <div className="text-sm text-gray-400 mt-1">
                   <span>#{nft.giftCardCategoryId?.toString().toLowerCase()}</span>{" "}
@@ -254,7 +262,7 @@ const Dashboard = () => {
             <div className="p-4">
               <div className="flex items-center gap-3 mb-4">
                 <div>
-                  <h3 className="font-medium">{nft.giftCardCategoryId}</h3>
+                  <h3 className="font-medium">{categoryMap[nft.giftCardCategoryId]}</h3>
                   <p className="text-sm text-gray-500">by {nft.artistAddress}</p>
                 </div>
               </div>
