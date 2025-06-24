@@ -67,22 +67,29 @@ const HeroSection: React.FC<HeroSectionProps> = ({ className = '' }) => {
       </div>
       
       <div className="relative max-w-4xl mx-auto text-center">
-        <h1 className="text-5xl font-normal text-slate-800 mb-6 leading-tight" style={{ fontFamily: 'Patrick Hand' }}>
-          Meeps, Greeting Cards with more value
+        <h1 className="text-5xl font-normal text-slate-800 mb-3 leading-tight" style={{ fontFamily: 'Patrick Hand' }}>
+          Meeps, New Greeting Cards Onchain
         </h1>
+        <h2 className="text-4xl font-normal mb-2  mx-auto leading-relaxed text-pink-500">
+          More meaningful than a message 
+        </h2>
+        <h3 className="text-4xl  font-normal text-slate-800 mb-10 leading-tight" >
+          More lasting than a like 
+        </h3>
         
         <div className="text-4xl font-medium mb-6 leading-tight">
           <span className="text-cyan-500">Save </span>
-          <span className="text-slate-800">Money. </span>
-          <span className="text-pink-500">Send </span>
-          <span className="text-slate-800">Instantly. </span>
+          <span className="text-slate-800">Time and Money,</span>
+          <span className="text-pink-500"> Access </span>
+          <span className="text-slate-800">Easily, </span>
           <span className="text-blue-600">Seal </span>
-          <span className="text-slate-800">Your Greetings Forever.</span>
+          <span className="text-slate-800">Your Greetings Onchain.</span>
         </div>
         
         <p className="text-xl text-slate-800 mb-12 max-w-lg mx-auto leading-relaxed">
           Keepsakes you and your friends, family - anyone can revisit anytime!
         </p>
+        
         
 <Button
   onClick={handleCreateCard}
