@@ -452,25 +452,6 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             >
               Choose how you want to transfer this NFT:
             </Typography>
-             <Button
-              variant="contained"
-              fullWidth
-              onClick={() => setTransferType("direct")}
-              sx={{
-                mb: 2,
-                bgcolor: "#60cedc",
-                color: "black",
-                border: "2px solid #00b2c7",
-                "&:hover": { bgcolor: "#4cbbc9" },
-                display: "flex",
-                gap: 2,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              startIcon={<Send size={20} />}
-            >
-              Direct Transfer to Address
-            </Button>
             <Button
               variant="contained"
               fullWidth
@@ -489,7 +470,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
               }}
               startIcon={<Lock size={20} />}
             >
-              Create Gift Card with Secret Key
+              Generate Meep
             </Button>
             <Button
               variant="contained"
