@@ -337,7 +337,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
           secret: secretKeyGenerated
         });
 
-        alert(`URL: http://localhost:8001/l/claim/?id=${giftCardIdGenerated}&secret=${secretKeyGenerated}`);
+        //alert(`URL: http://localhost:8001/l/claim/?id=${giftCardIdGenerated}&secret=${secretKeyGenerated}`);
 
         if (!secretResult.success) {
           throw new Error(secretResult.error || "Failed to set secret key");
@@ -791,12 +791,67 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     mb: 3,
                   }}
               >
-                <Typography
-                    variant="body1"
-                    sx={{ color: "rgba(0,0,0,0.87)", mb: 2 }}
+                <Box 
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2
+                  }}
                 >
-                  URL: http://localhost:8001/l/claim/?id={giftCardIdGenerated}&secret={secretKeyGenerated}
-                </Typography>
+                  <Typography
+                      variant="body1"
+                      sx={{ color: "rgba(0,0,0,0.87)" }}
+                  >
+                    Share this link with the recipient to let them claim their gift:
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      bgcolor: "white",
+                      border: "1px solid rgba(0,0,0,0.1)",
+                      borderRadius: 1,
+                      p: 2,
+                      alignItems: "center",
+                      gap: 2,
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{ 
+                        color: "rgba(0,0,0,0.8)",
+                        flexGrow: 1,
+                        fontFamily: "monospace",
+                        fontSize: "0.9rem",
+                        wordBreak: "break-all"
+                      }}
+                    >
+                      https://evrlink.com/l/claim/?id={giftCardIdGenerated}&secret={secretKeyGenerated}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        const url = `https://evrlink.com/l/claim/?id=${giftCardIdGenerated}&secret=${secretKeyGenerated}`;
+                        navigator.clipboard.writeText(url);
+                        toast.success("Gift card link copied to clipboard!");
+                      }}
+                      sx={{
+                        bgcolor: "#60cedc",
+                        color: "black",
+                        minWidth: "auto",
+                        flexShrink: 0,
+                        "&:hover": { bgcolor: "#4cbbc9" },
+                      }}
+                    >
+                      Copy Link
+                    </Button>
+                  </Box>
+
+                  <Alert severity="info" sx={{ mt: 1 }}>
+                    Anyone with this link can claim the gift card. Make sure to share it only with the intended recipient.
+                  </Alert>
+                </Box>
               </Box>
             </Box>
         );
