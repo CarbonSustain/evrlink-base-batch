@@ -31,6 +31,8 @@ import { API_BASE_URL } from "@/services/api";
 const USDC_ADDRESS = import.meta.env.VITE_USDC_TOKEN_ADDRESS; // <-- FILL THIS IN
 const GIFT_CARD_CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS; // Example from your prompt
 const USDC_DECIMALS = 18;
+let secretKeyGenerated = null;
+let giftCardIdGenerated = null;
 
 interface Background {
   id: string;
@@ -51,7 +53,7 @@ interface BackgroundDetailsModalProps {
   background: Background;
 }
 
-const steps = ["Select Option", "Details", "Confirm"];
+const steps = ["Select Option", "Details", "Confirm", "Complete"];
 
 const BackgroundDetailsModal = ({ open, onClose, background }) => {
   const { address: userAddress } = useWallet();
@@ -274,7 +276,8 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             toast.success("Gift card created and transferred successfully!");
           }
 
-          onClose();
+          // Switch to step 3 instead of closing the modal
+          setActiveStep(3);
         } else {
           // This is a true error case
           throw new Error(
@@ -304,7 +307,8 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
 
         if (transferResult.success) {
           toast.success("Gift card transferred using Base username!");
-          onClose();
+          // Switch to step 3 instead of closing the modal
+          setActiveStep(3);
         } else {
           throw new Error(
             transferResult.error || "Failed to transfer gift card"
@@ -324,23 +328,24 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
         }
 
         // Set the secret key for the gift card
-        const secretKey = String(Date.now());
-        const giftCardId = createResult.data.id;
+        secretKeyGenerated = String(Date.now());
+        giftCardIdGenerated = createResult.data.id;
 
         console.log(`Setting secret key...${secretKey}`);
         const secretResult = await setGiftCardSecret({
-          giftCardId: giftCardId,
-          secret: secretKey
+          giftCardId: giftCardIdGenerated,
+          secret: secretKeyGenerated
         });
 
-        alert(`URL: http://localhost:8001/l/claim/?id=${giftCardId}&secret=${secretKey}`);
+        alert(`URL: http://localhost:8001/l/claim/?id=${giftCardIdGenerated}&secret=${secretKeyGenerated}`);
 
         if (!secretResult.success) {
           throw new Error(secretResult.error || "Failed to set secret key");
         }
 
         console.log("Secret key set successfully");
-        onClose();
+        // Switch to step 3 instead of closing the modal
+        setActiveStep(3);
         toast.success("Gift card created with secret key successfully!");
       }
     } catch (error: never) {
@@ -772,29 +777,29 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             </Box>
           </Box>
         );
-        case 3:
-          return (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="h6" gutterBottom sx={{ color: "black" }}>
-                  Hello World
-                </Typography>
-                <Box
-                    sx={{
-                      bgcolor: "rgba(0,0,0,0.05)",
-                      p: 3,
-                      borderRadius: 2,
-                      mb: 3,
-                    }}
+      case 3:
+        return (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ color: "black" }}>
+                🔗 Copy and send Link
+              </Typography>
+              <Box
+                  sx={{
+                    bgcolor: "rgba(0,0,0,0.05)",
+                    p: 3,
+                    borderRadius: 2,
+                    mb: 3,
+                  }}
+              >
+                <Typography
+                    variant="body1"
+                    sx={{ color: "rgba(0,0,0,0.87)", mb: 2 }}
                 >
-                  <Typography
-                      variant="body1"
-                      sx={{ color: "rgba(0,0,0,0.87)", mb: 2 }}
-                  >
-                    Hello World
-                  </Typography>
-                </Box>
+                  URL: http://localhost:8001/l/claim/?id={giftCardIdGenerated}&secret={secretKeyGenerated}
+                </Typography>
               </Box>
-          );
+            </Box>
+        );
 
 
       default:
@@ -1077,9 +1082,9 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
           }}
           variant="contained"
         >
-          Cancel
+          {activeStep === 3 ? "Done" : "Cancel"}
         </Button>
-        {activeStep > 0 && (
+        {activeStep > 0 && activeStep < 3 && (
           <Button
             onClick={handleBack}
             sx={{
@@ -1095,7 +1100,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             Back
           </Button>
         )}
-        {activeStep === steps.length - 1 ? (
+        {activeStep === 2 ? (
           <Button
             onClick={handleTransferGiftCard}
             variant="contained"
@@ -1117,7 +1122,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
               "Create Gift Card"
             )}
           </Button>
-        ) : (
+        ) : activeStep < 2 ? (
           <Button
             onClick={() => {
               handleNext();
@@ -1137,7 +1142,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
           >
             Next
           </Button>
-        )}
+        ) : null}
       </DialogActions>
     </Dialog>
   );
