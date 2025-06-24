@@ -210,10 +210,10 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
     }
 
     // Always require secret key for gift card option
-    if (transferType === "giftcard" && !secretKey) {
-      setError("Please enter a secret key");
-      return;
-    }
+    // if (transferType === "giftcard" && !secretKey) {
+    //   setError("Please enter a secret key");
+    //   return;
+    // }
 
     setIsLoading(true);
     setError(null);
@@ -323,14 +323,17 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
           throw new Error(createResult.error || "Failed to create gift card");
         }
 
-        console.log("Gift card created successfully:", createResult.data.id);
-
         // Set the secret key for the gift card
-        console.log("Setting secret key...");
+        const secretKey = String(Date.now());
+        const giftCardId = createResult.data.id;
+
+        console.log(`Setting secret key...${secretKey}`);
         const secretResult = await setGiftCardSecret({
-          giftCardId: createResult.data.id,
-          secret: secretKey,
+          giftCardId: giftCardId,
+          secret: secretKey
         });
+
+        alert(`URL: http://localhost:8001/l/claim/?id=${giftCardId}&secret=${secretKey}`);
 
         if (!secretResult.success) {
           throw new Error(secretResult.error || "Failed to set secret key");
@@ -340,7 +343,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
         onClose();
         toast.success("Gift card created with secret key successfully!");
       }
-    } catch (error: any) {
+    } catch (error: never) {
       console.error("Gift card operation error:", error);
 
       let errorMessage = "An unexpected error occurred";
@@ -411,10 +414,10 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
         return;
       }
       // For gift card with secret key, require the secret
-      if (transferType === "giftcard" && !secretKey) {
-        setError("Please enter a secret key");
-        return;
-      }
+      // if (transferType === "giftcard" && !secretKey) {
+      //   setError("Please enter a secret key");
+      //   return;
+      // }
     }
     if (activeStep === 2) {
       return handleTransferGiftCard();
@@ -444,7 +447,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             >
               Choose how you want to transfer this NFT:
             </Typography>
-            {/* <Button
+             <Button
               variant="contained"
               fullWidth
               onClick={() => setTransferType("direct")}
@@ -482,7 +485,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
               startIcon={<Lock size={20} />}
             >
               Create Gift Card with Secret Key
-            </Button> */}
+            </Button>
             <Button
               variant="contained"
               fullWidth
@@ -544,17 +547,17 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             ) : (
               // Gift card UI - requires secret key only
               <>
-                <TextField
-                  fullWidth
-                  label="Secret Key"
-                  value={secretKey}
-                  onChange={(e) => setSecretKey(e.target.value)}
-                  margin="normal"
-                  required
-                  error={!!error && error.includes("secret key")}
-                  helperText="Must be at least 6 characters long"
-                  sx={{ mb: 3 }}
-                />
+                {/*<TextField*/}
+                {/*  fullWidth*/}
+                {/*  label="Secret Key"*/}
+                {/*  value={secretKey}*/}
+                {/*  onChange={(e) => setSecretKey(Date.now())}*/}
+                {/*  margin="normal"*/}
+                {/*  required*/}
+                {/*  error={!!error && error.includes("secret key")}*/}
+                {/*  helperText="Must be at least 6 characters long"*/}
+                {/*  sx={{ mb: 3 }}*/}
+                {/*/>*/}
                 <Typography
                   variant="body2"
                   sx={{ color: "rgba(0,0,0,0.87)", mb: 3 }}
@@ -769,6 +772,31 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             </Box>
           </Box>
         );
+        case 3:
+          return (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: "black" }}>
+                  Hello World
+                </Typography>
+                <Box
+                    sx={{
+                      bgcolor: "rgba(0,0,0,0.05)",
+                      p: 3,
+                      borderRadius: 2,
+                      mb: 3,
+                    }}
+                >
+                  <Typography
+                      variant="body1"
+                      sx={{ color: "rgba(0,0,0,0.87)", mb: 2 }}
+                  >
+                    Hello World
+                  </Typography>
+                </Box>
+              </Box>
+          );
+
+
       default:
         return "Unknown step";
     }
@@ -833,7 +861,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
     }
   };
 
-  // Check USDC allowance when payment method is USDC and step is 1
+  // Check USDC allowance when the payment method is USDC and a step is 1
   useEffect(() => {
     const checkAllowance = async () => {
       if (paymentMethod !== "usdc" || activeStep !== 1 || !userAddress) {

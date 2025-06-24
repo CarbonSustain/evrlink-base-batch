@@ -19,15 +19,17 @@ const ClaimGift = () => {
   const [isAddingToWallet, setIsAddingToWallet] = useState(false);
   const location = useLocation();
 
-  // Get giftCardId from URL query parameters or use the input field
+  // Get giftCardId and secret from URL query parameters or use the input fields
   const queryParams = new URLSearchParams(location.search);
   const urlGiftCardId = queryParams.get("id");
+  const urlSecret = queryParams.get("secret");
   const giftCardId = urlGiftCardId || giftCardIdInput;
+  const secret = urlSecret || secretMessage;
 
   const handleClaim = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!secretMessage.trim()) {
+    if (!secret.trim()) {
       toast.error("Please enter a secret message");
       return;
     }
@@ -50,7 +52,7 @@ const ClaimGift = () => {
       console.log("Claiming gift card with ID:", giftCardId);
       const response = await claimGiftCard({
         giftCardId: Number(giftCardId),
-        secret: secretMessage,
+        secret: secret,
         claimerAddress: walletAddress,
       });
 
@@ -78,7 +80,7 @@ const ClaimGift = () => {
         // Keep the test case for demo
         if (
           giftCardId === "TEST-2024-001" &&
-          secretMessage === "birthday2024"
+          secret === "birthday2024"
         ) {
           setClaimed(true);
           toast.success("Test gift card claimed successfully!");
@@ -87,7 +89,7 @@ const ClaimGift = () => {
       }
     } catch (error: any) {
       console.error("Claim gift card error:", error);
-      if (giftCardId === "TEST-2024-001" && secretMessage === "birthday2024") {
+      if (giftCardId === "TEST-2024-001" && secret === "birthday2024") {
         // For test case, simulate success even if API fails
         setClaimed(true);
         toast.success("Test gift card claimed successfully!");
@@ -160,7 +162,6 @@ const ClaimGift = () => {
   };
 
   return (
-    
     <div className="min-h-screen flex flex-col bg-white relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 grid-pattern opacity-10"></div>
@@ -174,12 +175,12 @@ const ClaimGift = () => {
         <div className="content-container mx-auto bg-white min-h-screen p-4 sm:p-6 md:p-8">
           {!claimed ? (
             <motion.div
-              className="max-w-xl mx-auto text-center"
+              className="max-w-xl mx-auto"
               initial="hidden"
               animate="visible"
               variants={containerVariants}
             >
-              <motion.div className="mb-10" variants={itemVariants}>
+              <motion.div className="text-center mb-10" variants={itemVariants}>
                 <div className="w-20 h-20 mx-auto mb-6 relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#00b2c7]/30 to-[#00d0a6]/30 rounded-full animate-pulse-slow" />
                   <div className="relative w-full h-full flex items-center justify-center">
@@ -191,24 +192,85 @@ const ClaimGift = () => {
                   Claim Your Gift
                 </h1>
                 <p className="text-lg text-gray-600">
-                  Click the button below to receive your surprise
+                  Enter the gift card ID and secret message to claim your gift
                 </p>
               </motion.div>
 
-              <motion.form
-                onSubmit={handleClaim}
+              <motion.div
+                className="bg-white backdrop-blur-xl border border-gray-200 rounded-xl p-6 sm:p-8 space-y-6 shadow-lg"
                 variants={itemVariants}
-                className="flex justify-center"
               >
-                <Button
-                  type="submit"
-                  loading={loading}
-                  icon={<ArrowRight className="w-4 h-4" />}
-                  className="!bg-[#00b2c7] hover:!bg-[#00b2c7]/90 text-white font-medium text-lg px-6 py-3 rounded-xl shadow-md transition-all duration-300 ease-in-out"
-                >
-                  {loading ? "Claiming..." : "Claim Gift"}
-                </Button>
-              </motion.form>
+                <form onSubmit={handleClaim} className="space-y-6">
+                  {/* Gift Card ID Field */}
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="giftCardId"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Gift Card ID
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Hash className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <Input
+                        id="giftCardId"
+                        type="text"
+                        placeholder="Enter gift card ID..."
+                        className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
+                        value={giftCardIdInput}
+                        onChange={(e) => setGiftCardIdInput(e.target.value)}
+                        disabled={!!urlGiftCardId}
+                      />
+                    </div>
+                    {urlGiftCardId && (
+                      <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                        Gift card ID provided in URL: {urlGiftCardId}
+                      </p>
+                    )}
+                    {urlSecret && (
+                      <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                        Secret provided in URL
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Secret Message Field */}
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="secretMessage"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Secret Message
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <Input
+                        id="secretMessage"
+                        type="text"
+                        placeholder="Enter secret message..."
+                        className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
+                        value={secretMessage}
+                        onChange={(e) => setSecretMessage(e.target.value)}
+                        disabled={!!urlSecret}
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    fullWidth
+                    loading={loading}
+                    variant="secondary"
+                    icon={<ArrowRight className="w-4 h-4" />}
+                    className="!bg-[#00b2c7] hover:!bg-[#00b2c7]/90 text-white font-medium shadow-md"
+                  >
+                    {loading ? "Claiming..." : "Claim Gift"}
+                  </Button>
+                </form>
+              </motion.div>
             </motion.div>
           ) : (
             <motion.div
@@ -217,8 +279,51 @@ const ClaimGift = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="p-10">
-                <h2 className="text-2xl font-semibold text-gray-800">Gift Claimed!</h2>
+              <div className="bg-white backdrop-blur-xl border border-gray-200 rounded-xl p-10 space-y-8 shadow-lg">
+                <ClaimCard
+                  title="Your Gift Card"
+                  message="Congratulations! You've successfully claimed your gift."
+                  value="TEST-2024-001"
+                  isFlipped={isFlipped}
+                  onClick={handleCardClick}
+                />
+
+                <div className="pt-8 mt-4 flex flex-col gap-4 sm:flex-row sm:justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setClaimed(false);
+                      setSecretMessage("");
+                      setIsFlipped(false);
+                      navigate("/");
+                    }}
+                    className="border-gray-300 bg-gray-100 text-gray-800 hover:bg-gray-200 font-medium shadow-md"
+                  >
+                    Return to Home
+                  </Button>
+
+                  {!isWalletConnected ? (
+                    <Button
+                      onClick={handleConnectWallet}
+                      loading={isWalletConnected}
+                      icon={<Wallet className="w-4 h-4" />}
+                      className="bg-gradient-to-r from-[#00b2c7]/90 to-[#00d0a6]/90 hover:from-[#00b2c7] hover:to-[#00d0a6] text-white font-medium shadow-md shadow-[#00b2c7]/20"
+                    >
+                      {isWalletConnected ? "Connecting..." : "Connect Wallet"}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleAddToWallet}
+                      loading={isAddingToWallet}
+                      icon={<Gift className="w-4 h-4" />}
+                      className="bg-gradient-to-r from-[#00b2c7]/90 to-[#00d0a6]/90 hover:from-[#00b2c7] hover:to-[#00d0a6] text-white font-medium shadow-md shadow-[#00b2c7]/20"
+                    >
+                      {isAddingToWallet
+                        ? "Adding to Wallet..."
+                        : "Add to Wallet"}
+                    </Button>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}
