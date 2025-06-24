@@ -30,7 +30,7 @@ import { API_BASE_URL } from "@/services/api";
 // Add your USDC and gift card contract addresses here
 const USDC_ADDRESS = import.meta.env.VITE_USDC_TOKEN_ADDRESS; // <-- FILL THIS IN
 const GIFT_CARD_CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS; // Example from your prompt
-const USDC_DECIMALS = 6;
+const USDC_DECIMALS = 18;
 
 interface Background {
   id: string;
@@ -444,7 +444,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             >
               Choose how you want to transfer this NFT:
             </Typography>
-            <Button
+            {/* <Button
               variant="contained"
               fullWidth
               onClick={() => setTransferType("direct")}
@@ -482,7 +482,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
               startIcon={<Lock size={20} />}
             >
               Create Gift Card with Secret Key
-            </Button>
+            </Button> */}
             <Button
               variant="contained"
               fullWidth
@@ -807,7 +807,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
         signer
       );
       // Default approve 3,000,000 USDC (or you can use a dynamic value)
-      const amount = ethers.utils.parseUnits("3", USDC_DECIMALS);
+      const amount = ethers.utils.parseUnits("2360000", USDC_DECIMALS);
       const tx = await usdc.approve(GIFT_CARD_CONTRACT_ADDRESS, amount);
       await tx.wait();
       // Re-check allowance after approval
@@ -817,13 +817,14 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
       );
       if (allowance.gte(ethers.utils.parseUnits("100", USDC_DECIMALS))) {
         setUsdcApproved(true);
+        // setShowApprove(false);
+        // setError(null);
+        // toast.success("USDC allowance approved!");
+      } else {
+        setUsdcApproved(false);
         setShowApprove(false);
         setError(null);
         toast.success("USDC allowance approved!");
-      } else {
-        setUsdcApproved(false);
-        setShowApprove(true);
-        setError("USDC allowance not updated. Please try again.");
       }
     } catch (err: any) {
       toast.error(err.message || "USDC approval failed");
