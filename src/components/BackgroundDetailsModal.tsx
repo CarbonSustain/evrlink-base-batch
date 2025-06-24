@@ -725,7 +725,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     <span>Tax Fee:</span>
                     <span>${priceBreakdown.taxFee.toFixed(2)}</span>
                   </Box>
-                  <Box
+                  {/* <Box
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
@@ -734,7 +734,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                   >
                     <span>Climate Fee:</span>
                     <span>${priceBreakdown.climateFee.toFixed(2)}</span>
-                  </Box>
+                  </Box> */}
                   <Box
                     sx={{
                       display: "flex",
