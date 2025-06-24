@@ -759,85 +759,143 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
           </Box>
         );
       case 3:
-        return (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ color: "black" }}>
-                🔗 Copy and send Link
-              </Typography>
-              <Box
-                  sx={{
-                    bgcolor: "rgba(0,0,0,0.05)",
-                    p: 3,
-                    borderRadius: 2,
-                    mb: 3,
-                  }}
-              >
-                <Box 
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 2
-                  }}
-                >
-                  <Typography
-                      variant="body1"
-                      sx={{ color: "rgba(0,0,0,0.87)" }}
-                  >
-                    Share this link with the recipient to let them claim their gift:
-                  </Typography>
-
-                  <Box
+        if(transferType == 'giftcard')
+        {
+          return (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: "black" }}>
+                  🔗 Copy and send Link
+                </Typography>
+                <Box
                     sx={{
-                      display: "flex",
-                      bgcolor: "white",
-                      border: "1px solid rgba(0,0,0,0.1)",
-                      borderRadius: 1,
-                      p: 2,
-                      alignItems: "center",
-                      gap: 2,
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+                      bgcolor: "rgba(0,0,0,0.05)",
+                      p: 3,
+                      borderRadius: 2,
+                      mb: 3,
                     }}
+                >
+                  <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 2
+                      }}
                   >
                     <Typography
-                      variant="body2"
-                      sx={{ 
-                        color: "rgba(0,0,0,0.8)",
-                        flexGrow: 1,
-                        fontFamily: "monospace",
-                        fontSize: "0.9rem",
-                        wordBreak: "break-all"
-                      }}
+                        variant="body1"
+                        sx={{ color: "rgba(0,0,0,0.87)" }}
                     >
-                      https://evrlink.com/l/claim/?id={giftCardIdGenerated}&secret={secretKeyGenerated}
+                      Share this link with the recipient to let them claim their gift:
                     </Typography>
-                    <Button
-                      variant="contained"
-                      onClick={() => {
-                        const url = `https://evrlink.com/l/claim/?id=${giftCardIdGenerated}&secret=${secretKeyGenerated}`;
-                        navigator.clipboard.writeText(url);
-                        toast.success("Gift card link copied to clipboard!");
-                      }}
-                      sx={{
-                        bgcolor: "#60cedc",
-                        color: "black",
-                        minWidth: "auto",
-                        flexShrink: 0,
-                        "&:hover": { bgcolor: "#4cbbc9" },
-                      }}
-                    >
-                      Copy Link
-                    </Button>
-                  </Box>
 
-                  <Alert severity="info" sx={{ mt: 1 }}>
-                    Anyone with this link can claim the gift card. Make sure to share it only with the intended recipient.
-                  </Alert>
+                    <Box
+                        sx={{
+                          display: "flex",
+                          bgcolor: "white",
+                          border: "1px solid rgba(0,0,0,0.1)",
+                          borderRadius: 1,
+                          p: 2,
+                          alignItems: "center",
+                          gap: 2,
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+                        }}
+                    >
+                      <Typography
+                          variant="body2"
+                          sx={{
+                            color: "rgba(0,0,0,0.8)",
+                            flexGrow: 1,
+                            fontFamily: "monospace",
+                            fontSize: "0.9rem",
+                            wordBreak: "break-all"
+                          }}
+                      >
+                        https://evrlink.com/l/claim/?id={giftCardIdGenerated}&secret={secretKeyGenerated}
+                      </Typography>
+                      <Button
+                          variant="contained"
+                          onClick={() => {
+                            const url = `https://evrlink.com/l/claim/?id=${giftCardIdGenerated}&secret=${secretKeyGenerated}`;
+                            navigator.clipboard.writeText(url);
+                            toast.success("Gift card link copied to clipboard!");
+                          }}
+                          sx={{
+                            bgcolor: "#60cedc",
+                            color: "black",
+                            minWidth: "auto",
+                            flexShrink: 0,
+                            "&:hover": { bgcolor: "#4cbbc9" },
+                          }}
+                      >
+                        Copy Link
+                      </Button>
+                    </Box>
+
+                    <Alert severity="info" sx={{ mt: 1 }}>
+                      Anyone with this link can claim the gift card. Make sure to share it only with the intended recipient.
+                    </Alert>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-        );
-
-
+          );
+        }
+        else
+        {
+          return (
+              <Box sx={{ mt: 2 }}>
+                <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      gap: 2,
+                      bgcolor: "rgba(76, 175, 80, 0.1)",
+                      p: 4,
+                      borderRadius: 2,
+                      border: "2px solid #4caf50",
+                    }}
+                >
+                  <Box
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: "50%",
+                        bgcolor: "#4caf50",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontSize: "2rem",
+                        fontWeight: "bold",
+                      }}
+                  >
+                    ✓
+                  </Box>
+                  <Typography
+                      variant="h5"
+                      sx={{
+                        color: "#2e7d32",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
+                  >
+                    Transaction Complete
+                  </Typography>
+                  <Typography
+                      variant="body1"
+                      sx={{
+                        color: "#388e3c",
+                        textAlign: "center",
+                      }}
+                  >
+                    Your gift card has been successfully created!
+                  </Typography>
+                </Box>
+              </Box>
+          );
+        }
+        break;
       default:
         return "Unknown step";
     }
