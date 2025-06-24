@@ -29,6 +29,8 @@ const ClaimGift = () => {
   const handleClaim = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Note: Form inputs are hidden in UI but the validation logic is preserved
+    // as URL parameters are still being used for claiming
     if (!secret.trim()) {
       toast.error("Please enter a secret message");
       return;
@@ -192,7 +194,7 @@ const ClaimGift = () => {
                   Claim Your Gift
                 </h1>
                 <p className="text-lg text-gray-600">
-                  Enter the gift card ID and secret message to claim your gift
+                  Click the button below to claim your gift
                 </p>
               </motion.div>
 
@@ -200,74 +202,44 @@ const ClaimGift = () => {
                 className="bg-white backdrop-blur-xl border border-gray-200 rounded-xl p-6 sm:p-8 space-y-6 shadow-lg"
                 variants={itemVariants}
               >
+                {/* Hidden form fields - keep for logic but don't display */}
                 <form onSubmit={handleClaim} className="space-y-6">
-                  {/* Gift Card ID Field */}
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="giftCardId"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Gift Card ID
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Hash className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <Input
-                        id="giftCardId"
-                        type="text"
-                        placeholder="Enter gift card ID..."
-                        className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
-                        value={giftCardIdInput}
-                        onChange={(e) => setGiftCardIdInput(e.target.value)}
-                        disabled={!!urlGiftCardId}
-                      />
-                    </div>
-                    {urlGiftCardId && (
-                      <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                        Gift card ID provided in URL: {urlGiftCardId}
-                      </p>
-                    )}
-                    {urlSecret && (
-                      <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                        Secret provided in URL
-                      </p>
-                    )}
+                  {/* These input fields are hidden but still functional for the logic */}
+                  <div className="hidden">
+                    <Input
+                      id="giftCardId"
+                      type="text"
+                      value={giftCardIdInput}
+                      onChange={(e) => setGiftCardIdInput(e.target.value)}
+                      disabled={!!urlGiftCardId}
+                    />
+                    <Input
+                      id="secretMessage"
+                      type="text"
+                      value={secretMessage}
+                      onChange={(e) => setSecretMessage(e.target.value)}
+                      disabled={!!urlSecret}
+                    />
                   </div>
 
-                  {/* Secret Message Field */}
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="secretMessage"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Secret Message
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <Input
-                        id="secretMessage"
-                        type="text"
-                        placeholder="Enter secret message..."
-                        className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
-                        value={secretMessage}
-                        onChange={(e) => setSecretMessage(e.target.value)}
-                        disabled={!!urlSecret}
-                      />
+                  {/* URL parameters info (if present) */}
+                  {urlGiftCardId && (
+                    <div className="text-center mb-4">
+                      <p className="text-lg text-gray-600 font-medium">Gift card ready to claim</p>
+                      <p className="text-sm text-gray-500">ID: {urlGiftCardId}</p>
                     </div>
-                  </div>
+                  )}
 
+                  {/* Main claim button */}
                   <Button
                     type="submit"
                     fullWidth
                     loading={loading}
                     variant="secondary"
-                    icon={<ArrowRight className="w-4 h-4" />}
-                    className="!bg-[#00b2c7] hover:!bg-[#00b2c7]/90 text-white font-medium shadow-md"
+                    icon={<Gift className="w-5 h-5" />}
+                    className="!bg-[#00b2c7] hover:!bg-[#00b2c7]/90 text-white font-medium shadow-md py-6 text-lg"
                   >
-                    {loading ? "Claiming..." : "Claim Gift"}
+                    {loading ? "Claiming..." : "Claim Your Gift"}
                   </Button>
                 </form>
               </motion.div>
@@ -280,6 +252,12 @@ const ClaimGift = () => {
               transition={{ duration: 0.5 }}
             >
               <div className="bg-white backdrop-blur-xl border border-gray-200 rounded-xl p-10 space-y-8 shadow-lg">
+                {/* Success message at the top */}
+                <div className="mb-4">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Successfully Claimed!</h2>
+                  <p className="text-gray-600">Click on the card below to see your gift</p>
+                </div>
+
                 <ClaimCard
                   title="Your Gift Card"
                   message="Congratulations! You've successfully claimed your gift."
