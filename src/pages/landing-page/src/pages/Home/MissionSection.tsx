@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../../components/ui/Button';
+import { useNavigate } from 'react-router-dom';
 
 const svg1 = `<svg xmlns="http://www.w3.org/2000/svg" width="157" height="153" viewBox="0 0 157 153" fill="none">
   <g filter="url(#filter0_dd_527_2240)">
@@ -91,12 +92,13 @@ const svg1 = `<svg xmlns="http://www.w3.org/2000/svg" width="157" height="153" v
 </svg>`;
 
 const MissionSection: React.FC = () => {
+  const navigate = useNavigate();
   const handleExploreMeeps = () => {
-    console.log('Explore Meeps clicked');
+    navigate('/dashboard');
   };
 
   const handleLearnHow = () => {
-    console.log('Learn how it Works clicked');
+    navigate('/faqs');
   };
 
   return (

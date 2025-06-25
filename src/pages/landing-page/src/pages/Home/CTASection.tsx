@@ -3,7 +3,7 @@ import Button from '../../components/ui/Button';
 
 const CTASection: React.FC = () => {
   const handleGetSmartWallet = () => {
-    console.log('Get a Smart Wallet clicked');
+    window.open('https://www.coinbase.com/en-in/wallet', '_blank');
   };
 
   const handleLearnBase = () => {
