@@ -4,7 +4,7 @@ const TestimonialSection: React.FC = () => {
   return (
     <section className="flex justify-center px-4 py-16 bg-white">
       <div className="w-[80%] text-center">
-        <h2 className="text-2xl md:text-3xl font-medium mb-10">
+        <h2 className="font-satoshi text-2xl md:text-3xl font-medium mb-10">
           From Us, to You!
         </h2>
 

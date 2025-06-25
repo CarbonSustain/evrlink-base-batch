@@ -134,9 +134,10 @@ export default {
 				'float': 'float 6s infinite ease-in-out'
 			},
 			fontFamily: {
-				sans: ['Inter', 'system-ui', 'sans-serif'],
-				display: ['SF Pro Display', 'Inter', 'system-ui', 'sans-serif']
-			},
+				sans: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
+				display: ['SF Pro Display', 'Inter', 'system-ui', 'sans-serif'],
+				},
+
 			boxShadow: {
 				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
 				'subtle': '0 2px 10px rgba(0, 0, 0, 0.05)',

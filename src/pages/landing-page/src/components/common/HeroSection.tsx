@@ -66,30 +66,42 @@ const HeroSection: React.FC<HeroSectionProps> = ({ className = '' }) => {
         />
       </div>
       
-      <div className="relative max-w-4xl mx-auto text-center">
-        <h1 className="text-5xl font-normal text-slate-800 mb-6 leading-tight" style={{ fontFamily: 'Patrick Hand' }}>
-          Meeps, Greeting Cards with more value
+      <div className="relative max-w-4xl mx-auto text-center ">
+        <h1 className="text-5xl font-light text-slate-800 mb-2 leading-tight " style={{ fontFamily: 'Patrick Hand' }}>
+          Meeps, New Greeting Cards Onchain
         </h1>
+        <h2 className="font-satoshi text-4xl font-normal mb-1  mx-auto leading-relaxed text-pink-500 tracking-normal" style={{ fontFamily: 'Patrick Hand' }}>
+          More meaningful than a message 
+        </h2>
+        <h3 className=" font-satoshi text-4xl  font-normal text-slate-800 mb-6 leading-tight"style={{ fontFamily: 'Patrick Hand' }}  >
+          More lasting than a like 
+        </h3>
         
-        <div className="text-4xl font-medium mb-6 leading-tight">
+        <p className="font-satoshi text-4xl font-medium mb-6 leading-tight">
           <span className="text-cyan-500">Save </span>
-          <span className="text-slate-800">Money. </span>
-          <span className="text-pink-500">Send </span>
-          <span className="text-slate-800">Instantly. </span>
+          <span className="text-slate-800">Time and Money,</span>
+          <span className="text-pink-500"> Access </span>
+          <span className="text-slate-800">Easily, </span>
           <span className="text-blue-600">Seal </span>
-          <span className="text-slate-800">Your Greetings Forever.</span>
-        </div>
+          <span className="text-slate-800">Your Greetings Onchain.</span>
+        </p>
+
+
         
-        <p className="text-xl text-slate-800 mb-12 max-w-lg mx-auto leading-relaxed">
+        <p className="text-xl text-slate-800 mb-8 max-w-lg mx-auto leading-relaxed">
           Keepsakes you and your friends, family - anyone can revisit anytime!
         </p>
         
-<Button
-  onClick={handleCreateCard}
-  className="bg-[#221c5c] text-white px-12 py-4 text-lg rounded-full hover:bg-[#1a1548] shadow-md transition-all duration-300"
->
-  Create a Card
-</Button>
+            <div className="flex justify-center">
+            <Button
+              onClick={handleCreateCard}
+              className="font-satoshi w-[200px] bg-[#251d5b] text-white py-4 text-lg rounded-full hover:bg-[#1c1543] shadow-md transition-all duration-300"
+            >
+              Create a Card
+            </Button>
+          </div>
+
+
 
       </div>
     </section>
