@@ -3,7 +3,7 @@ import Card from '../../components/ui/Card';
 
 const ProcessSection: React.FC = () => {
   const handleLearnMore = () => {
-    console.log('Learn more clicked');
+    window.open('https://www.base.org/', '_blank');
   };
 
   return (

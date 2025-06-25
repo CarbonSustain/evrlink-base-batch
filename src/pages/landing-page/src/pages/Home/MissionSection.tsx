@@ -98,7 +98,10 @@ const MissionSection: React.FC = () => {
   };
 
   const handleLearnHow = () => {
-    navigate('/faqs');
+    const faqSection = document.getElementById('faq-section');
+    if (faqSection) {
+      faqSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
