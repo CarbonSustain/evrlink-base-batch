@@ -7,7 +7,7 @@ const CTASection: React.FC = () => {
   };
 
   const handleLearnBase = () => {
-    console.log('Learn about Base clicked');
+    window.open('https://www.base.org/', '_blank');
   };
 
   return (

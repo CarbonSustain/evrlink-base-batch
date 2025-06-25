@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../ui/Button';
+import { useNavigate } from 'react-router-dom';
 import "@fontsource/nunito"; // Defaults to weight 400
 
 // or import specific weights if needed:
@@ -11,8 +12,9 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ className = '' }) => {
+  const navigate = useNavigate();
   const handleCreateCard = () => {
-    console.log('Create a Card clicked');
+    navigate('/dashboard/');
   };
 
   return (
@@ -79,9 +81,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ className = '' }) => {
         
         <p className="font-satoshi text-4xl font-medium mb-6 leading-tight">
           <span className="text-cyan-500">Save </span>
-          <span className="text-slate-800">Time and Money,</span>
-          <span className="text-pink-500"> Access </span>
-          <span className="text-slate-800">Easily, </span>
           <span className="text-slate-800">Time and Money,</span>
           <span className="text-pink-500"> Access </span>
           <span className="text-slate-800">Easily, </span>
