@@ -8,6 +8,8 @@ const Dashboard = () => {
   const { address, disconnect } = useWallet();
   const [walletAddress, setWalletAddress] = useState('');
   const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   const categoryMap: { [key: string]: string } = {
     "1": "Birthday Cards",
     "2": "Wedding Cards",
@@ -144,6 +146,9 @@ const Dashboard = () => {
   }, []);
 
   console.log("artNfts: ", artNfts);
+  const filteredNfts = selectedCategory
+  ? artNfts.filter((nft) => String(nft.giftCardCategoryId) === selectedCategory)
+  : artNfts;
 
   return (
     <div className="py-4">
@@ -181,16 +186,30 @@ const Dashboard = () => {
           </Link>
         </div>
         <p className="text-gray-600 mb-4 text-sm">See some of our categories, and create a Meep.</p>
+        
 
         <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 mb-8 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 lg:mx-0 px-4 lg:px-0">
-          {(categories).map((category) => (
-            <button
-              key={category}
-              className="px-4 py-2 rounded-full border border-gray-200 hover:border-[#00B2C7] text-gray-600 hover:text-[#00B2C7] whitespace-nowrap text-sm flex-shrink-0"
-            >
-              {categoryMap[category]}
-            </button>
-          ))}
+        <button
+  onClick={() => setSelectedCategory(null)}
+  className={`px-4 py-2 rounded-full border 
+    ${selectedCategory === null ? 'border-[#00B2C7] text-[#00B2C7]' : 'border-gray-200 text-gray-600'} 
+    hover:border-[#00B2C7] hover:text-[#00B2C7] whitespace-nowrap text-sm flex-shrink-0`}
+>
+  Show All
+</button>
+        {Object.keys(categoryMap).map((categoryId) => (
+  <button
+    key={categoryId}
+    onClick={() => setSelectedCategory(categoryId)}
+    className={`px-4 py-2 rounded-full border 
+      ${selectedCategory === categoryId ? 'border-[#00B2C7] text-[#00B2C7]' : 'border-gray-200 text-gray-600'} 
+      hover:border-[#00B2C7] hover:text-[#00B2C7] whitespace-nowrap text-sm flex-shrink-0`}
+  >
+    {categoryMap[categoryId]}
+  </button>
+))}
+
+
         </div>
       </div>
 
@@ -202,7 +221,7 @@ const Dashboard = () => {
           <p className="text-center text-gray-400">No templates available.</p>
         )}
 
-        {artNfts.map((nft) => (
+        {filteredNfts.map((nft) => (
           <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
             <div className="flex items-center gap-3 p-4">
               <div>
@@ -248,7 +267,7 @@ const Dashboard = () => {
           <div className="col-span-3 text-center text-gray-400">No templates available.</div>
         )}
 
-        {artNfts.map((nft) => (
+        {filteredNfts.map((nft) => (
           <div key={nft.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
             <Link to={`/meep/${nft.id}`}>
             <div className="aspect-w-16 aspect-h-9 bg-gray-100 w-full">
@@ -271,9 +290,11 @@ const Dashboard = () => {
                   <span className="material-icons">favorite_border</span>
                   <span>74</span>
                 </button>
+                <Link to={`/l/marketplace`}>
                 <button className="px-4 py-2 bg-[#00B2C7] text-white rounded-lg hover:bg-[#00a1b3] text-sm">
                   Generate Meep
                 </button>
+                </Link>
               </div>
             </div>
           </div>

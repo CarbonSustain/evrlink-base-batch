@@ -31,6 +31,8 @@ import { API_BASE_URL } from "@/services/api";
 const USDC_ADDRESS = import.meta.env.VITE_USDC_TOKEN_ADDRESS; // <-- FILL THIS IN
 const GIFT_CARD_CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS; // Example from your prompt
 const USDC_DECIMALS = 18;
+let secretKeyGenerated = null;
+let giftCardIdGenerated = null;
 
 interface Background {
   id: string;
@@ -51,7 +53,7 @@ interface BackgroundDetailsModalProps {
   background: Background;
 }
 
-const steps = ["Select Option", "Details", "Confirm"];
+const steps = ["Select Option", "Details", "Confirm", "Complete"];
 
 const BackgroundDetailsModal = ({ open, onClose, background }) => {
   const { address: userAddress } = useWallet();
@@ -210,10 +212,10 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
     }
 
     // Always require secret key for gift card option
-    if (transferType === "giftcard" && !secretKey) {
-      setError("Please enter a secret key");
-      return;
-    }
+    // if (transferType === "giftcard" && !secretKey) {
+    //   setError("Please enter a secret key");
+    //   return;
+    // }
 
     setIsLoading(true);
     setError(null);
@@ -274,7 +276,8 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             toast.success("Gift card created and transferred successfully!");
           }
 
-          onClose();
+          // Switch to step 3 instead of closing the modal
+          setActiveStep(3);
         } else {
           // This is a true error case
           throw new Error(
@@ -304,7 +307,8 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
 
         if (transferResult.success) {
           toast.success("Gift card transferred using Base username!");
-          onClose();
+          // Switch to step 3 instead of closing the modal
+          setActiveStep(3);
         } else {
           throw new Error(
             transferResult.error || "Failed to transfer gift card"
@@ -323,24 +327,28 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
           throw new Error(createResult.error || "Failed to create gift card");
         }
 
-        console.log("Gift card created successfully:", createResult.data.id);
-
         // Set the secret key for the gift card
-        console.log("Setting secret key...");
+        secretKeyGenerated = String(Date.now());
+        giftCardIdGenerated = createResult.data.id;
+
+        console.log(`Setting secret key...${secretKey}`);
         const secretResult = await setGiftCardSecret({
-          giftCardId: createResult.data.id,
-          secret: secretKey,
+          giftCardId: giftCardIdGenerated,
+          secret: secretKeyGenerated
         });
+
+        //alert(`URL: http://localhost:8001/l/claim/?id=${giftCardIdGenerated}&secret=${secretKeyGenerated}`);
 
         if (!secretResult.success) {
           throw new Error(secretResult.error || "Failed to set secret key");
         }
 
         console.log("Secret key set successfully");
-        onClose();
+        // Switch to step 3 instead of closing the modal
+        setActiveStep(3);
         toast.success("Gift card created with secret key successfully!");
       }
-    } catch (error: any) {
+    } catch (error: never) {
       console.error("Gift card operation error:", error);
 
       let errorMessage = "An unexpected error occurred";
@@ -411,10 +419,10 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
         return;
       }
       // For gift card with secret key, require the secret
-      if (transferType === "giftcard" && !secretKey) {
-        setError("Please enter a secret key");
-        return;
-      }
+      // if (transferType === "giftcard" && !secretKey) {
+      //   setError("Please enter a secret key");
+      //   return;
+      // }
     }
     if (activeStep === 2) {
       return handleTransferGiftCard();
@@ -444,25 +452,6 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             >
               Choose how you want to transfer this NFT:
             </Typography>
-            {/* <Button
-              variant="contained"
-              fullWidth
-              onClick={() => setTransferType("direct")}
-              sx={{
-                mb: 2,
-                bgcolor: "#60cedc",
-                color: "black",
-                border: "2px solid #00b2c7",
-                "&:hover": { bgcolor: "#4cbbc9" },
-                display: "flex",
-                gap: 2,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              startIcon={<Send size={20} />}
-            >
-              Direct Transfer to Address
-            </Button>
             <Button
               variant="contained"
               fullWidth
@@ -481,8 +470,8 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
               }}
               startIcon={<Lock size={20} />}
             >
-              Create Gift Card with Secret Key
-            </Button> */}
+              Generate Meep
+            </Button>
             <Button
               variant="contained"
               fullWidth
@@ -544,17 +533,17 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             ) : (
               // Gift card UI - requires secret key only
               <>
-                <TextField
-                  fullWidth
-                  label="Secret Key"
-                  value={secretKey}
-                  onChange={(e) => setSecretKey(e.target.value)}
-                  margin="normal"
-                  required
-                  error={!!error && error.includes("secret key")}
-                  helperText="Must be at least 6 characters long"
-                  sx={{ mb: 3 }}
-                />
+                {/*<TextField*/}
+                {/*  fullWidth*/}
+                {/*  label="Secret Key"*/}
+                {/*  value={secretKey}*/}
+                {/*  onChange={(e) => setSecretKey(Date.now())}*/}
+                {/*  margin="normal"*/}
+                {/*  required*/}
+                {/*  error={!!error && error.includes("secret key")}*/}
+                {/*  helperText="Must be at least 6 characters long"*/}
+                {/*  sx={{ mb: 3 }}*/}
+                {/*/>*/}
                 <Typography
                   variant="body2"
                   sx={{ color: "rgba(0,0,0,0.87)", mb: 3 }}
@@ -725,7 +714,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                     <span>Tax Fee:</span>
                     <span>${priceBreakdown.taxFee.toFixed(2)}</span>
                   </Box>
-                  <Box
+                  {/* <Box
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
@@ -734,7 +723,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
                   >
                     <span>Climate Fee:</span>
                     <span>${priceBreakdown.climateFee.toFixed(2)}</span>
-                  </Box>
+                  </Box> */}
                   <Box
                     sx={{
                       display: "flex",
@@ -769,6 +758,144 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             </Box>
           </Box>
         );
+      case 3:
+        if(transferType == 'giftcard')
+        {
+          return (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: "black" }}>
+                  🔗 Copy and send Link
+                </Typography>
+                <Box
+                    sx={{
+                      bgcolor: "rgba(0,0,0,0.05)",
+                      p: 3,
+                      borderRadius: 2,
+                      mb: 3,
+                    }}
+                >
+                  <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 2
+                      }}
+                  >
+                    <Typography
+                        variant="body1"
+                        sx={{ color: "rgba(0,0,0,0.87)" }}
+                    >
+                      Share this link with the recipient to let them claim their gift:
+                    </Typography>
+
+                    <Box
+                        sx={{
+                          display: "flex",
+                          bgcolor: "white",
+                          border: "1px solid rgba(0,0,0,0.1)",
+                          borderRadius: 1,
+                          p: 2,
+                          alignItems: "center",
+                          gap: 2,
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+                        }}
+                    >
+                      <Typography
+                          variant="body2"
+                          sx={{
+                            color: "rgba(0,0,0,0.8)",
+                            flexGrow: 1,
+                            fontFamily: "monospace",
+                            fontSize: "0.9rem",
+                            wordBreak: "break-all"
+                          }}
+                      >
+                        https://evrlink.com/l/claim/?id={giftCardIdGenerated}&secret={secretKeyGenerated}
+                      </Typography>
+                      <Button
+                          variant="contained"
+                          onClick={() => {
+                            const url = `https://evrlink.com/l/claim/?id=${giftCardIdGenerated}&secret=${secretKeyGenerated}`;
+                            navigator.clipboard.writeText(url);
+                            toast.success("Gift card link copied to clipboard!");
+                          }}
+                          sx={{
+                            bgcolor: "#60cedc",
+                            color: "black",
+                            minWidth: "auto",
+                            flexShrink: 0,
+                            "&:hover": { bgcolor: "#4cbbc9" },
+                          }}
+                      >
+                        Copy Link
+                      </Button>
+                    </Box>
+
+                    <Alert severity="info" sx={{ mt: 1 }}>
+                      Anyone with this link can claim the gift card. Make sure to share it only with the intended recipient.
+                    </Alert>
+                  </Box>
+                </Box>
+              </Box>
+          );
+        }
+        else
+        {
+          return (
+              <Box sx={{ mt: 2 }}>
+                <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      gap: 2,
+                      bgcolor: "rgba(76, 175, 80, 0.1)",
+                      p: 4,
+                      borderRadius: 2,
+                      border: "2px solid #4caf50",
+                    }}
+                >
+                  <Box
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: "50%",
+                        bgcolor: "#4caf50",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontSize: "2rem",
+                        fontWeight: "bold",
+                      }}
+                  >
+                    ✓
+                  </Box>
+                  <Typography
+                      variant="h5"
+                      sx={{
+                        color: "#2e7d32",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
+                  >
+                    Transaction Complete
+                  </Typography>
+                  <Typography
+                      variant="body1"
+                      sx={{
+                        color: "#388e3c",
+                        textAlign: "center",
+                      }}
+                  >
+                    Your gift card has been successfully created!
+                  </Typography>
+                </Box>
+              </Box>
+          );
+        }
+        break;
       default:
         return "Unknown step";
     }
@@ -833,7 +960,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
     }
   };
 
-  // Check USDC allowance when payment method is USDC and step is 1
+  // Check USDC allowance when the payment method is USDC and a step is 1
   useEffect(() => {
     const checkAllowance = async () => {
       if (paymentMethod !== "usdc" || activeStep !== 1 || !userAddress) {
@@ -1049,9 +1176,9 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
           }}
           variant="contained"
         >
-          Cancel
+          {activeStep === 3 ? "Done" : "Cancel"}
         </Button>
-        {activeStep > 0 && (
+        {activeStep > 0 && activeStep < 3 && (
           <Button
             onClick={handleBack}
             sx={{
@@ -1067,7 +1194,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
             Back
           </Button>
         )}
-        {activeStep === steps.length - 1 ? (
+        {activeStep === 2 ? (
           <Button
             onClick={handleTransferGiftCard}
             variant="contained"
@@ -1089,7 +1216,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
               "Create Gift Card"
             )}
           </Button>
-        ) : (
+        ) : activeStep < 2 ? (
           <Button
             onClick={() => {
               handleNext();
@@ -1109,7 +1236,7 @@ const BackgroundDetailsModal = ({ open, onClose, background }) => {
           >
             Next
           </Button>
-        )}
+        ) : null}
       </DialogActions>
     </Dialog>
   );

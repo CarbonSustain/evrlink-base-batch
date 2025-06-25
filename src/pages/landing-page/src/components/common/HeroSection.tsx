@@ -82,6 +82,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ className = '' }) => {
           <span className="text-slate-800">Time and Money,</span>
           <span className="text-pink-500"> Access </span>
           <span className="text-slate-800">Easily, </span>
+          <span className="text-slate-800">Time and Money,</span>
+          <span className="text-pink-500"> Access </span>
+          <span className="text-slate-800">Easily, </span>
           <span className="text-blue-600">Seal </span>
           <span className="text-slate-800">Your Greetings Onchain.</span>
         </p>
