@@ -48,7 +48,6 @@ const Navbar = () => {
     { to: '/dashboard', label: 'Home', icon: <Home className="w-5 h-5" /> },
     { to: '/gallery', label: 'My Gallery', icon: <Image className="w-5 h-5" /> },
     { to: '/l/marketplace', label: 'Templates', icon: <LayoutGrid className="w-5 h-5" /> },
-    { to: '/l/claim', label: 'Claim Meep', icon: <Gift className="w-5 h-5" /> },
     { to: '/l/create-background', label: 'Create Background', icon: <ImagePlus className="w-5 h-5" /> },
     { to: '/settings', label: 'Settings', icon: <Settings className="w-5 h-5" /> },
     { to: '/faqs', label: 'FAQs', icon: <QuestionCircle className="w-5 h-5" /> },
